@@ -112,6 +112,9 @@ namespace Charging
                     kwh = item.energy is float v ? v : 0.0F,
                     start_time = DateTime.Parse((string)item.start, culture),
                     end_time = DateTime.Parse((string)item.end, culture),
+                    meter_diff = item.eto_diff,
+                    meter_start = item.eto_start,
+                    meter_end = item.eto_end,
                 };
                 kwh_sum += charge.kwh;
                 charges.Add(charge);

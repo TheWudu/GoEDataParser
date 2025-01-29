@@ -32,11 +32,12 @@ namespace Charging
                 float kwh = float.Parse(currentRow[11], NumberStyles.Any, culture);
                 kwh_sum += kwh;
                 Console.WriteLine(
-                    "{0}, {1}, {2} / {3}",
+                    "{0} - {1}: {2} / {3} -- {4}",
                     currentRow[5],
                     currentRow[6],
                     currentRow[11],
-                    kwh_sum
+                    kwh_sum,
+                    currentRow[14]
                 );
 
                 Charge charge = new Charge();
