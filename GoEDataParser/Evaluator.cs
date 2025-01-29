@@ -8,7 +8,17 @@ namespace Charging
             printGroup(monthly, "month");
         }
 
-        private Dictionary<string, float> groupMonthly(List<Charge> charges)
+        public Dictionary<string, float> groupMonthly(List<Charge> charges)
+        {
+            return groupBy(charges, "yyyy.MM");
+        }
+
+        public Dictionary<string, float> groupYearly(List<Charge> charges)
+        {
+            return groupBy(charges, "yyyy");
+        }
+
+        private Dictionary<string, float> groupBy(List<Charge> charges, string timecode)
         {
             Dictionary<string, float> dict_monthly = [];
 
@@ -16,7 +26,7 @@ namespace Charging
             {
                 // Console.WriteLine("From {0} to {1}: {2} -- {3}", c.start_time.ToString("yy.MM.dd"), c.end_time.ToString("yy.MM.dd"), c.kwh, kwh_sum);
 
-                string key = c.start_time.ToString("yyyy.MM");
+                string key = c.start_time.ToString(timecode);
                 if (dict_monthly.TryGetValue(key, out float kwh))
                 {
                     kwh += c.kwh;

@@ -25,16 +25,31 @@ public class EvaluatorTests
     }
 
     [Test]
-    public void EvaluatorTest()
+    public void testMonthly()
     {
         Evaluator evaluator = new();
-        evaluator.run(charges);
+        Dictionary<string, float> monthly = evaluator.groupMonthly(charges);
 
         Assert.Multiple(() =>
         {
-            Assert.That(charges, Has.Count.EqualTo(259));
-            Assert.That(charges[0].kwh, Is.EqualTo(0.071F));
-            Assert.That(charges[1].kwh, Is.EqualTo(9.874F));
+            Assert.That(monthly, Has.Count.EqualTo(18));
+            Assert.That(monthly.GetValueOrDefault("2024.12"), Is.EqualTo(384.706024F));
+            Assert.That(monthly.GetValueOrDefault("2025.06", 0.0F), Is.EqualTo(0.0F));
+        });
+    }
+
+    [Test]
+    public void testYearly()
+    {
+        Evaluator evaluator = new();
+        Dictionary<string, float> monthly = evaluator.groupYearly(charges);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(monthly, Has.Count.EqualTo(3));
+            Assert.That(monthly.GetValueOrDefault("2022", 0.0F), Is.EqualTo(0.0F));
+            Assert.That(monthly.GetValueOrDefault("2024"), Is.EqualTo(1852.09448F));
+            Assert.That(monthly.GetValueOrDefault("2025", 0.0F), Is.EqualTo(302.902008F));
         });
     }
 }
