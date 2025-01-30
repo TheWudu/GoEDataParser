@@ -1,0 +1,2 @@
+"Session Number";"Session Identifier";"ID Chip";"ID Chip UID";"ID Chip Name";"Start";"Ende";"Dauer gesamt";"Dauer aktiver Stromfluss";"max. Leistung [kW]";"max. Strom [A]";"Energie [kWh]";"Zaehlerstand Differenz [kWh]";"Zaehlerstand Anfang [kWh]";"Zaehlerstand Ende [kWh]";"WLAN-Verbindung"
+2;"212234_1685716486";;"";"";"02.06.2023 16:34:46";"02.06.2023 16:36:00";"00:01:14";"00:00:51";6,23;10,3;0,071;0,071;0,004;0,075;"egal"
