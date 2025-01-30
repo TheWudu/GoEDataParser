@@ -18,6 +18,6 @@ public class GoEDataParser
         parser.parse(filepath);
 
         Charging.Evaluator evaluator = new Charging.Evaluator();
-        evaluator.run(parser.charges);
+        evaluator.run(parser.GetCharges());
     }
 }

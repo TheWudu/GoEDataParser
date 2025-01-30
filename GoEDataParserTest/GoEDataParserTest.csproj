@@ -25,4 +25,11 @@
     <ProjectReference Include="..\GoEDataParser\GoEDataParser.csproj" />
   </ItemGroup>
 
+  <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+    <!-- Command Line (dotnet test) -->
+    <Copy SourceFiles="App.config" DestinationFiles="$(OutDir)\testhost.dll.config" />
+    <!-- Visual Studio Test Explorer -->
+    <!-- <Copy SourceFiles="App.config" DestinationFiles="$(OutDir)\testhost.x86.dll.config" /> -->
+  </Target>
+
 </Project>

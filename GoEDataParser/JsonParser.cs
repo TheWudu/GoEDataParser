@@ -99,7 +99,7 @@ namespace Charging
                 return;
             }
 
-            CultureInfo culture = CultureInfo.CreateSpecificCulture("de-DE");
+            CultureInfo culture = CultureInfo.CreateSpecificCulture(Charging.Configuration.Culture());
             float kwh_sum = 0.0F;
             foreach (Item item in data.data)
             {

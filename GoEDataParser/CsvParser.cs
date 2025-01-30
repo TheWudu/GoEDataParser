@@ -5,14 +5,21 @@ namespace Charging
 {
     public class CsvParser
     {
-        public List<Charge> charges = [];
+        private List<Charge> charges = [];
+        private CultureInfo culture = CultureInfo.CreateSpecificCulture(
+            Charging.Configuration.Culture()
+        );
+
+        public List<Charge> GetCharges()
+        {
+            return charges;
+        }
 
         public void parse(string filepath)
         {
             TextFieldParser tfp = new TextFieldParser(filepath);
             tfp.Delimiters = new string[] { ";" };
 
-            CultureInfo culture = CultureInfo.CreateSpecificCulture("de-DE");
             float kwh_sum = 0.0F;
             while (!tfp.EndOfData)
             {
