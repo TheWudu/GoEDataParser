@@ -5,8 +5,8 @@ namespace Charging
 {
     public class CsvParser
     {
-        private List<Charge> charges = [];
-        private CultureInfo culture = CultureInfo.CreateSpecificCulture(
+        private readonly List<Charge> charges = [];
+        private readonly CultureInfo culture = CultureInfo.CreateSpecificCulture(
             Charging.Configuration.Culture()
         );
 
@@ -15,10 +15,10 @@ namespace Charging
             return charges;
         }
 
-        public void parse(string filepath)
+        public void Parse(string filepath)
         {
-            TextFieldParser tfp = new TextFieldParser(filepath);
-            tfp.Delimiters = new string[] { ";" };
+            TextFieldParser tfp = new (filepath);
+            tfp.Delimiters = [";"];
 
             float kwh_sum = 0.0F;
             while (!tfp.EndOfData)
@@ -38,14 +38,14 @@ namespace Charging
                 DateTime end_time = DateTime.Parse(currentRow[6], culture);
                 float kwh = float.Parse(currentRow[11], NumberStyles.Any, culture);
                 kwh_sum += kwh;
-                Console.WriteLine(
-                    "{0} - {1}: {2} / {3} -- {4}",
-                    currentRow[5],
-                    currentRow[6],
-                    currentRow[11],
-                    kwh_sum,
-                    currentRow[14]
-                );
+                // Console.WriteLine(
+                //     "{0} - {1}: {2} / {3} -- {4}",
+                //     currentRow[5],
+                //     currentRow[6],
+                //     currentRow[11],
+                //     kwh_sum,
+                //     currentRow[14]
+                // );
 
                 Charge charge = new Charge();
                 charge.kwh = kwh;

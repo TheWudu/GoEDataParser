@@ -15,7 +15,7 @@ public class GoEDataParser
 
         string filepath = "/home/martin/github/GoEDataParser/GoEDataParser/tmp.csv";
         Charging.CsvParser parser = new Charging.CsvParser();
-        parser.parse(filepath);
+        parser.Parse(filepath);
 
         Charging.Evaluator evaluator = new Charging.Evaluator();
         evaluator.run(parser.GetCharges());

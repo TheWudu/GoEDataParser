@@ -17,7 +17,7 @@ public class CsvParserTests
     {
         string filepath = appPath + "/../../../fixtures/" + filename;
 
-        parser.parse(filepath);
+        parser.Parse(filepath);
         charges = parser.GetCharges();
     }
 
