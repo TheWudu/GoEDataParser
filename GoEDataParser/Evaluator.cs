@@ -43,8 +43,6 @@ namespace Charging
                 {
                     info.kwhSum += c.kwh;
                     info.count += 1;
-                    dict_monthly.Remove(key);
-                    dict_monthly.Add(key, info);
                 }
                 else
                 {

@@ -46,13 +46,13 @@ namespace GoEDataParserTest
         public void testMonthly()
         {
             Evaluator evaluator = new();
-            Dictionary<string, float> monthly = evaluator.groupMonthly(charges);
+            Dictionary<string, ChargeInfo> monthly = evaluator.groupMonthly(charges);
 
             Assert.Multiple(() =>
             {
                 Assert.That(monthly, Has.Count.EqualTo(18));
-                Assert.That(monthly.GetValueOrDefault("2024.12"), Is.EqualTo(384.706024F));
-                Assert.That(monthly.GetValueOrDefault("2025.06", 0.0F), Is.EqualTo(0.0F));
+                Assert.That(monthly["2024.12"].kwhSum, Is.EqualTo(384.706024F));
+                Assert.That(monthly.ContainsKey("2025.02"), Is.False);
             });
         }
 
@@ -60,14 +60,14 @@ namespace GoEDataParserTest
         public void testYearly()
         {
             Evaluator evaluator = new();
-            Dictionary<string, float> monthly = evaluator.groupYearly(charges);
+            Dictionary<string, ChargeInfo> monthly = evaluator.groupYearly(charges);
 
             Assert.Multiple(() =>
             {
                 Assert.That(monthly, Has.Count.EqualTo(3));
-                Assert.That(monthly.GetValueOrDefault("2022", 0.0F), Is.EqualTo(0.0F));
-                Assert.That(monthly.GetValueOrDefault("2024"), Is.EqualTo(1852.09448F));
-                Assert.That(monthly.GetValueOrDefault("2025", 0.0F), Is.EqualTo(302.902008F));
+                Assert.That(monthly.ContainsKey("2022"), Is.False);
+                Assert.That(monthly["2024"].kwhSum, Is.EqualTo(1852.09448F));
+                Assert.That(monthly["2025"].kwhSum, Is.EqualTo(302.902008F));
             });
         }
     }
