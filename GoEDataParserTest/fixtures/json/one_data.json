@@ -1,0 +1,25 @@
+{
+  "columns": [
+  ],
+  "data": [
+    {
+      "session_number": 260,
+      "session_identifier": "212234_1737978911",
+      "id_chip": "",
+      "id_chip_uid": "",
+      "id_chip_name": "",
+      "start": "27.01.2025 12:55:11",
+      "end": "27.01.2025 16:15:41",
+      "seconds_total": "03:20:30",
+      "seconds_charged": "01:37:39",
+      "max_power": 4.103,
+      "max_current": 8.1,
+      "energy": 6.535,
+      "eto_diff": 6.507,
+      "eto_start": 4359.68,
+      "eto_end": 4366.187,
+      "wifi": "egal",
+      "link": "https://grafana.v3.go-e.io/d/efc231ae-527b-4043-ba68-88203a416b35/charging-log?orgId=1&var-auth=9zl3Q-MX2G17pf1A82hZyl8PMY5j7qNm7BGCTiXDYqSRDWsGfTNOsR7SbR8rz-2ERpRksmcq7JBsJAUQOqx9VC54gV2QB2e0YPfW_9UDSaEojV6rxKiKyntTMG3bHdriP8cq9f0&from=1737978911000&to=1737990941000&kiosk"
+    }
+  ]
+}

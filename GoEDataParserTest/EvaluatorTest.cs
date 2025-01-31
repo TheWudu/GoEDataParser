@@ -28,7 +28,7 @@ namespace GoEDataParserTest
         {
             Console.WriteLine("Setup in EvaluatorTests");
 
-            string json_data = File.ReadAllText(Base.AppDirectory() + "/fixtures/data.json");
+            string json_data = File.ReadAllText(Base.AppDirectory() + "/fixtures/json/data.json");
             string media_type = "application/json";
             string mock_url = "https://data.v3.go-e.io/api/v1/direct_json";
             MockHttpMessageHandler mockHttp = new();

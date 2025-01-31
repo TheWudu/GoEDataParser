@@ -1,0 +1,65 @@
+{
+  "columns": [
+    {
+      "key": "session_number"
+    },
+    {
+      "hide": true,
+      "key": "session_identifier"
+    },
+    {
+      "key": "id_chip"
+    },
+    {
+      "key": "id_chip_uid"
+    },
+    {
+      "key": "id_chip_name"
+    },
+    {
+      "type": "date",
+      "key": "start"
+    },
+    {
+      "type": "date",
+      "key": "end"
+    },
+    {
+      "type": "duration",
+      "key": "seconds_total"
+    },
+    {
+      "type": "duration",
+      "key": "seconds_charged"
+    },
+    {
+      "unit": "kW",
+      "key": "max_power"
+    },
+    {
+      "unit": "A",
+      "key": "max_current"
+    },
+    {
+      "unit": "kWh",
+      "key": "energy"
+    },
+    {
+      "unit": "kWh",
+      "key": "eto_diff"
+    },
+    {
+      "unit": "kWh",
+      "key": "eto_start"
+    },
+    {
+      "unit": "kWh",
+      "key": "eto_end"
+    },
+    {
+      "key": "wifi"
+    }
+  ],
+  "data": [
+  ]
+}

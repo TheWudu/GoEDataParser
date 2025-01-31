@@ -43,12 +43,13 @@ namespace Charging
     {
         public List<Charge> charges = [];
         string base_url = "https://data.v3.go-e.io/api/v1/direct_json";
-        string? token = ""; // fetched from App.config
+        string? token = null; // fetched from App.config
         string timezone = "Europe%2FVienna";
         long from = 1682892000000; // 01.05.2023
         long to = 1767218340000; // 31.12.2025
 
         private HttpClient? client;
+        private CultureInfo culture = CultureInfo.CreateSpecificCulture(Configuration.Culture());
 
         public JsonParser(HttpClient? client)
         {
@@ -56,19 +57,23 @@ namespace Charging
             this.token = Charging.Configuration.Token();
         }
 
-        public void load()
+        public List<Charge> GetCharges()
         {
-            string json_data = fetch_json();
-            JsonData? data = deserialize(json_data);
-            parse_data(data);
+            return charges;
         }
 
-        private string fetch_json()
+        public void load()
+        {
+            string json_data = FetchJson();
+            JsonData? data = Deserialize(json_data);
+            ParseData(data);
+        }
+
+        private string FetchJson()
         {
             if (client is not null)
             {
-                Console.WriteLine("uRL: {0}", Url());
-
+                // Console.WriteLine("uRL: {0}", Url());
                 Task<string> stream = client.GetStringAsync(Url());
                 return stream.Result;
             }
@@ -89,17 +94,16 @@ namespace Charging
                 + to.ToString();
         }
 
-        private JsonData? deserialize(string json_data) =>
+        private JsonData? Deserialize(string json_data) =>
             JsonSerializer.Deserialize<JsonData>(json_data);
 
-        private void parse_data(JsonData? data)
+        private void ParseData(JsonData? data)
         {
             if (data is null || data.data is null)
             {
                 return;
             }
 
-            CultureInfo culture = CultureInfo.CreateSpecificCulture(Charging.Configuration.Culture());
             float kwh_sum = 0.0F;
             foreach (Item item in data.data)
             {

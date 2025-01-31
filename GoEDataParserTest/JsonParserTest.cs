@@ -9,27 +9,23 @@ public class JsonParserTests
 
     private MockHttpMessageHandler mockHttp;
 
+    private List<Charging.Charge> charges = [];
+
     [SetUp]
     public void Setup()
     {
         mockHttp = new();
     }
 
-    // Commented, as it would need a valid token to really
-    // download the data from go-e cloud.
-    // [Test]
-    // public void JsonParserTestRealRequest()
-    // {
-    //     Charging.JsonParser parser = new(new HttpClient());
-    //     parser.load();
+    public void Initialize(string json_data)
+    {
+        _ = mockHttp.When(mock_url).Respond(media_type, json_data);
+        HttpClient client = mockHttp.ToHttpClient();
 
-    //     Assert.Multiple(() =>
-    //     {
-    //         Assert.That(parser.charges[0].kwh, Is.EqualTo(0.071F));
-    //         Assert.That(parser.charges[254].kwh, Is.EqualTo(10.001F));
-    //         Assert.That(parser.charges.Count, Is.GreaterThan(256));
-    //     });
-    // }
+        Charging.JsonParser parser = new(client);
+        parser.load();
+        charges = parser.GetCharges();
+    }
 
     [Test]
     public void JsonParserTestSimple()
@@ -40,35 +36,35 @@ public class JsonParserTests
                 {""start"":""05.06.2023 10:34:00"",""end"":""05.06.2023 12:15:00"",""energy"":10.012}
                 ]}";
 
-        // Setup a respond for the user api (including a wildcard in the URL)
-        _ = mockHttp.When(mock_url).Respond(media_type, json_data);
-        HttpClient client = mockHttp.ToHttpClient();
-
-        Charging.JsonParser parser = new(client);
-        parser.load();
-
-        Assert.That(parser.charges, Has.Count.EqualTo(2));
-        Assert.That(parser.charges[0].kwh, Is.EqualTo(0.071F));
-        Assert.That(parser.charges[1].kwh, Is.EqualTo(10.012F));
-    }
-
-    [Test]
-    public void JsonParserFull()
-    {
-        string json_data = File.ReadAllText("../../../fixtures/data.json");
-
-        // Setup a respond for the user api (including a wildcard in the URL)
-        _ = mockHttp.When(mock_url).Respond(media_type, json_data);
-        HttpClient client = mockHttp.ToHttpClient();
-
-        Charging.JsonParser parser = new(client);
-        parser.load();
+        Initialize(json_data);
 
         Assert.Multiple(() =>
         {
-            Assert.That(parser.charges, Has.Count.EqualTo(259));
-            Assert.That(parser.charges[0].kwh, Is.EqualTo(0.071F));
-            Assert.That(parser.charges[1].kwh, Is.EqualTo(9.874F));
+            Assert.That(charges, Has.Count.EqualTo(2));
+            Assert.That(charges[0].kwh, Is.EqualTo(0.071F));
+            Assert.That(charges[1].kwh, Is.EqualTo(10.012F));
+        });
+    }
+
+    [TestCase("data.json", 259, 0.071F)]
+    [TestCase("one_data.json", 1, 6.535F)]
+    [TestCase("no_data.json", 0, null)]
+    [TestCase("no_columns.json", 0, null)]
+    [TestCase("invalid.json", 0, null)]
+    public void JsonParserFull(string filename, int expectedCount, float? expectedFirstValue)
+    {
+        string filepath = String.Join("/", Base.AppDirectory(), "fixtures/json", filename);
+        string json_data = File.ReadAllText(filepath);
+
+        Initialize(json_data);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(charges, Has.Count.EqualTo(expectedCount));
+            if (expectedFirstValue is not null)
+            {
+                Assert.That(charges[0].kwh, Is.EqualTo(expectedFirstValue));
+            }
         });
     }
 }
