@@ -6,16 +6,16 @@ public class GoEDataParser
     {
         Console.WriteLine("Hello Charger-Data-Parser !");
 
-        // Charging.JsonParser parser = new Charging.JsonParser(new HttpClient());
-        // parser.load();
+        Charging.JsonParser parser = new(new HttpClient());
+        parser.load();
 
         // Charging.CsvDownloader downloader = new Charging.CsvDownloader();
         // downloader.run();
         // string filepath = downloader.filepath;
 
-        string filepath = "/home/martin/github/GoEDataParser/GoEDataParser/tmp.csv";
-        Charging.CsvParser parser = new Charging.CsvParser();
-        parser.Parse(filepath);
+        // string filepath = "/home/martin/github/GoEDataParser/GoEDataParser/tmp.csv";
+        // Charging.CsvParser parser = new Charging.CsvParser();
+        // parser.Parse(filepath);
 
         Charging.Evaluator evaluator = new Charging.Evaluator();
         evaluator.run(parser.GetCharges());
