@@ -23,20 +23,12 @@ namespace GoEDataParserTest
     {
         List<Charge> charges;
 
-        static string __FILE__(
-            [System.Runtime.CompilerServices.CallerFilePath] string fileName = ""
-        )
-        {
-            return fileName;
-        }
-
         [SetUp]
         public void Setup()
         {
-            string? directory = Path.GetDirectoryName(__FILE__());
             Console.WriteLine("Setup in EvaluatorTests");
 
-            string json_data = File.ReadAllText(directory + "/fixtures/data.json");
+            string json_data = File.ReadAllText(Base.AppDirectory() + "/fixtures/data.json");
             string media_type = "application/json";
             string mock_url = "https://data.v3.go-e.io/api/v1/direct_json";
             MockHttpMessageHandler mockHttp = new();

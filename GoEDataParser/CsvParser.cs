@@ -17,19 +17,25 @@ namespace Charging
 
         public void Parse(string filepath)
         {
-            TextFieldParser tfp = new (filepath);
+            if (!File.Exists(filepath))
+            {
+                return;
+            }
+
+            TextFieldParser tfp = new(filepath);
             tfp.Delimiters = [";"];
 
-            float kwh_sum = 0.0F;
             while (!tfp.EndOfData)
             {
                 String[]? currentRow = tfp.ReadFields();
 
-                if (currentRow == null)
+                // return if csv has invalid format or no content
+                if (currentRow == null || currentRow.Length <= 12)
                 {
                     break;
                 }
-                if (currentRow[5] == "Start")
+                // skip head row
+                if (currentRow[0] == "Session Number")
                 {
                     continue;
                 }
@@ -37,20 +43,20 @@ namespace Charging
                 DateTime start_time = DateTime.Parse(currentRow[5], culture);
                 DateTime end_time = DateTime.Parse(currentRow[6], culture);
                 float kwh = float.Parse(currentRow[11], NumberStyles.Any, culture);
-                kwh_sum += kwh;
                 // Console.WriteLine(
-                //     "{0} - {1}: {2} / {3} -- {4}",
+                //     "{0} - {1}: {2} / {3}",
                 //     currentRow[5],
                 //     currentRow[6],
                 //     currentRow[11],
-                //     kwh_sum,
                 //     currentRow[14]
                 // );
 
-                Charge charge = new Charge();
-                charge.kwh = kwh;
-                charge.start_time = start_time;
-                charge.end_time = end_time;
+                Charge charge = new()
+                {
+                    kwh = kwh,
+                    start_time = start_time,
+                    end_time = end_time,
+                };
                 charges.Add(charge);
             }
         }
