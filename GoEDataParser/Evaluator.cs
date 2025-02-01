@@ -4,11 +4,13 @@ namespace Charging
     {
         public float kwhSum = 0.0F;
         public float count = 0;
+        public List<float> kwhValues = [];
 
         public ChargeInfo(float kwhSum, int count)
         {
             this.kwhSum = kwhSum;
             this.count = count;
+            this.kwhValues.Add(kwhSum);
         }
     }
 
@@ -17,7 +19,7 @@ namespace Charging
         public void run(List<Charge> charges)
         {
             Dictionary<string, ChargeInfo> monthly = groupMonthly(charges);
-            printGroup(monthly, "month");
+            PrintGroup(monthly, "month");
         }
 
         public Dictionary<string, ChargeInfo> groupMonthly(List<Charge> charges)
@@ -43,6 +45,7 @@ namespace Charging
                 {
                     info.kwhSum += c.kwh;
                     info.count += 1;
+                    info.kwhValues.Add(c.kwh);
                 }
                 else
                 {
@@ -53,19 +56,23 @@ namespace Charging
             return dict_monthly;
         }
 
-        public void printGroup(Dictionary<string, ChargeInfo> dict, string grouping)
+        public void PrintGroup(Dictionary<string, ChargeInfo> dict, string grouping)
         {
             float kwh_sum = 0.0F;
             Console.WriteLine("\nSums per {0}: ", grouping);
             foreach (KeyValuePair<string, ChargeInfo> kv in dict)
             {
                 kwh_sum += kv.Value.kwhSum;
+                float kwh_avg = kv.Value.kwhValues.Average();
+                float kwh_max = kv.Value.kwhValues.Max();
                 Console.WriteLine(
-                    "{0}: {1:F2}, {2:F2} ({3})",
+                    "{0}: {1,6:F2}, {2:F2} (Count: {3}, Max: {4:F2}, Avg: {5:F2})",
                     kv.Key,
                     kv.Value.kwhSum,
                     kwh_sum,
-                    kv.Value.count
+                    kv.Value.count,
+                    kwh_max,
+                    kwh_avg
                 );
             }
             Console.WriteLine("\n\e[31mOverall sum:\e[37m {0}", kwh_sum);
