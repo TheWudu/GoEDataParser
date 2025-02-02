@@ -113,6 +113,7 @@ namespace Charging
                 }
                 Charge charge = new()
                 {
+                    session_id = item.session_identifier,
                     kwh = item.energy is float v ? v : 0.0F,
                     start_time = DateTime.Parse((string)item.start, culture),
                     end_time = DateTime.Parse((string)item.end, culture),

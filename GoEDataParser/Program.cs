@@ -1,5 +1,6 @@
 ﻿using System.Configuration;
 
+
 public class GoEDataParser
 {
     public static void Main()
@@ -19,5 +20,10 @@ public class GoEDataParser
 
         Charging.Evaluator evaluator = new Charging.Evaluator();
         evaluator.run(parser.GetCharges());
+
+        Charging.MongoStore ms = new();
+        //ms.Insert(parser.GetCharges().First());
+        Charging.Charge c = ms.Find();
+        c.Print();
     }
 }
