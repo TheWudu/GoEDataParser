@@ -1,6 +1,5 @@
 ﻿using System.Configuration;
 
-
 public class GoEDataParser
 {
     public static void Main()
@@ -17,13 +16,20 @@ public class GoEDataParser
         // string filepath = "/home/martin/github/GoEDataParser/GoEDataParser/tmp.csv";
         // Charging.CsvParser parser = new Charging.CsvParser();
         // parser.Parse(filepath);
+        List<Charging.Charge> charges = parser.GetCharges();
 
         Charging.Evaluator evaluator = new Charging.Evaluator();
-        evaluator.run(parser.GetCharges());
+        evaluator.run(charges);
 
         Charging.MongoStore ms = new();
-        //ms.Insert(parser.GetCharges().First());
-        Charging.Charge c = ms.Find();
+        foreach (Charging.Charge charge in charges)
+        {
+            if (ms.Find(charge.session_id) is null)
+            {
+                ms.Insert(charge);
+            }
+        }
+        Charging.Charge c = ms.First();
         c.Print();
     }
 }
