@@ -48,16 +48,6 @@ namespace Charging
                 return document;
             }
 
-            public Charge First()
-            {
-                var collection = client.GetDatabase(dbName).GetCollection<Charge>("charges");
-                //var filter = Builders<BsonDocument>.Filter.Eq("title", "Back to the Future");
-                var filter = Builders<Charge>.Filter.Empty;
-                var document = collection.Find(filter).First();
-
-                return document;
-            }
-
             public void Clear()
             {
                 client.GetDatabase(dbName).DropCollection("charges");

@@ -29,7 +29,5 @@ public class GoEDataParser
                 store.Insert(charge);
             }
         }
-        Charging.Charge c = store.First();
-        c.Print();
     }
 }

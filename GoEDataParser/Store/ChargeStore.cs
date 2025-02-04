@@ -16,11 +16,6 @@ namespace Charging
                 return store.FindBySessionId(session_id);
             }
 
-            public Charge First()
-            {
-                return store.First();
-            }
-
             public Charge Insert(Charge charge)
             {
                 return store.Insert(charge);

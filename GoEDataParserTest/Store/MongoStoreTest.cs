@@ -53,5 +53,4 @@ public class MongoStoreTest
             Assert.That(store.FindBySessionId(searchId), Is.Null);
         }
     }
-    // First
 }
