@@ -30,27 +30,43 @@ public class MongoStoreTest
         Assert.That(store.Count(), Is.EqualTo(1));
     }
 
-    [TestCase("212234_1685716486", "212234_1685716486", true)]
-    [TestCase("212234_1685716486", "non-existing-id", false)]
-    public void FindBySessionId(string sessionId, string searchId, bool findIt)
+    Charging.Charge CreateCharge(int day)
     {
         Charging.Charge charge = new()
         {
-            session_id = sessionId,
+            session_id = "sessionId_1234_" + day.ToString(),
             kwh = 10.123F,
-            start_time = new DateTime(2025, 01, 01, 09, 01, 02, DateTimeKind.Utc),
-            end_time = new DateTime(2025, 01, 01, 11, 05, 47, DateTimeKind.Utc),
+            start_time = new DateTime(2025, 01, day, 09, 01, 02, DateTimeKind.Utc),
+            end_time = new DateTime(2025, 01, day, 11, 05, 47, DateTimeKind.Utc),
         };
 
         store.Insert(charge);
 
-        if (findIt)
+        return charge;
+    }
+
+    [Test]
+    public void FindBySessionIdSuccess()
+    {
+        Charging.Charge charge = CreateCharge(10);
+
+        Assert.That(store.FindBySessionId("sessionId_1234_10"), Is.EqualTo(charge));
+    }
+
+    [Test]
+    public void FindBySessionIdNotFound()
+    {
+        Assert.That(store.FindBySessionId("not-existing-id"), Is.Null);
+    }
+
+    [TestCase(1)]
+    [TestCase(5)]
+    public void Count(int amount)
+    {
+        for (int i = 0; i < amount; i++)
         {
-            Assert.That(store.FindBySessionId(searchId), Is.EqualTo(charge));
+            CreateCharge(i+1);
         }
-        else
-        {
-            Assert.That(store.FindBySessionId(searchId), Is.Null);
-        }
+        Assert.That(store.Count(), Is.EqualTo(amount));
     }
 }
