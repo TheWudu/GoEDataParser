@@ -7,29 +7,26 @@ namespace Charging
     {
         public class MongoStore : IChargeStore
         {
-            private MongoClient client;
-            private string dbName;
-
-            // private IMongoCollection<Charge> collection = null;
+            private readonly MongoClient client;
+            private readonly string dbHost = Configuration.MongoDbHost();
+            private readonly string dbName = Configuration.MongoDbName();
+            private readonly string collectionName = "charges";
+            private readonly IMongoCollection<Charge> collection;
 
             public MongoStore()
             {
-                string? connectionString = "mongodb://localhost/?retryWrites=true&w=majority";
-
+                string? connectionString = "mongodb://" + dbHost + "/?retryWrites=true&w=majority";
                 client = new MongoClient(connectionString);
-                dbName = Configuration.MongoDbName();
+                collection = client.GetDatabase(dbName).GetCollection<Charge>(collectionName);
             }
 
             public long Count()
             {
-                var collection = client.GetDatabase(dbName).GetCollection<Charge>("charges");
-
                 return collection.CountDocuments(Builders<Charge>.Filter.Empty);
             }
 
             public Charge Insert(Charge charge)
             {
-                var collection = client.GetDatabase(dbName).GetCollection<Charge>("charges");
                 if (charge._id is null)
                 {
                     charge._id = Guid.NewGuid().ToString();
@@ -39,18 +36,30 @@ namespace Charging
                 return charge;
             }
 
-            public Charge? FindBySessionId(string session_id)
+            public Charge? FindBySessionId(string sessionId)
             {
-                var collection = client.GetDatabase(dbName).GetCollection<Charge>("charges");
-                var filter = Builders<Charge>.Filter.Eq("session_id", session_id);
+                var filter = Builders<Charge>.Filter.Eq("session_id", sessionId);
                 var document = collection.Find(filter).FirstOrDefault();
 
                 return document;
             }
 
+            public List<Charge> FindByStartDate(DateTime dateTime)
+            {
+                var start = dateTime.Date;
+                var end = start.AddDays(1);
+                var filter =
+                    Builders<Charge>.Filter.Gte("start_time", start)
+                    & Builders<Charge>.Filter.Lt("start_time", end);
+
+                var documents = collection.Find(filter);
+
+                return documents.ToList<Charge>();
+            }
+
             public void Clear()
             {
-                client.GetDatabase(dbName).DropCollection("charges");
+                collection.DeleteMany(Builders<Charge>.Filter.Empty);
             }
         }
     }

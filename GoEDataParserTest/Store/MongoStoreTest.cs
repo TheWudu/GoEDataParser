@@ -1,4 +1,5 @@
 using System.Globalization;
+using Charging;
 
 namespace GoEDataParserTest;
 
@@ -59,13 +60,27 @@ public class MongoStoreTest
         Assert.That(store.FindBySessionId("not-existing-id"), Is.Null);
     }
 
+    [Test]
+    public void FindByStartDate()
+    {
+        CreateCharge(10);
+        Charge charge = CreateCharge(22);
+
+        List<Charge> charges = store.FindByStartDate(charge.start_time);
+        Assert.Multiple(() =>
+        {
+            Assert.That(charges.Count(), Is.EqualTo(1));
+            Assert.That(charges.First(), Is.EqualTo(charge));
+        });
+    }
+
     [TestCase(1)]
     [TestCase(5)]
     public void Count(int amount)
     {
         for (int i = 0; i < amount; i++)
         {
-            CreateCharge(i+1);
+            _ = CreateCharge(i + 1);
         }
         Assert.That(store.Count(), Is.EqualTo(amount));
     }

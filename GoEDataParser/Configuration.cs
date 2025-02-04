@@ -30,5 +30,16 @@ namespace Charging
 
             return name;
         }
+
+        public static string MongoDbHost()
+        {
+            string? name = ConfigurationManager.AppSettings.Get("MongoDbHost");
+            if (name is null)
+            {
+                return "localhost";
+            }
+
+            return name;
+        }
     }
 }
