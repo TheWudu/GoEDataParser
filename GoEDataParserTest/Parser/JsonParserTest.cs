@@ -53,7 +53,7 @@ public class JsonParserTests
     [TestCase("invalid.json", 0, null)]
     public void JsonParserFull(string filename, int expectedCount, float? expectedFirstValue)
     {
-        string filepath = String.Join("/", Base.AppDirectory(), "fixtures/json", filename);
+        string filepath = String.Join("/", Base.AppDirectory(), "../fixtures/json", filename);
         string json_data = File.ReadAllText(filepath);
 
         Initialize(json_data);

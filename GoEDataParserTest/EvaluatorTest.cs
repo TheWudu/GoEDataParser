@@ -31,24 +31,28 @@ namespace GoEDataParserTest
             {
                 new Charge()
                 {
+                    session_id = "s1",
                     start_time = DateTime.Parse("2024-11-20T05:08:00Z"),
                     end_time = DateTime.Parse("2024-11-20T11:08:00Z"),
                     kwh = 60.00F,
                 },
                 new Charge()
                 {
+                    session_id = "s2",
                     start_time = DateTime.Parse("2024-12-01T08:08:00Z"),
                     end_time = DateTime.Parse("2024-12-01T10:08:00Z"),
                     kwh = 8.00F,
                 },
                 new Charge()
                 {
+                    session_id = "s3",
                     start_time = DateTime.Parse("2024-12-24T12:08:00Z"),
                     end_time = DateTime.Parse("2024-12-24T15:08:00Z"),
                     kwh = 33.00F,
                 },
                 new Charge()
                 {
+                    session_id = "s4",
                     start_time = DateTime.Parse("2025-01-01T08:08:00Z"),
                     end_time = DateTime.Parse("2025-01-01T10:08:00Z"),
                     kwh = 12.00F,

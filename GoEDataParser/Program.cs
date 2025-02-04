@@ -21,15 +21,15 @@ public class GoEDataParser
         Charging.Evaluator evaluator = new Charging.Evaluator();
         evaluator.run(charges);
 
-        Charging.MongoStore ms = new();
+        Charging.Store.ChargeStore store = new();
         foreach (Charging.Charge charge in charges)
         {
-            if (ms.Find(charge.session_id) is null)
+            if (charge.session_id is not null && store.FindBySessionId(charge.session_id) is null)
             {
-                ms.Insert(charge);
+                store.Insert(charge);
             }
         }
-        Charging.Charge c = ms.First();
+        Charging.Charge c = store.First();
         c.Print();
     }
 }

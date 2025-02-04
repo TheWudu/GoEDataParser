@@ -5,7 +5,7 @@ public class CsvParserTests
     string appPath = Base.AppDirectory();
 
     List<Charging.Charge> charges = [];
-    Charging.CsvParser parser;
+    Charging.Parser.CsvParser parser;
 
     [SetUp]
     public void Setup()
@@ -15,7 +15,7 @@ public class CsvParserTests
 
     public void Initialize(string filename)
     {
-        string filepath = String.Join("/", appPath, "fixtures/csv", filename);
+        string filepath = String.Join("/", appPath, "../fixtures/csv", filename);
 
         parser.Parse(filepath);
         charges = parser.GetCharges();

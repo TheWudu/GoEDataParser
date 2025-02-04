@@ -111,9 +111,12 @@ namespace Charging
                 {
                     continue;
                 }
+                string session_id = item.session_identifier is not null
+                    ? item.session_identifier
+                    : Guid.NewGuid().ToString();
                 Charge charge = new()
                 {
-                    session_id = item.session_identifier,
+                    session_id = session_id,
                     kwh = item.energy is float v ? v : 0.0F,
                     start_time = DateTime.Parse((string)item.start, culture),
                     end_time = DateTime.Parse((string)item.end, culture),

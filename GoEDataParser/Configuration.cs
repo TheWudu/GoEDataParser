@@ -19,5 +19,16 @@ namespace Charging
 
             return culture;
         }
+
+        public static string MongoDbName()
+        {
+            string? name = ConfigurationManager.AppSettings.Get("MongoDbName");
+            if (name is null)
+            {
+                return "goe_default";
+            }
+
+            return name;
+        }
     }
 }
