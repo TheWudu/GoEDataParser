@@ -25,6 +25,11 @@ namespace Charging
             {
                 return store.Count();
             }
+
+            public List<Charge> ReadAll()
+            {
+                return store.ReadAll();
+            }
         };
     }
 }

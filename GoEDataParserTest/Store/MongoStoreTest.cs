@@ -63,13 +63,14 @@ public class MongoStoreTest
     [Test]
     public void FindByStartDate()
     {
-        CreateCharge(10);
+        _ = CreateCharge(10);
         Charge charge = CreateCharge(22);
+        _ = CreateCharge(23);
 
         List<Charge> charges = store.FindByStartDate(charge.start_time);
         Assert.Multiple(() =>
         {
-            Assert.That(charges.Count(), Is.EqualTo(1));
+            Assert.That(charges, Has.Count.EqualTo(1));
             Assert.That(charges.First(), Is.EqualTo(charge));
         });
     }
@@ -83,5 +84,29 @@ public class MongoStoreTest
             _ = CreateCharge(i + 1);
         }
         Assert.That(store.Count(), Is.EqualTo(amount));
+    }
+
+    [TestCase(1)]
+    [TestCase(2)]
+    [TestCase(29)]
+    public void ReadAll(int amount)
+    {
+        List<Charging.Charge> insertedCharges = new();
+
+        for (int i = 0; i < amount; i++)
+        {
+            insertedCharges.Add(CreateCharge(i + 1));
+        }
+        List<Charging.Charge> charges = store.ReadAll();
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(charges, Has.Count.EqualTo(amount));
+            Assert.That(charges.ElementAt(0), Is.EqualTo(insertedCharges.ElementAt(0)));
+            Assert.That(
+                charges.ElementAt(amount - 1),
+                Is.EqualTo(insertedCharges.ElementAt(amount - 1))
+            );
+        });
     }
 }

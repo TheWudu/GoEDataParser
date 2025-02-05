@@ -61,6 +61,11 @@ namespace Charging
             {
                 collection.DeleteMany(Builders<Charge>.Filter.Empty);
             }
+
+            public List<Charge> ReadAll()
+            {
+                return collection.Find(Builders<Charge>.Filter.Empty).ToList();
+            }
         }
     }
 }
