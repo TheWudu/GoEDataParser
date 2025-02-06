@@ -37,6 +37,14 @@ namespace Charging
                 return entity;
             }
 
+            public T Update(T entity)
+            {
+                var filter = Builders<T>.Filter.Eq("_id", entity.Id);
+                collection.ReplaceOne(filter, entity);
+
+                return entity;
+            }
+
             public T? FindBy<V>(string key, V value)
             {
                 var filter = Builders<T>.Filter.Eq(key, value);
@@ -52,6 +60,11 @@ namespace Charging
             public List<T> ReadAll()
             {
                 return collection.Find(Builders<T>.Filter.Empty).ToList();
+            }
+
+            public T? Find(string id)
+            {
+                return FindBy("_id", id);
             }
         }
     }

@@ -31,10 +31,11 @@ public class MongoStoreTest
         Assert.That(store.Count(), Is.EqualTo(1));
     }
 
-    Charging.Charge CreateCharge(int day)
+    Charging.Charge CreateCharge(int day, string? id = null)
     {
         Charging.Charge charge = new()
         {
+            Id = id is not null ? id : Guid.NewGuid().ToString(),
             session_id = "sessionId_1234_" + day.ToString(),
             kwh = 10.123F,
             start_time = new DateTime(2025, 01, day, 09, 01, 02, DateTimeKind.Utc),
@@ -108,5 +109,19 @@ public class MongoStoreTest
                 Is.EqualTo(insertedCharges.ElementAt(amount - 1))
             );
         });
+    }
+
+    [Test]
+    public void UpdateExisting()
+    {
+        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+        Charging.Charge charge = CreateCharge(14, id);
+
+        charge.kwh += 10.0F;
+        store.Update(charge);
+
+        Charging.Charge? updatedCharge = store.Find(id);
+        Assert.That(charge, Is.Not.Null);
+        Assert.That(updatedCharge, Is.EqualTo(charge));
     }
 }

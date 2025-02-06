@@ -17,6 +17,16 @@ namespace Charging
                 return store.Insert(entity);
             }
 
+            public T Update(T entity)
+            {
+                return store.Update(entity);
+            }
+
+            public T? Find(string id)
+            {
+                return store.Find(id);
+            }
+
             public T? FindBy<V>(string key, V value)
             {
                 return store.FindBy(key, value);
