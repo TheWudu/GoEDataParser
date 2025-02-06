@@ -124,4 +124,19 @@ public class MongoStoreTest
         Assert.That(charge, Is.Not.Null);
         Assert.That(updatedCharge, Is.EqualTo(charge));
     }
+
+    [Test]
+    public void UpdateTheCorrectOne()
+    {
+        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+        Charging.Charge charge = CreateCharge(14, id);
+        string unchangedId = "8da64b25-5522-4ded-8c0f-ffcdd4331840";
+        Charging.Charge unchanged = CreateCharge(15, unchangedId);
+
+        charge.kwh += 10.0F;
+        store.Update(charge);
+
+        Assert.That(store.Find(id), Is.EqualTo(charge));
+        Assert.That(store.Find(unchangedId), Is.EqualTo(unchanged));
+    }
 }
