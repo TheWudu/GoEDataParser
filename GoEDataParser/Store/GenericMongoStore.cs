@@ -5,6 +5,8 @@ namespace Charging
 {
     namespace Store
     {
+        public class EntityNotFoundException(string? message) : Exception(message) { }
+
         public class GenericMongoStore<T> : IGenericStore<T>
             where T : BaseEntity
         {
@@ -28,10 +30,9 @@ namespace Charging
 
             public T Insert(T entity)
             {
-                if (entity.Id is null)
-                {
-                    entity.Id = Guid.NewGuid().ToString();
-                }
+                entity.Id ??= Guid.NewGuid().ToString();
+                entity.Version = 1;
+
                 collection.InsertOne(entity);
 
                 return entity;
@@ -39,8 +40,22 @@ namespace Charging
 
             public T Update(T entity)
             {
-                var filter = Builders<T>.Filter.Eq("_id", entity.Id);
-                collection.ReplaceOne(filter, entity);
+                var filter =
+                    Builders<T>.Filter.Eq("_id", entity.Id)
+                    & Builders<T>.Filter.Eq("Version", entity.Version);
+
+                entity.Version += 1;
+                var resp = collection.ReplaceOne(filter, entity);
+                if (resp.ModifiedCount != 1)
+                {
+                    string message =
+                        "Entity with Id: "
+                        + entity.Id
+                        + " and Version: "
+                        + entity.Version
+                        + " not found";
+                    throw new EntityNotFoundException(message);
+                }
 
                 return entity;
             }

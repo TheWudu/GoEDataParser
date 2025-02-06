@@ -1,5 +1,6 @@
 using System.Globalization;
 using Charging;
+using Charging.Store;
 
 namespace GoEDataParserTest;
 
@@ -118,7 +119,7 @@ public class MongoStoreTest
         Charging.Charge charge = CreateCharge(14, id);
 
         charge.kwh += 10.0F;
-        store.Update(charge);
+        charge = store.Update(charge);
 
         Charging.Charge? updatedCharge = store.Find(id);
         Assert.That(charge, Is.Not.Null);
@@ -134,9 +135,26 @@ public class MongoStoreTest
         Charging.Charge unchanged = CreateCharge(15, unchangedId);
 
         charge.kwh += 10.0F;
-        store.Update(charge);
+        charge = store.Update(charge);
 
         Assert.That(store.Find(id), Is.EqualTo(charge));
         Assert.That(store.Find(unchangedId), Is.EqualTo(unchanged));
+    }
+
+    [Test]
+    public void UpdateOnlyWithProperVersion()
+    {
+        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+        Charging.Charge charge = CreateCharge(14, id);
+
+        charge.kwh += 10.0F;
+        charge.Version = 5;
+
+        Assert.Throws<EntityNotFoundException>(
+            delegate
+            {
+                _ = store.Update(charge);
+            }
+        );
     }
 }

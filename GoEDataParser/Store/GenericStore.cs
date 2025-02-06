@@ -12,6 +12,11 @@ namespace Charging
                 store = new GenericMongoStore<T>();
             }
 
+            public GenericStore(IGenericStore<T> genericStore)
+            {
+                store = genericStore;
+            }
+
             public T Insert(T entity)
             {
                 return store.Insert(entity);

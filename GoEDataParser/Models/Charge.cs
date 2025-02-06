@@ -35,6 +35,7 @@ namespace Charging
 
             if (
                 this.Id != other.Id
+                || this.Version != this.Version
                 || this.kwh != other.kwh
                 || this.session_id != other.session_id
                 || !this.start_time.Equals(other.start_time)
@@ -52,6 +53,7 @@ namespace Charging
 
             return magicPrime
                 * (Id is null ? 1 : Id.GetHashCode())
+                * Version.GetHashCode()
                 * session_id.GetHashCode()
                 * kwh.GetHashCode()
                 * start_time.GetHashCode()

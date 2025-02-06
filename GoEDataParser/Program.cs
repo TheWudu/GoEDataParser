@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using Charging.Store;
 
 public class GoEDataParser
 {
@@ -9,7 +10,6 @@ public class GoEDataParser
         downloader.run();
         string filepath = downloader.filepath;
 
-        // string filepath = "/home/martin/github/GoEDataParser/GoEDataParser/tmp.csv";
         Charging.Parser.CsvParser csvParser = new Charging.Parser.CsvParser();
         csvParser.Parse(filepath);
 
@@ -30,8 +30,8 @@ public class GoEDataParser
     {
         int storedCount = 0;
 
-        // Charging.Store.ChargeStore store = new();
-        Charging.Store.ChargeMongoStore store = new();
+        Charging.Store.ChargeMongoStore chargeStore = new();
+        GenericStore<Charging.Charge> store = new(chargeStore);
         foreach (Charging.Charge charge in charges)
         {
             if (
@@ -55,10 +55,11 @@ public class GoEDataParser
 
         List<Charging.Charge> charges = useJson();
 
-        Charging.Evaluator evaluator = new Charging.Evaluator();
-        evaluator.run(charges);
-
         int storedCount = storeCharges(charges);
         Console.WriteLine("Stored {0} charges in db", storedCount);
+
+        Console.WriteLine("Evaluate charges...\n");
+        Charging.Evaluator evaluator = new Charging.Evaluator();
+        evaluator.run(charges);
     }
 }
