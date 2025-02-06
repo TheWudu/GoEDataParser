@@ -1,0 +1,36 @@
+namespace Charging
+{
+    namespace Store
+    {
+        class GenericStore<T> : IGenericStore<T>
+            where T : BaseEntity
+        {
+            private readonly IGenericStore<T> store;
+
+            public GenericStore()
+            {
+                store = new GenericMongoStore<T>();
+            }
+
+            public T Insert(T entity)
+            {
+                return store.Insert(entity);
+            }
+
+            public T? FindBy<V>(string key, V value)
+            {
+                return store.FindBy(key, value);
+            }
+
+            public long Count()
+            {
+                return store.Count();
+            }
+
+            public List<T> ReadAll()
+            {
+                return store.ReadAll();
+            }
+        };
+    }
+}

@@ -5,7 +5,7 @@ namespace GoEDataParserTest;
 
 public class MongoStoreTest
 {
-    Charging.Store.MongoStore store;
+    Charging.Store.ChargeMongoStore store;
 
     [SetUp]
     public void Setup()
@@ -47,17 +47,17 @@ public class MongoStoreTest
     }
 
     [Test]
-    public void FindBySessionIdSuccess()
+    public void FindBySuccess()
     {
         Charging.Charge charge = CreateCharge(10);
 
-        Assert.That(store.FindBySessionId("sessionId_1234_10"), Is.EqualTo(charge));
+        Assert.That(store.FindBy("session_id", "sessionId_1234_10"), Is.EqualTo(charge));
     }
 
     [Test]
-    public void FindBySessionIdNotFound()
+    public void FindByNotFound()
     {
-        Assert.That(store.FindBySessionId("not-existing-id"), Is.Null);
+        Assert.That(store.FindBy("session_id", "not-existing-id"), Is.Null);
     }
 
     [Test]

@@ -30,10 +30,16 @@ public class GoEDataParser
     {
         int storedCount = 0;
 
-        Charging.Store.ChargeStore store = new();
+        // Charging.Store.ChargeStore store = new();
+        Charging.Store.ChargeMongoStore store = new();
         foreach (Charging.Charge charge in charges)
         {
-            if (charge.session_id is not null && store.FindBySessionId(charge.session_id) is null)
+            if (
+                !(
+                    charge.session_id is null
+                    || store.FindBy("session_id", charge.session_id) is not null
+                )
+            )
             {
                 store.Insert(charge);
                 storedCount++;

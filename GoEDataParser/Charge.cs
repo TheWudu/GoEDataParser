@@ -2,9 +2,8 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Charging
 {
-    public class Charge
+    public class Charge : Store.BaseEntity
     {
-        public string? _id = null;
         public required string session_id;
         public required float kwh;
 
@@ -35,7 +34,7 @@ namespace Charging
             }
 
             if (
-                this._id != other._id
+                this.Id != other.Id
                 || this.kwh != other.kwh
                 || this.session_id != other.session_id
                 || !this.start_time.Equals(other.start_time)
@@ -52,7 +51,7 @@ namespace Charging
             int magicPrime = 23;
 
             return magicPrime
-                * (_id is null ? 1 : _id.GetHashCode())
+                * (Id is null ? 1 : Id.GetHashCode())
                 * session_id.GetHashCode()
                 * kwh.GetHashCode()
                 * start_time.GetHashCode()
