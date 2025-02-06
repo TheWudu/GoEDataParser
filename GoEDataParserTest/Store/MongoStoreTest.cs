@@ -157,4 +157,21 @@ public class MongoStoreTest
             }
         );
     }
+
+    [Test]
+    public void DeleteExisting()
+    {
+        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+        Charging.Charge charge = CreateCharge(14, id);
+
+        Assert.That(store.Delete(id), Is.True);
+    }
+
+    [Test]
+    public void DeleteNonExisting()
+    {
+        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+
+        Assert.That(store.Delete(id), Is.False);
+    }
 }

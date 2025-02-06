@@ -46,6 +46,11 @@ namespace Charging
             {
                 return store.ReadAll();
             }
+
+            public bool Delete(string id)
+            {
+                return store.Delete(id);
+            }
         };
     }
 }

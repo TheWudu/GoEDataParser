@@ -81,6 +81,14 @@ namespace Charging
             {
                 return FindBy("_id", id);
             }
+
+            public bool Delete(string id)
+            {
+                var filter = Builders<T>.Filter.Eq(e => e.Id, id);
+                var res = collection.DeleteOne(filter);
+
+                return res.DeletedCount == 1;
+            }
         }
     }
 }

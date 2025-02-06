@@ -9,6 +9,7 @@ namespace Charging
         {
             public T Insert(T entity);
             public T Update(T entity);
+            public bool Delete(string id);
             public T? Find(string id);
             public T? FindBy<V>(string key, V value);
             public List<T> ReadAll();
