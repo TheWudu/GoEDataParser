@@ -2,7 +2,7 @@ using System.Configuration;
 
 namespace Charging
 {
-    class Configuration
+    public class Configuration
     {
         public static string? Token()
         {

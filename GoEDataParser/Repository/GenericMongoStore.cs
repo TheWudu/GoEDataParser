@@ -9,12 +9,10 @@ namespace Repository
         where T : BaseEntity
     {
         private readonly MongoClient client;
-        private readonly string dbHost = Charging.Configuration.MongoDbHost();
-        private readonly string dbName = Charging.Configuration.MongoDbName();
         private readonly string collectionName = "charges";
         protected readonly IMongoCollection<T> collection;
 
-        public GenericMongoStore()
+        public GenericMongoStore(string dbHost, string dbName)
         {
             string? connectionString = "mongodb://" + dbHost + "/?retryWrites=true&w=majority";
             client = new MongoClient(connectionString);

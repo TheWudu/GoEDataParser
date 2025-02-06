@@ -38,8 +38,8 @@ namespace Charging
                 || this.Version != this.Version
                 || this.kwh != other.kwh
                 || this.session_id != other.session_id
-                || !this.start_time.Equals(other.start_time)
-                || !this.end_time.Equals(other.end_time)
+                || this.start_time.ToUniversalTime() != other.start_time.ToUniversalTime()
+                || this.end_time.ToUniversalTime() != other.end_time.ToUniversalTime()
             )
             {
                 return false;

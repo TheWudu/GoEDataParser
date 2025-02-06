@@ -10,7 +10,9 @@ public class MongoStoreTest
     [SetUp]
     public void Setup()
     {
-        store = new();
+        string dbHost = Charging.Configuration.MongoDbHost();
+        string dbName = Charging.Configuration.MongoDbName();
+        store = new(dbHost, dbName);
         store.Clear();
     }
 

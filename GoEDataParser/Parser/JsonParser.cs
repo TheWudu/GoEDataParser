@@ -94,8 +94,10 @@ namespace Charging
                 + to.ToString();
         }
 
-        private JsonData? Deserialize(string json_data) =>
-            JsonSerializer.Deserialize<JsonData>(json_data);
+        private JsonData? Deserialize(string json_data)
+        {
+            return JsonSerializer.Deserialize<JsonData>(json_data);
+        }
 
         private void ParseData(JsonData? data)
         {
@@ -118,8 +120,8 @@ namespace Charging
                 {
                     session_id = session_id,
                     kwh = item.energy is float v ? v : 0.0F,
-                    start_time = DateTime.Parse((string)item.start, culture),
-                    end_time = DateTime.Parse((string)item.end, culture),
+                    start_time = DateTime.Parse((string)item.start, culture, DateTimeStyles.AssumeLocal),
+                    end_time = DateTime.Parse((string)item.end, culture, DateTimeStyles.AssumeLocal),
                     meter_diff = item.eto_diff,
                     meter_start = item.eto_start,
                     meter_end = item.eto_end,
