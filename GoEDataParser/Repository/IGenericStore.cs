@@ -1,5 +1,3 @@
-using MongoDB.Bson.Serialization.Attributes;
-
 namespace Repository
 {
     public interface IGenericStore<T>
