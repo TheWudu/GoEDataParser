@@ -1,12 +1,11 @@
 using System.Globalization;
 using Charging;
-using Charging.Store;
 
 namespace GoEDataParserTest;
 
 public class MongoStoreTest
 {
-    Charging.Store.ChargeMongoStore store;
+    Charging.ChargeMongoStore store;
 
     [SetUp]
     public void Setup()
@@ -150,7 +149,7 @@ public class MongoStoreTest
         charge.kwh += 10.0F;
         charge.Version = 5;
 
-        Assert.Throws<EntityNotFoundException>(
+        Assert.Throws<Repository.EntityNotFoundException>(
             delegate
             {
                 _ = store.Update(charge);

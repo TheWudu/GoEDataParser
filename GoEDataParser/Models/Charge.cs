@@ -2,7 +2,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Charging
 {
-    public class Charge : Store.BaseEntity
+    public class Charge : Repository.BaseEntity
     {
         public required string session_id;
         public required float kwh;

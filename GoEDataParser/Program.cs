@@ -1,9 +1,8 @@
 ﻿using System.Configuration;
-using Charging.Store;
 
 public class GoEDataParser
 {
-    List<Charging.Charge> useCsv()
+    public static List<Charging.Charge> useCsv()
     {
         Console.WriteLine("Using CSV downloader and parser");
         Charging.CsvDownloader downloader = new Charging.CsvDownloader();
@@ -30,8 +29,8 @@ public class GoEDataParser
     {
         int storedCount = 0;
 
-        Charging.Store.ChargeMongoStore chargeStore = new();
-        GenericStore<Charging.Charge> store = new(chargeStore);
+        Charging.ChargeMongoStore chargeStore = new();
+        Repository.GenericStore<Charging.Charge> store = new(chargeStore);
         foreach (Charging.Charge charge in charges)
         {
             if (
@@ -49,14 +48,38 @@ public class GoEDataParser
         return storedCount;
     }
 
-    public static void Main()
+    public static List<Charging.Charge> useDatabase()
+    {
+        Charging.ChargeMongoStore chargeStore = new();
+        Repository.GenericStore<Charging.Charge> store = new(chargeStore);
+
+        return store.ReadAll();
+    }
+
+    public static void Main(string[] args)
     {
         Console.WriteLine("Hello Charger-Data-Parser !");
 
-        List<Charging.Charge> charges = useJson();
+        List<Charging.Charge> charges = [];
 
-        int storedCount = storeCharges(charges);
-        Console.WriteLine("Stored {0} charges in db", storedCount);
+        if (args.Contains("-csv"))
+        {
+            charges = useCsv();
+        }
+        else if (args.Contains("-json"))
+        {
+            charges = useJson();
+        }
+        else
+        {
+            charges = useDatabase();
+        }
+
+        if (!args.Contains("-nostore"))
+        {
+            int storedCount = storeCharges(charges);
+            Console.WriteLine("Stored {0} charges in db", storedCount);
+        }
 
         Console.WriteLine("Evaluate charges...\n");
         Charging.Evaluator evaluator = new Charging.Evaluator();
