@@ -1,4 +1,5 @@
 ﻿using RichardSzalay.MockHttp;
+using Xunit;
 
 namespace GoEDataParserTest;
 
@@ -11,13 +12,12 @@ public class JsonParserTests
 
     private List<Charging.Charge> charges = [];
 
-    [SetUp]
-    public void Setup()
+    public JsonParserTests()
     {
         mockHttp = new();
     }
 
-    public void Initialize(string json_data)
+    internal void Initialize(string json_data)
     {
         _ = mockHttp.When(mock_url).Respond(media_type, json_data);
         HttpClient client = mockHttp.ToHttpClient();
@@ -27,7 +27,7 @@ public class JsonParserTests
         charges = parser.GetCharges();
     }
 
-    [Test]
+    [Fact]
     public void JsonParserTestSimple()
     {
         string json_data =
@@ -40,17 +40,18 @@ public class JsonParserTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(charges, Has.Count.EqualTo(2));
-            Assert.That(charges[0].kwh, Is.EqualTo(0.071F));
-            Assert.That(charges[1].kwh, Is.EqualTo(10.012F));
+            Assert.Equal(2, charges.Count);
+            Assert.Equal(0.071F, charges[0].kwh);
+            Assert.Equal(10.012F, charges[1].kwh);
         });
     }
 
-    [TestCase("data.json", 259, 0.071F)]
-    [TestCase("one_data.json", 1, 6.535F)]
-    [TestCase("no_data.json", 0, null)]
-    [TestCase("no_columns.json", 0, null)]
-    [TestCase("invalid.json", 0, null)]
+    [Theory]
+    [InlineData("data.json", 259, 0.071F)]
+    [InlineData("one_data.json", 1, 6.535F)]
+    [InlineData("no_data.json", 0, null)]
+    [InlineData("no_columns.json", 0, null)]
+    [InlineData("invalid.json", 0, null)]
     public void JsonParserFull(string filename, int expectedCount, float? expectedFirstValue)
     {
         string filepath = String.Join("/", Base.AppDirectory(), "../fixtures/json", filename);
@@ -60,10 +61,10 @@ public class JsonParserTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(charges, Has.Count.EqualTo(expectedCount));
+            Assert.Equal(charges.Count, expectedCount);
             if (expectedFirstValue is not null)
             {
-                Assert.That(charges[0].kwh, Is.EqualTo(expectedFirstValue));
+                Assert.Equal(charges[0].kwh, expectedFirstValue);
             }
         });
     }

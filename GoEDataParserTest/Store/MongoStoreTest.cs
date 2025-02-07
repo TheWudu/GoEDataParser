@@ -1,5 +1,6 @@
 using System.Globalization;
 using Charging;
+using Xunit;
 
 namespace GoEDataParserTest;
 
@@ -7,8 +8,7 @@ public class MongoStoreTest
 {
     Charging.ChargeMongoStore store;
 
-    [SetUp]
-    public void Setup()
+    public MongoStoreTest()
     {
         string dbHost = Charging.Configuration.MongoDbHost();
         string dbName = Charging.Configuration.MongoDbName();
@@ -17,7 +17,7 @@ public class MongoStoreTest
     }
 
     // Insert
-    [Test]
+    [Fact]
     public void InsertSimple()
     {
         Charging.Charge charge = new()
@@ -30,7 +30,7 @@ public class MongoStoreTest
 
         store.Insert(charge);
 
-        Assert.That(store.Count(), Is.EqualTo(1));
+        Assert.Equal(1, store.Count());
     }
 
     Charging.Charge CreateCharge(int day, string? id = null)
@@ -49,21 +49,21 @@ public class MongoStoreTest
         return charge;
     }
 
-    [Test]
+    [Fact]
     public void FindBySuccess()
     {
         Charging.Charge charge = CreateCharge(10);
 
-        Assert.That(store.FindBy("session_id", "sessionId_1234_10"), Is.EqualTo(charge));
+        Assert.Equal(store.FindBy("session_id", "sessionId_1234_10"), charge);
     }
 
-    [Test]
+    [Fact]
     public void FindByNotFound()
     {
-        Assert.That(store.FindBy("session_id", "not-existing-id"), Is.Null);
+        Assert.Null(store.FindBy("session_id", "not-existing-id"));
     }
 
-    [Test]
+    [Fact]
     public void FindByStartDate()
     {
         _ = CreateCharge(10);
@@ -73,25 +73,27 @@ public class MongoStoreTest
         List<Charge> charges = store.FindByStartDate(charge.start_time);
         Assert.Multiple(() =>
         {
-            Assert.That(charges, Has.Count.EqualTo(1));
-            Assert.That(charges.First(), Is.EqualTo(charge));
+            Assert.Single(charges);
+            Assert.Equal(charges.First(), charge);
         });
     }
 
-    [TestCase(1)]
-    [TestCase(5)]
+    [Theory]
+    [InlineData(1)]
+    [InlineData(5)]
     public void Count(int amount)
     {
         for (int i = 0; i < amount; i++)
         {
             _ = CreateCharge(i + 1);
         }
-        Assert.That(store.Count(), Is.EqualTo(amount));
+        Assert.Equal(store.Count(), amount);
     }
 
-    [TestCase(1)]
-    [TestCase(2)]
-    [TestCase(29)]
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(29)]
     public void ReadAll(int amount)
     {
         List<Charging.Charge> insertedCharges = new();
@@ -104,16 +106,13 @@ public class MongoStoreTest
 
         Assert.Multiple(() =>
         {
-            Assert.That(charges, Has.Count.EqualTo(amount));
-            Assert.That(charges.ElementAt(0), Is.EqualTo(insertedCharges.ElementAt(0)));
-            Assert.That(
-                charges.ElementAt(amount - 1),
-                Is.EqualTo(insertedCharges.ElementAt(amount - 1))
-            );
+            Assert.Equal(charges.Count, amount);
+            Assert.Equal(charges.ElementAt(0), insertedCharges.ElementAt(0));
+            Assert.Equal(charges.ElementAt(amount - 1), insertedCharges.ElementAt(amount - 1));
         });
     }
 
-    [Test]
+    [Fact]
     public void UpdateExisting()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
@@ -123,11 +122,11 @@ public class MongoStoreTest
         charge = store.Update(charge);
 
         Charging.Charge? updatedCharge = store.Find(id);
-        Assert.That(charge, Is.Not.Null);
-        Assert.That(updatedCharge, Is.EqualTo(charge));
+        Assert.NotNull(charge);
+        Assert.Equal(updatedCharge, charge);
     }
 
-    [Test]
+    [Fact]
     public void UpdateTheCorrectOne()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
@@ -138,11 +137,11 @@ public class MongoStoreTest
         charge.kwh += 10.0F;
         charge = store.Update(charge);
 
-        Assert.That(store.Find(id), Is.EqualTo(charge));
-        Assert.That(store.Find(unchangedId), Is.EqualTo(unchanged));
+        Assert.Equal(store.Find(id), charge);
+        Assert.Equal(store.Find(unchangedId), unchanged);
     }
 
-    [Test]
+    [Fact]
     public void UpdateOnlyWithProperVersion()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
@@ -159,20 +158,20 @@ public class MongoStoreTest
         );
     }
 
-    [Test]
+    [Fact]
     public void DeleteExisting()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
         Charging.Charge charge = CreateCharge(14, id);
 
-        Assert.That(store.Delete(id), Is.True);
+        Assert.True(store.Delete(id));
     }
 
-    [Test]
+    [Fact]
     public void DeleteNonExisting()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
 
-        Assert.That(store.Delete(id), Is.False);
+        Assert.False(store.Delete(id));
     }
 }

@@ -1,29 +1,13 @@
 ﻿using Charging;
+using Xunit;
 
 namespace GoEDataParserTest
 {
-    [SetUpFixture]
-    public class MySetupClass
-    {
-        [OneTimeSetUp]
-        public void RunBeforeAnyTest()
-        {
-            TestContext.Progress.WriteLine("RunBeforeAnyTest");
-        }
-
-        [OneTimeTearDown]
-        public void RunAfterAnyTest()
-        {
-            TestContext.Progress.WriteLine("RunAfterAnyTest");
-        }
-    }
-
     public class EvaluatorTests
     {
         List<Charge> charges;
 
-        [SetUp]
-        public void Setup()
+        public EvaluatorTests()
         {
             Console.WriteLine("Setup in EvaluatorTests");
 
@@ -60,7 +44,7 @@ namespace GoEDataParserTest
             };
         }
 
-        [Test]
+        [Fact]
         public void testMonthly()
         {
             Evaluator evaluator = new();
@@ -68,13 +52,13 @@ namespace GoEDataParserTest
 
             Assert.Multiple(() =>
             {
-                Assert.That(monthly, Has.Count.EqualTo(3));
-                Assert.That(monthly["2024.12"].kwhSum, Is.EqualTo(41.00F));
-                Assert.That(monthly.ContainsKey("2025.02"), Is.False);
+                Assert.Equal(3, monthly.Count);
+                Assert.Equal(41.00F, monthly["2024.12"].kwhSum);
+                Assert.False(monthly.ContainsKey("2025.02"));
             });
         }
 
-        [Test]
+        [Fact]
         public void testYearly()
         {
             Evaluator evaluator = new();
@@ -82,10 +66,10 @@ namespace GoEDataParserTest
 
             Assert.Multiple(() =>
             {
-                Assert.That(monthly, Has.Count.EqualTo(2));
-                Assert.That(monthly.ContainsKey("2022"), Is.False);
-                Assert.That(monthly["2024"].kwhSum, Is.EqualTo(101.00F));
-                Assert.That(monthly["2025"].kwhSum, Is.EqualTo(12.0F));
+                Assert.Equal(2, monthly.Count);
+                Assert.False(monthly.ContainsKey("2022"));
+                Assert.Equal(101.00F, monthly["2024"].kwhSum);
+                Assert.Equal(12.0F, monthly["2025"].kwhSum);
             });
         }
     }

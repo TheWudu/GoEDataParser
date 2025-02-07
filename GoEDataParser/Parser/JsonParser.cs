@@ -120,8 +120,16 @@ namespace Charging
                 {
                     session_id = session_id,
                     kwh = item.energy is float v ? v : 0.0F,
-                    start_time = DateTime.Parse((string)item.start, culture, DateTimeStyles.AssumeLocal),
-                    end_time = DateTime.Parse((string)item.end, culture, DateTimeStyles.AssumeLocal),
+                    start_time = DateTime.Parse(
+                        (string)item.start,
+                        culture,
+                        DateTimeStyles.AssumeLocal
+                    ),
+                    end_time = DateTime.Parse(
+                        (string)item.end,
+                        culture,
+                        DateTimeStyles.AssumeLocal
+                    ),
                     meter_diff = item.eto_diff,
                     meter_start = item.eto_start,
                     meter_end = item.eto_end,
