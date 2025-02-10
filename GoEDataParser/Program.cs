@@ -52,7 +52,7 @@ public class GoEDataParser
                 charge.Version = storedCharge.Version;
                 if (!charge.Equals(storedCharge))
                 {
-                    store.Update(storedCharge);
+                    store.Update(charge);
                     updatedCount++;
                 }
             }
@@ -79,7 +79,7 @@ public class GoEDataParser
         Console.WriteLine("Hello Charger-Data-Parser !");
 
         List<Charging.Charge> charges = [];
-        // args = args.Append("-json").ToArray();
+        //args = args.Append("-csv").ToArray();
 
         if (args.Contains("-csv"))
         {

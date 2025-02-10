@@ -3,7 +3,7 @@ using MongoDB.Driver;
 namespace Charging
 {
     public class ChargeMongoStore(string dbHost, string dbName)
-        : Repository.GenericMongoStore<Charge>(dbHost, dbName)
+        : Repository.GenericMongoStore<Charge>(dbHost, dbName, "charges")
     {
         public List<Charge> FindByStartDate(DateTime dateTime)
         {

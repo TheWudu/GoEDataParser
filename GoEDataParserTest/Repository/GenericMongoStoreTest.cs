@@ -39,7 +39,7 @@ public class GenericMongoStoreTest
     {
         string dbHost = Charging.Configuration.MongoDbHost();
         string dbName = Charging.Configuration.MongoDbName();
-        store = new(dbHost, dbName);
+        store = new(dbHost, dbName, "test_entities");
         store.Clear();
     }
 

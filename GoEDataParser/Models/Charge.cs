@@ -16,9 +16,18 @@ namespace Charging
         public float? meter_end;
         public float? meter_diff;
 
+        public long seconds_charged;
+
         public void Print()
         {
-            Console.WriteLine("{0}: {1} - {2} => {3}", session_id, start_time, end_time, kwh);
+            Console.WriteLine(
+                "{0}: {1} - {2} ({4})=> {3}",
+                session_id,
+                start_time,
+                end_time,
+                kwh,
+                seconds_charged
+            );
         }
 
         public override bool Equals(object? obj)
@@ -40,6 +49,7 @@ namespace Charging
                 || this.session_id != other.session_id
                 || this.start_time.ToUniversalTime() != other.start_time.ToUniversalTime()
                 || this.end_time.ToUniversalTime() != other.end_time.ToUniversalTime()
+                || this.seconds_charged != other.seconds_charged
             )
             {
                 return false;
@@ -57,7 +67,8 @@ namespace Charging
                 * session_id.GetHashCode()
                 * kwh.GetHashCode()
                 * start_time.GetHashCode()
-                * end_time.GetHashCode();
+                * end_time.GetHashCode()
+                * seconds_charged.GetHashCode();
         }
     }
 }

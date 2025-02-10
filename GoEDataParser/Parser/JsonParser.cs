@@ -133,6 +133,9 @@ namespace Charging
                     meter_diff = item.eto_diff,
                     meter_start = item.eto_start,
                     meter_end = item.eto_end,
+                    seconds_charged = item.seconds_charged is not null
+                        ? (long)TimeOnly.Parse(item.seconds_charged).ToTimeSpan().TotalSeconds
+                        : 0,
                 };
                 kwh_sum += charge.kwh;
                 charges.Add(charge);

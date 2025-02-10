@@ -5,9 +5,9 @@ namespace Repository
     {
         private readonly IGenericStore<T> store;
 
-        public GenericStore(string dbHost, string dbName)
+        public GenericStore(string dbHost, string dbName, string dbCollection)
         {
-            store = new GenericMongoStore<T>(dbHost, dbName);
+            store = new GenericMongoStore<T>(dbHost, dbName, dbCollection);
         }
 
         public GenericStore(IGenericStore<T> genericStore)

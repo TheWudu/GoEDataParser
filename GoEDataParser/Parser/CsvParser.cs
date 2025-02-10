@@ -46,6 +46,8 @@ namespace Charging
                     DateTime start_time = DateTime.Parse(currentRow[5], culture);
                     DateTime end_time = DateTime.Parse(currentRow[6], culture);
                     float kwh = float.Parse(currentRow[11], NumberStyles.Any, culture);
+                    long seconds_charged = (long)
+                        TimeOnly.Parse(currentRow[8]).ToTimeSpan().TotalSeconds;
                     // Console.WriteLine(
                     //     "{0} - {1}: {2} / {3}",
                     //     currentRow[5],
@@ -60,6 +62,7 @@ namespace Charging
                         kwh = kwh,
                         start_time = start_time,
                         end_time = end_time,
+                        seconds_charged = seconds_charged,
                     };
                     charges.Add(charge);
                 }
