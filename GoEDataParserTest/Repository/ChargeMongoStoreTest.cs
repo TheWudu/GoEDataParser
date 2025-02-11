@@ -22,10 +22,10 @@ public class MongoStoreTest
     {
         Charging.Charge charge = new()
         {
-            session_id = "212234_1685716486",
-            kwh = 10.123F,
-            start_time = DateTime.Parse("2025-01-01T09:01:02Z"),
-            end_time = DateTime.Parse("2025-01-01T11:05:47Z"),
+            SessionId = "212234_1685716486",
+            Kwh = 10.123F,
+            StartTime = DateTime.Parse("2025-01-01T09:01:02Z"),
+            EndTime = DateTime.Parse("2025-01-01T11:05:47Z"),
         };
 
         store.Insert(charge);
@@ -38,10 +38,10 @@ public class MongoStoreTest
         Charging.Charge charge = new()
         {
             Id = id is not null ? id : Guid.NewGuid().ToString(),
-            session_id = "sessionId_1234_" + day.ToString(),
-            kwh = 10.123F,
-            start_time = new DateTime(2025, 01, day, 09, 01, 02, DateTimeKind.Utc),
-            end_time = new DateTime(2025, 01, day, 11, 05, 47, DateTimeKind.Utc),
+            SessionId = "sessionId_1234_" + day.ToString(),
+            Kwh = 10.123F,
+            StartTime = new DateTime(2025, 01, day, 09, 01, 02, DateTimeKind.Utc),
+            EndTime = new DateTime(2025, 01, day, 11, 05, 47, DateTimeKind.Utc),
         };
 
         store.Insert(charge);
@@ -54,13 +54,13 @@ public class MongoStoreTest
     {
         Charging.Charge charge = CreateCharge(10);
 
-        Assert.Equal(store.FindBy("session_id", "sessionId_1234_10"), charge);
+        Assert.Equal(store.FindBy("SessionId", "sessionId_1234_10"), charge);
     }
 
     [Fact]
     public void FindByNotFound()
     {
-        Assert.Null(store.FindBy("session_id", "not-existing-id"));
+        Assert.Null(store.FindBy("SessionId", "not-existing-id"));
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class MongoStoreTest
         Charge charge = CreateCharge(22);
         _ = CreateCharge(23);
 
-        List<Charge> charges = store.FindByStartDate(charge.start_time);
+        List<Charge> charges = store.FindByStartDate(charge.StartTime);
         Assert.Multiple(() =>
         {
             Assert.Single(charges);
@@ -118,7 +118,7 @@ public class MongoStoreTest
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
         Charging.Charge charge = CreateCharge(14, id);
 
-        charge.kwh += 10.0F;
+        charge.Kwh += 10.0F;
         charge = store.Update(charge);
 
         Charging.Charge? updatedCharge = store.Find(id);
@@ -134,7 +134,7 @@ public class MongoStoreTest
         string unchangedId = "8da64b25-5522-4ded-8c0f-ffcdd4331840";
         Charging.Charge unchanged = CreateCharge(15, unchangedId);
 
-        charge.kwh += 10.0F;
+        charge.Kwh += 10.0F;
         charge = store.Update(charge);
 
         Assert.Equal(store.Find(id), charge);
@@ -147,7 +147,7 @@ public class MongoStoreTest
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
         Charging.Charge charge = CreateCharge(14, id);
 
-        charge.kwh += 10.0F;
+        charge.Kwh += 10.0F;
         charge.Version = 5;
 
         Assert.Throws<Repository.EntityNotFoundException>(

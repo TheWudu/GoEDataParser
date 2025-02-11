@@ -2,17 +2,17 @@ namespace Charging
 {
     public class ChargeInfo
     {
-        public float kwhSum = 0.0F;
-        public float count = 0;
-        public long timeSum = 0;
-        public List<float> kwhValues = [];
+        public float KwhSum = 0.0F;
+        public float Count = 0;
+        public long TimeSum = 0;
+        public List<float> KwhValues = [];
 
         public ChargeInfo(float kwhSum, int count, long timeSum)
         {
-            this.kwhSum = kwhSum;
-            this.count = count;
-            this.timeSum = timeSum;
-            this.kwhValues.Add(kwhSum);
+            this.KwhSum = kwhSum;
+            this.Count = count;
+            this.TimeSum = timeSum;
+            this.KwhValues.Add(KwhSum);
         }
     }
 
@@ -40,19 +40,19 @@ namespace Charging
 
             foreach (Charge c in charges)
             {
-                // Console.WriteLine("From {0} to {1}: {2} -- {3}", c.start_time.ToString("yy.MM.dd"), c.end_time.ToString("yy.MM.dd"), c.kwh, kwh_sum);
+                // Console.WriteLine("From {0} to {1}: {2} -- {3}", c.StartTime.ToString("yy.MM.dd"), c.EndTime.ToString("yy.MM.dd"), c.Kwh, Kwh_sum);
 
-                string key = c.start_time.ToString(timecode);
+                string key = c.StartTime.ToString(timecode);
                 if (dict_monthly.TryGetValue(key, out ChargeInfo? info))
                 {
-                    info.kwhSum += c.kwh;
-                    info.count += 1;
-                    info.kwhValues.Add(c.kwh);
-                    info.timeSum += c.seconds_charged;
+                    info.KwhSum += c.Kwh;
+                    info.Count += 1;
+                    info.KwhValues.Add(c.Kwh);
+                    info.TimeSum += c.SecondsCharged;
                 }
                 else
                 {
-                    dict_monthly.Add(key, new ChargeInfo(c.kwh, 1, c.seconds_charged));
+                    dict_monthly.Add(key, new ChargeInfo(c.Kwh, 1, c.SecondsCharged));
                 }
             }
 
@@ -61,43 +61,43 @@ namespace Charging
 
         public void PrintGroup(Dictionary<string, ChargeInfo> dict, string grouping)
         {
-            float kwh_sum = 0.0F;
-            long time_sum = 0;
+            float kwhSum = 0.0F;
+            long timeSum = 0;
             Console.WriteLine("\nSums per {0}: ", grouping);
             foreach (KeyValuePair<string, ChargeInfo> kv in dict)
             {
-                kwh_sum += kv.Value.kwhSum;
-                time_sum += kv.Value.timeSum;
-                float kwh_avg = kv.Value.kwhValues.Average();
-                float kwh_max = kv.Value.kwhValues.Max();
+                kwhSum += kv.Value.KwhSum;
+                timeSum += kv.Value.TimeSum;
+                float kwhAvg = kv.Value.KwhValues.Average();
+                float kwhMax = kv.Value.KwhValues.Max();
                 Console.WriteLine(
                     "{0}: {1,6:F2}, {2,7:F2} (Count: {3,2}, Max: {4:F2}, Avg: {5,5:F2}, TimeSum: {6})",
                     kv.Key,
-                    kv.Value.kwhSum,
-                    kwh_sum,
-                    kv.Value.count,
-                    kwh_max,
-                    kwh_avg,
-                    TimeSpan.FromSeconds(kv.Value.timeSum).ToString()
+                    kv.Value.KwhSum,
+                    kwhSum,
+                    kv.Value.Count,
+                    kwhMax,
+                    kwhAvg,
+                    TimeSpan.FromSeconds(kv.Value.TimeSum).ToString()
                 );
             }
             Console.WriteLine(
                 "\n\e[31mOverall sum:\e[37m {0} in {1}",
-                kwh_sum,
-                TimeSpan.FromSeconds(time_sum).ToString()
+                kwhSum,
+                TimeSpan.FromSeconds(timeSum).ToString()
             );
         }
 
         public void evaluate_meter_values(Charge prev, Charge curr)
         {
-            if (prev.meter_end + 1.0F < curr.meter_start)
+            if (prev.MeterEnd + 1.0F < curr.MeterStart)
             {
                 Console.WriteLine(
                     "{0} {1} -> {2} {3}",
-                    prev.end_time,
-                    prev.meter_end,
-                    curr.meter_start,
-                    curr.start_time
+                    prev.EndTime,
+                    prev.MeterEnd,
+                    curr.MeterStart,
+                    curr.StartTime
                 );
             }
         }

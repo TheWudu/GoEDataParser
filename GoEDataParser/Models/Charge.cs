@@ -4,29 +4,29 @@ namespace Charging
 {
     public class Charge : Repository.BaseEntity
     {
-        public required string session_id;
-        public required float kwh;
+        public required string SessionId;
+        public required float Kwh;
 
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-        public required DateTime start_time;
+        public required DateTime StartTime;
 
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-        public required DateTime end_time;
-        public float? meter_start;
-        public float? meter_end;
-        public float? meter_diff;
+        public required DateTime EndTime;
+        public float? MeterStart;
+        public float? MeterEnd;
+        public float? MeterDiff;
 
-        public long seconds_charged;
+        public long SecondsCharged;
 
         public void Print()
         {
             Console.WriteLine(
                 "{0}: {1} - {2} ({4})=> {3}",
-                session_id,
-                start_time,
-                end_time,
-                kwh,
-                seconds_charged
+                SessionId,
+                StartTime,
+                EndTime,
+                Kwh,
+                SecondsCharged
             );
         }
 
@@ -45,11 +45,11 @@ namespace Charging
             if (
                 this.Id != other.Id
                 || this.Version != this.Version
-                || this.kwh != other.kwh
-                || this.session_id != other.session_id
-                || this.start_time.ToUniversalTime() != other.start_time.ToUniversalTime()
-                || this.end_time.ToUniversalTime() != other.end_time.ToUniversalTime()
-                || this.seconds_charged != other.seconds_charged
+                || this.Kwh != other.Kwh
+                || this.SessionId != other.SessionId
+                || this.StartTime.ToUniversalTime() != other.StartTime.ToUniversalTime()
+                || this.EndTime.ToUniversalTime() != other.EndTime.ToUniversalTime()
+                || this.SecondsCharged != other.SecondsCharged
             )
             {
                 return false;
@@ -64,11 +64,11 @@ namespace Charging
             return magicPrime
                 * (Id is null ? 1 : Id.GetHashCode())
                 * Version.GetHashCode()
-                * session_id.GetHashCode()
-                * kwh.GetHashCode()
-                * start_time.GetHashCode()
-                * end_time.GetHashCode()
-                * seconds_charged.GetHashCode();
+                * SessionId.GetHashCode()
+                * Kwh.GetHashCode()
+                * StartTime.GetHashCode()
+                * EndTime.GetHashCode()
+                * SecondsCharged.GetHashCode();
         }
     }
 }

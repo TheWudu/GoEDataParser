@@ -35,7 +35,7 @@ public class CsvParserTests
         Initialize(filename);
 
         Assert.Equal(charges.Count, expectedCount);
-        Assert.Equal(charges.Sum(item => item.kwh), expectedSum);
+        Assert.Equal(charges.Sum(item => item.Kwh), expectedSum);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public class CsvParserTests
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(0.071F, charges[0].kwh);
-            Assert.Equal(10.001F, charges[254].kwh);
+            Assert.Equal(0.071F, charges[0].Kwh);
+            Assert.Equal(10.001F, charges[254].Kwh);
             Assert.Equal(256, charges.Count);
         });
     }

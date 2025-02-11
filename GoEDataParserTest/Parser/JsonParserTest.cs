@@ -41,8 +41,8 @@ public class JsonParserTests
         Assert.Multiple(() =>
         {
             Assert.Equal(2, charges.Count);
-            Assert.Equal(0.071F, charges[0].kwh);
-            Assert.Equal(10.012F, charges[1].kwh);
+            Assert.Equal(0.071F, charges[0].Kwh);
+            Assert.Equal(10.012F, charges[1].Kwh);
         });
     }
 
@@ -64,7 +64,7 @@ public class JsonParserTests
             Assert.Equal(charges.Count, expectedCount);
             if (expectedFirstValue is not null)
             {
-                Assert.Equal(charges[0].kwh, expectedFirstValue);
+                Assert.Equal(charges[0].Kwh, expectedFirstValue);
             }
         });
     }

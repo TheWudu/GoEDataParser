@@ -21,14 +21,14 @@ namespace Charging
     public class Item
     {
         public int? session_number { get; set; }
-        public string? session_identifier { get; set; }
+        public string? SessionIdentifier { get; set; }
         public string? id_chip { get; set; }
         public string? id_chip_uid { get; set; }
         public string? id_chip_name { get; set; }
         public string? start { get; set; }
         public string? end { get; set; }
         public string? seconds_total { get; set; }
-        public string? seconds_charged { get; set; }
+        public string? SecondsCharged { get; set; }
         public float? max_power { get; set; }
         public float? max_current { get; set; }
         public float? energy { get; set; }
@@ -106,41 +106,41 @@ namespace Charging
                 return;
             }
 
-            float kwh_sum = 0.0F;
+            float Kwh_sum = 0.0F;
             foreach (Item item in data.data)
             {
                 if (item.start is null || item.end is null)
                 {
                     continue;
                 }
-                string session_id = item.session_identifier is not null
-                    ? item.session_identifier
+                string SessionId = item.SessionIdentifier is not null
+                    ? item.SessionIdentifier
                     : Guid.NewGuid().ToString();
                 Charge charge = new()
                 {
-                    session_id = session_id,
-                    kwh = item.energy is float v ? v : 0.0F,
-                    start_time = DateTime.Parse(
+                    SessionId = SessionId,
+                    Kwh = item.energy is float v ? v : 0.0F,
+                    StartTime = DateTime.Parse(
                         (string)item.start,
                         culture,
                         DateTimeStyles.AssumeLocal
                     ),
-                    end_time = DateTime.Parse(
+                    EndTime = DateTime.Parse(
                         (string)item.end,
                         culture,
                         DateTimeStyles.AssumeLocal
                     ),
-                    meter_diff = item.eto_diff,
-                    meter_start = item.eto_start,
-                    meter_end = item.eto_end,
-                    seconds_charged = item.seconds_charged is not null
-                        ? (long)TimeOnly.Parse(item.seconds_charged).ToTimeSpan().TotalSeconds
+                    MeterDiff = item.eto_diff,
+                    MeterStart = item.eto_start,
+                    MeterEnd = item.eto_end,
+                    SecondsCharged = item.SecondsCharged is not null
+                        ? (long)TimeOnly.Parse(item.SecondsCharged).ToTimeSpan().TotalSeconds
                         : 0,
                 };
-                kwh_sum += charge.kwh;
+                Kwh_sum += charge.Kwh;
                 charges.Add(charge);
             }
-            Console.WriteLine("kWh sum: {0}", kwh_sum);
+            Console.WriteLine("Kwh sum: {0}", Kwh_sum);
         }
     }
 }

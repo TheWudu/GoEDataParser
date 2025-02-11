@@ -10,8 +10,8 @@ namespace Charging
             var start = dateTime.Date;
             var end = start.AddDays(1);
             var filter =
-                Builders<Charge>.Filter.Gte("start_time", start)
-                & Builders<Charge>.Filter.Lt("start_time", end);
+                Builders<Charge>.Filter.Gte("StartTime", start)
+                & Builders<Charge>.Filter.Lt("StartTime", end);
 
             var documents = collection.Find(filter);
 

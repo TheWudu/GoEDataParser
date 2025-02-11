@@ -43,10 +43,10 @@ namespace Charging
                     }
 
                     string sessionId = currentRow[1];
-                    DateTime start_time = DateTime.Parse(currentRow[5], culture);
-                    DateTime end_time = DateTime.Parse(currentRow[6], culture);
-                    float kwh = float.Parse(currentRow[11], NumberStyles.Any, culture);
-                    long seconds_charged = (long)
+                    DateTime StartTime = DateTime.Parse(currentRow[5], culture);
+                    DateTime EndTime = DateTime.Parse(currentRow[6], culture);
+                    float Kwh = float.Parse(currentRow[11], NumberStyles.Any, culture);
+                    long SecondsCharged = (long)
                         TimeOnly.Parse(currentRow[8]).ToTimeSpan().TotalSeconds;
                     // Console.WriteLine(
                     //     "{0} - {1}: {2} / {3}",
@@ -58,11 +58,11 @@ namespace Charging
 
                     Charge charge = new()
                     {
-                        session_id = sessionId,
-                        kwh = kwh,
-                        start_time = start_time,
-                        end_time = end_time,
-                        seconds_charged = seconds_charged,
+                        SessionId = sessionId,
+                        Kwh = Kwh,
+                        StartTime = StartTime,
+                        EndTime = EndTime,
+                        SecondsCharged = SecondsCharged,
                     };
                     charges.Add(charge);
                 }
