@@ -28,7 +28,7 @@ namespace Charging
         public string? start { get; set; }
         public string? end { get; set; }
         public string? seconds_total { get; set; }
-        public string? SecondsCharged { get; set; }
+        public string? seconds_charged { get; set; }
         public float? max_power { get; set; }
         public float? max_current { get; set; }
         public float? energy { get; set; }
@@ -133,8 +133,8 @@ namespace Charging
                     MeterDiff = item.eto_diff,
                     MeterStart = item.eto_start,
                     MeterEnd = item.eto_end,
-                    SecondsCharged = item.SecondsCharged is not null
-                        ? (long)TimeOnly.Parse(item.SecondsCharged).ToTimeSpan().TotalSeconds
+                    SecondsCharged = item.seconds_charged is not null
+                        ? (long)TimeOnly.Parse(item.seconds_charged).ToTimeSpan().TotalSeconds
                         : 0,
                 };
                 Kwh_sum += charge.Kwh;
