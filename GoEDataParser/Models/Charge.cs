@@ -21,7 +21,7 @@ namespace Charging
         public void Print()
         {
             Console.WriteLine(
-                "{0}: {1} - {2} ({4})=> {3}",
+                "{0}: {1} - {2} ({4}) => {3}",
                 SessionId,
                 StartTime,
                 EndTime,
