@@ -125,11 +125,7 @@ namespace Charging
                         culture,
                         DateTimeStyles.AssumeLocal
                     ),
-                    EndTime = DateTime.Parse(
-                        (string)item.end,
-                        culture,
-                        DateTimeStyles.AssumeLocal
-                    ),
+                    EndTime = DateTime.Parse((string)item.end, culture, DateTimeStyles.AssumeLocal),
                     MeterDiff = item.eto_diff,
                     MeterStart = item.eto_start,
                     MeterEnd = item.eto_end,
