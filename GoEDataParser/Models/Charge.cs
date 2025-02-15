@@ -5,16 +5,16 @@ namespace Charging
     public class Charge : Repository.BaseEntity
     {
         public required string SessionId;
-        public required float Kwh;
+        public required double Kwh;
 
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public required DateTime StartTime;
 
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
         public required DateTime EndTime;
-        public float? MeterStart;
-        public float? MeterEnd;
-        public float? MeterDiff;
+        public double? MeterStart;
+        public double? MeterEnd;
+        public double? MeterDiff;
 
         public long SecondsCharged;
 

@@ -29,12 +29,12 @@ namespace Charging
         public string? end { get; set; }
         public string? seconds_total { get; set; }
         public string? seconds_charged { get; set; }
-        public float? max_power { get; set; }
-        public float? max_current { get; set; }
-        public float? energy { get; set; }
-        public float? eto_diff { get; set; }
-        public float? eto_start { get; set; }
-        public float? eto_end { get; set; }
+        public double? max_power { get; set; }
+        public double? max_current { get; set; }
+        public double? energy { get; set; }
+        public double? eto_diff { get; set; }
+        public double? eto_start { get; set; }
+        public double? eto_end { get; set; }
         public string? wifi { get; set; }
         public string? link { get; set; }
     }
@@ -106,7 +106,7 @@ namespace Charging
                 return;
             }
 
-            float Kwh_sum = 0.0F;
+            double kwhSum = 0.0F;
             foreach (Item item in data.data)
             {
                 if (item.start is null || item.end is null)
@@ -119,7 +119,7 @@ namespace Charging
                 Charge charge = new()
                 {
                     SessionId = SessionId,
-                    Kwh = item.energy is float v ? v : 0.0F,
+                    Kwh = item.energy is double v ? v : 0.0F,
                     StartTime = DateTime.Parse(
                         (string)item.start,
                         culture,
@@ -133,10 +133,10 @@ namespace Charging
                         ? (long)TimeOnly.Parse(item.seconds_charged).ToTimeSpan().TotalSeconds
                         : 0,
                 };
-                Kwh_sum += charge.Kwh;
+                kwhSum += charge.Kwh;
                 charges.Add(charge);
             }
-            Console.WriteLine("Kwh sum: {0}", Kwh_sum);
+            Console.WriteLine("Kwh sum: {0}", kwhSum);
         }
     }
 }

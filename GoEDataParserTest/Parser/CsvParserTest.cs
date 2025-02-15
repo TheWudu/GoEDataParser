@@ -23,19 +23,19 @@ public class CsvParserTests
     }
 
     [Theory]
-    [InlineData("not_existing_file", 0, 0.0F)]
-    [InlineData("invalid_file.csv", 0, 0.0F)]
-    [InlineData("empty_file.csv", 0, 0.0F)]
-    [InlineData("no_entry.csv", 0, 0.0F)]
-    [InlineData("one_entry.csv", 1, 0.071F)]
-    [InlineData("20250124_part.csv", 18, 317.716F)]
-    [InlineData("20250124_goe.csv", 256, 3474.874F)]
-    public void CountRowsTest(string filename, int expectedCount, float expectedSum)
+    [InlineData("not_existing_file", 0, 0.0)]
+    [InlineData("invalid_file.csv", 0, 0.0)]
+    [InlineData("empty_file.csv", 0, 0.0)]
+    [InlineData("no_entry.csv", 0, 0.0)]
+    [InlineData("one_entry.csv", 1, 0.071)]
+    [InlineData("20250124_part.csv", 18, 317.716)]
+    [InlineData("20250124_goe.csv", 256, 3474.874)]
+    public void CountRowsTest(string filename, int expectedCount, double expectedSum)
     {
         Initialize(filename);
 
-        Assert.Equal(charges.Count, expectedCount);
-        Assert.Equal(charges.Sum(item => item.Kwh), expectedSum);
+        Assert.Equal(expectedCount, charges.Count);
+        Assert.Equal(expectedSum, charges.Sum(item => item.Kwh), 3);
     }
 
     [Fact]
@@ -45,8 +45,8 @@ public class CsvParserTests
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(0.071F, charges[0].Kwh);
-            Assert.Equal(10.001F, charges[254].Kwh);
+            Assert.Equal(0.071, charges[0].Kwh);
+            Assert.Equal(10.001, charges[254].Kwh);
             Assert.Equal(256, charges.Count);
         });
     }

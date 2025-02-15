@@ -45,7 +45,7 @@ namespace Charging
                     string sessionId = currentRow[1];
                     DateTime StartTime = DateTime.Parse(currentRow[5], culture);
                     DateTime EndTime = DateTime.Parse(currentRow[6], culture);
-                    float Kwh = float.Parse(currentRow[11], NumberStyles.Any, culture);
+                    double Kwh = Double.Parse(currentRow[11], NumberStyles.Any, culture);
                     long SecondsCharged = (long)
                         TimeOnly.Parse(currentRow[8]).ToTimeSpan().TotalSeconds;
                     // Console.WriteLine(

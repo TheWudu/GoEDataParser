@@ -39,7 +39,7 @@ public class MongoStoreTest
         {
             Id = id is not null ? id : Guid.NewGuid().ToString(),
             SessionId = "sessionId_1234_" + day.ToString(),
-            Kwh = 10.123F,
+            Kwh = 10.123,
             StartTime = new DateTime(2025, 01, day, 09, 01, 02, DateTimeKind.Utc),
             EndTime = new DateTime(2025, 01, day, 11, 05, 47, DateTimeKind.Utc),
         };
@@ -173,5 +173,21 @@ public class MongoStoreTest
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
 
         Assert.False(store.Delete(id));
+    }
+
+    [Fact]
+    public void testMonthly()
+    {
+        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+        Charging.Charge charge = CreateCharge(14, id);
+
+        var monthly = store.GroupMonthly();
+
+        Assert.Multiple(() =>
+        {
+            Assert.Single(monthly);
+            Assert.Equal(10.123, monthly["2025.01"].KwhSum);
+            Assert.False(monthly.ContainsKey("2025.02"));
+        });
     }
 }

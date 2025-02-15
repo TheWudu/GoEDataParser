@@ -25,7 +25,7 @@ namespace Charging
 
             foreach (Charge c in charges)
             {
-                float missing = 0.0F;
+                double missing = 0.0F;
                 // Console.WriteLine("From {0} to {1}: {2} -- {3}", c.StartTime.ToString("yy.MM.dd"), c.EndTime.ToString("yy.MM.dd"), c.Kwh, Kwh_sum);
                 if (prev is not null)
                 {
@@ -43,7 +43,7 @@ namespace Charging
                 }
                 else
                 {
-                    dict_monthly.Add(key, new ChargeInfo(c.Kwh, 1, c.SecondsCharged, missing));
+                    dict_monthly.Add(key, new ChargeInfo(key, c.Kwh, 1, c.SecondsCharged, missing));
                 }
 
                 prev = c;
@@ -54,15 +54,15 @@ namespace Charging
 
         public void PrintGroup(Dictionary<string, ChargeInfo> dict, string grouping)
         {
-            float kwhSum = 0.0F;
+            double kwhSum = 0.0F;
             long timeSum = 0;
             Console.WriteLine("\nSums per {0}: ", grouping);
             foreach (KeyValuePair<string, ChargeInfo> kv in dict)
             {
                 kwhSum += kv.Value.KwhSum;
                 timeSum += kv.Value.TimeSum;
-                float kwhAvg = kv.Value.KwhValues.Average();
-                float kwhMax = kv.Value.KwhValues.Max();
+                double kwhAvg = kv.Value.KwhValues.Average();
+                double kwhMax = kv.Value.KwhValues.Max();
                 Console.WriteLine(
                     "{0}: {1,7:F2}, {2,7:F2} (Count: {3,3}, Max: {4:F2} kWh, Avg: {5,5:F2} kWh, TimeSum: {6,11}, Missing: {7:F2} kWh)",
                     kv.Key,
@@ -82,7 +82,7 @@ namespace Charging
             );
         }
 
-        public float MissingKwh(Charge prev, Charge curr)
+        public double MissingKwh(Charge prev, Charge curr)
         {
             if (prev.MeterEnd is null || curr.MeterStart is null)
             {
@@ -99,7 +99,7 @@ namespace Charging
                 //     curr.StartTime
                 // );
 
-                float diff = (float)curr.MeterStart - (float)prev.MeterEnd;
+                double diff = (double)curr.MeterStart - (double)prev.MeterEnd;
 
                 return diff;
             }

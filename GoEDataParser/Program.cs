@@ -74,7 +74,7 @@ public class GoEDataParser
         return store.ReadAll();
     }
 
-    public static List<Charging.ChargeInfo> StatsViaMongo()
+    public static Dictionary<string, Charging.ChargeInfo> StatsViaMongo()
     {
         string dbHost = Charging.Configuration.MongoDbHost();
         string dbName = Charging.Configuration.MongoDbName();
@@ -120,5 +120,6 @@ public class GoEDataParser
         evaluator.PrintGroup(yearly, "year");
 
         var docs = StatsViaMongo();
+        evaluator.PrintGroup(docs, "month");
     }
 }

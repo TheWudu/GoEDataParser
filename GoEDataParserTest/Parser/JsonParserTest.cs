@@ -41,18 +41,18 @@ public class JsonParserTests
         Assert.Multiple(() =>
         {
             Assert.Equal(2, charges.Count);
-            Assert.Equal(0.071F, charges[0].Kwh);
-            Assert.Equal(10.012F, charges[1].Kwh);
+            Assert.Equal(0.071, charges[0].Kwh);
+            Assert.Equal(10.012, charges[1].Kwh);
         });
     }
 
     [Theory]
-    [InlineData("data.json", 259, 0.071F)]
-    [InlineData("one_data.json", 1, 6.535F)]
+    [InlineData("data.json", 259, 0.071)]
+    [InlineData("one_data.json", 1, 6.535)]
     [InlineData("no_data.json", 0, null)]
     [InlineData("no_columns.json", 0, null)]
     [InlineData("invalid.json", 0, null)]
-    public void JsonParserFull(string filename, int expectedCount, float? expectedFirstValue)
+    public void JsonParserFull(string filename, int expectedCount, double? expectedFirstValue)
     {
         string filepath = String.Join("/", Base.AppDirectory(), "../fixtures/json", filename);
         string json_data = File.ReadAllText(filepath);

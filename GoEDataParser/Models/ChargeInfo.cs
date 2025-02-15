@@ -2,14 +2,18 @@ namespace Charging
 {
     public class ChargeInfo
     {
-        public float KwhSum = 0.0F;
-        public float Count = 0;
+        public string TimeKey = "";
+        public double KwhSum = 0.0;
+        public int Count = 0;
         public long TimeSum = 0;
-        public float Missing = 0.0F;
-        public List<float> KwhValues = [];
+        public double Missing = 0.0;
+        public List<double> KwhValues = [];
 
-        public ChargeInfo(float kwhSum, int count, long timeSum, float missing)
+        public ChargeInfo() { }
+
+        public ChargeInfo(string timeKey, double kwhSum, int count, long timeSum, double missing)
         {
+            this.TimeKey = timeKey;
             this.KwhSum = kwhSum;
             this.Count = count;
             this.TimeSum = timeSum;
