@@ -136,7 +136,7 @@ namespace Charging
                 kwhSum += charge.Kwh;
                 charges.Add(charge);
             }
-            Console.WriteLine("Kwh sum: {0}", kwhSum);
+            Console.WriteLine("Kwh sum: {0:F2}", kwhSum);
         }
     }
 }

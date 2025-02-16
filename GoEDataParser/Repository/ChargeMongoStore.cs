@@ -44,7 +44,7 @@ namespace Charging
                 )
                 .Sort(Builders<ChargeInfo>.Sort.Ascending(x => x.TimeKey));
 
-            Console.WriteLine(pipeline);
+            // Console.WriteLine(pipeline);
 
             var documents = collection.Aggregate(pipeline).ToList();
             Dictionary<string, ChargeInfo> infos = new();

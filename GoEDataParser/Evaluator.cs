@@ -76,7 +76,7 @@ namespace Charging
                 );
             }
             Console.WriteLine(
-                "\n\e[31mOverall sum:\e[37m {0} in {1}",
+                "\n\e[31mOverall sum:\e[37m {0:F2} in {1}",
                 kwhSum,
                 TimeSpan.FromSeconds(timeSum).ToString()
             );
