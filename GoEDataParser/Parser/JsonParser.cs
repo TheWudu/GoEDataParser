@@ -21,7 +21,7 @@ namespace Charging
     public class Item
     {
         public int? session_number { get; set; }
-        public string? SessionIdentifier { get; set; }
+        public string? session_identifier { get; set; }
         public string? id_chip { get; set; }
         public string? id_chip_uid { get; set; }
         public string? id_chip_name { get; set; }
@@ -113,8 +113,8 @@ namespace Charging
                 {
                     continue;
                 }
-                string SessionId = item.SessionIdentifier is not null
-                    ? item.SessionIdentifier
+                string SessionId = item.session_identifier is not null
+                    ? item.session_identifier
                     : Guid.NewGuid().ToString();
                 Charge charge = new()
                 {
