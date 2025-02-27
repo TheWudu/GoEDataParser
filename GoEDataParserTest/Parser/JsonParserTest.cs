@@ -32,8 +32,8 @@ public class JsonParserTests
     {
         string json_data =
             /*lang=json,strict*/@"{""columns"":[], ""data"":[
-                {""start"":""02.06.2023 16:34:46"",""end"":""02.06.2023 16:36:00"",""energy"":0.071},
-                {""start"":""05.06.2023 10:34:00"",""end"":""05.06.2023 12:15:00"",""energy"":10.012}
+                {""session_identifier"":""abcd_1234"",""start"":""02.06.2023 16:34:46"",""end"":""02.06.2023 16:36:00"",""energy"":0.071},
+                {""session_identifier"":""abcd_5678"",""start"":""05.06.2023 10:34:00"",""end"":""05.06.2023 12:15:00"",""energy"":10.012}
                 ]}";
 
         Initialize(json_data);
@@ -43,6 +43,7 @@ public class JsonParserTests
             Assert.Equal(2, charges.Count);
             Assert.Equal(0.071, charges[0].Kwh);
             Assert.Equal(10.012, charges[1].Kwh);
+            Assert.Equal("abcd_1234", charges.ElementAt(0).SessionId);
         });
     }
 

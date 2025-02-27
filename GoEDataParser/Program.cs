@@ -91,7 +91,7 @@ public class GoEDataParser
 
         List<Charging.Charge> charges = [];
         // args = args.Append("-csv").ToArray();
-        // args = args.Append("-json").ToArray();
+        //args = args.Append("-json").ToArray();
 
         if (args.Contains("-csv"))
         {
@@ -113,13 +113,22 @@ public class GoEDataParser
 
         Console.WriteLine("Evaluate charges...\n");
         Charging.Evaluator evaluator = new Charging.Evaluator();
-        var monthly = evaluator.groupMonthly(charges);
+        var monthly = Charging.Utils.Time.MeasureTime(
+            "Group monthly ... ",
+            codeBlock: () => evaluator.groupMonthly(charges)
+        );
         evaluator.PrintGroup(monthly, "month");
 
-        var yearly = evaluator.groupYearly(charges);
+        var yearly = Charging.Utils.Time.MeasureTime(
+            "Group yearly ... ",
+            codeBlock: () => evaluator.groupYearly(charges)
+        );
         evaluator.PrintGroup(yearly, "year");
 
-        var docs = StatsViaMongo();
+        var docs = Charging.Utils.Time.MeasureTime(
+            "Get stats by mongo ... ",
+            codeBlock: () => StatsViaMongo()
+        );
         evaluator.PrintGroup(docs, "month");
     }
 }

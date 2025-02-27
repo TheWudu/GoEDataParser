@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Runtime.Serialization;
 using System.Text.Json;
 
 namespace Charging
@@ -64,9 +63,12 @@ namespace Charging
 
         public void load()
         {
-            string json_data = FetchJson();
-            JsonData? data = Deserialize(json_data);
-            ParseData(data);
+            string json_data = Utils.Time.MeasureTime("Fetching ... ", codeBlock: () => FetchJson());
+            JsonData? data = Utils.Time.MeasureTime(
+                "Deserializing ... ",
+                codeBlock: () => Deserialize(json_data)
+            );
+            Utils.Time.MeasureTimeVoid("Parsing ... ", codeBlock: () => ParseData(data));
         }
 
         private string FetchJson()
@@ -96,7 +98,11 @@ namespace Charging
 
         private JsonData? Deserialize(string json_data)
         {
-            return JsonSerializer.Deserialize<JsonData>(json_data);
+            var result = Utils.Time.MeasureTime(
+                "Deserializing ... ",
+                codeBlock: () => JsonSerializer.Deserialize<JsonData>(json_data)
+            );
+            return (JsonData?)result;
         }
 
         private void ParseData(JsonData? data)
@@ -136,7 +142,7 @@ namespace Charging
                 kwhSum += charge.Kwh;
                 charges.Add(charge);
             }
-            Console.WriteLine("Kwh sum: {0:F2}", kwhSum);
+            // Console.WriteLine("Kwh sum: {0:F2}", kwhSum);
         }
     }
 }
