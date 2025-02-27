@@ -71,7 +71,7 @@ public class GoEDataParser
         Charging.ChargeMongoStore chargeStore = new(dbHost, dbName);
         Repository.GenericStore<Charging.Charge> store = new(chargeStore);
 
-        return store.ReadAll();
+        return Charging.Utils.Time.MeasureTime("Read from database ... ", codeBlock: store.ReadAll);
     }
 
     public static Dictionary<string, Charging.ChargeInfo> StatsViaMongo()
@@ -83,6 +83,15 @@ public class GoEDataParser
         Repository.GenericStore<Charging.Charge> store = new(chargeStore);
 
         return chargeStore.GroupMonthly();
+    }
+
+    public static void listCharges(List<Charging.Charge> charges)
+    {
+        foreach (Charging.Charge charge in charges)
+        {
+            charge.Print();
+        }
+        Console.WriteLine("");
     }
 
     public static void Main(string[] args)
@@ -103,7 +112,10 @@ public class GoEDataParser
         }
         else
         {
-            charges = useDatabase();
+            charges = Charging.Utils.Time.MeasureTime(
+                "Read charges from database ...",
+                codeBlock: useDatabase
+            );
         }
 
         if (!args.Contains("-nostore"))
@@ -111,6 +123,14 @@ public class GoEDataParser
             Charging.Utils.Time.MeasureTimeVoid(
                 "Store charges ... ",
                 codeBlock: () => storeCharges(charges)
+            );
+        }
+
+        if (args.Contains("-list"))
+        {
+            Charging.Utils.Time.MeasureTimeVoid(
+                "List charges ... ",
+                codeBlock: () => listCharges(charges)
             );
         }
 
@@ -129,7 +149,7 @@ public class GoEDataParser
 
         var docs = Charging.Utils.Time.MeasureTime(
             "Get stats by mongo ... ",
-            codeBlock: () => StatsViaMongo()
+            codeBlock: StatsViaMongo
         );
         evaluator.PrintGroup(docs, "month");
     }

@@ -23,8 +23,8 @@ namespace Charging
             Console.WriteLine(
                 "{0}: {1} - {2} ({4}) => {3}",
                 SessionId,
-                StartTime,
-                EndTime,
+                StartTime.ToLocalTime(),
+                EndTime.ToLocalTime(),
                 Kwh,
                 SecondsCharged
             );
