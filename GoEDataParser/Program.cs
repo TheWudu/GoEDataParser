@@ -108,10 +108,12 @@ public class GoEDataParser
 
         if (!args.Contains("-nostore"))
         {
-            storeCharges(charges);
+            Charging.Utils.Time.MeasureTimeVoid(
+                "Store charges ... ",
+                codeBlock: () => storeCharges(charges)
+            );
         }
 
-        Console.WriteLine("Evaluate charges...\n");
         Charging.Evaluator evaluator = new Charging.Evaluator();
         var monthly = Charging.Utils.Time.MeasureTime(
             "Group monthly ... ",
