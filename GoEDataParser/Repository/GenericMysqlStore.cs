@@ -1,13 +1,14 @@
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Bson;
+using MongoDB.Driver.Linq;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using Org.BouncyCastle.Math.EC.Rfc7748;
 
 namespace Repository
 {
-    public class GenericMysqlStore<T> : DbContext // , IGenericStore<T>
+    public class GenericMysqlStore<T> : DbContext, IGenericStore<T>
         where T : BaseEntity
     {
         public DbSet<T> Dataset { get; set; }
@@ -15,7 +16,6 @@ namespace Repository
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySQL(
-                // "server=127.0.0.1;database=goe_test;user=root;password=password"
                 $"server={dbHost};database={dbName};user={dbUser};password={dbPassword}"
             );
         }
@@ -79,10 +79,9 @@ namespace Repository
 
         public T? FindBy<V>(string key, V value)
         {
-            string q = $"SELECT * FROM {dbTablename}"; // WHERE {key} = {value}";
-            FormattableString query = FormattableStringFactory.Create(q);
+            string q = $"SELECT * FROM {dbTablename} WHERE {key} = '{value}'";
 
-            return Dataset.FromSql(query).ToList().First();
+            return Dataset.FromSqlRaw(q).ToList().FirstOrDefault<T>();
         }
 
         public T Insert(T entity)
@@ -96,11 +95,15 @@ namespace Repository
         public List<T> ReadAll()
         {
             var list = Dataset.Where(e => true).ToList();
+
             return list;
         }
 
         public T Update(T entity)
         {
+            Dataset.Update(entity);
+            this.SaveChanges();
+
             return entity;
         }
     }

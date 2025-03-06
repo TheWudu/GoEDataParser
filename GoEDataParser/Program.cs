@@ -26,7 +26,7 @@ public class GoEDataParser
         return parser.GetCharges();
     }
 
-    public static int storeCharges(List<Charging.Charge> charges)
+    public static int storeChargesInMongo(List<Charging.Charge> charges)
     {
         int storedCount = 0;
         int updatedCount = 0;
@@ -44,6 +44,8 @@ public class GoEDataParser
             Charging.Charge? storedCharge = store.FindBy("SessionId", charge.SessionId);
             if (storedCharge is null)
             {
+                charge.Id ??= Guid.NewGuid().ToString();
+                charge.Version = 1;
                 store.Insert(charge);
                 storedCount++;
             }
@@ -53,7 +55,56 @@ public class GoEDataParser
                 charge.Version = storedCharge.Version;
                 if (!charge.Equals(storedCharge))
                 {
+                    // charge.Version += 1;
                     store.Update(charge);
+                    updatedCount++;
+                }
+            }
+        }
+
+        Console.WriteLine("Stored {0} and updated {1} charges in db", storedCount, updatedCount);
+
+        return storedCount;
+    }
+
+    public static int storeChargesInMySql(List<Charging.Charge> charges)
+    {
+        int storedCount = 0;
+        int updatedCount = 0;
+        string dbHost = Charging.Configuration.MysqlDbHost();
+        string dbName = Charging.Configuration.MysqlDbName();
+        string dbUser = Charging.Configuration.MysqlDbUser();
+        string dbPassword = Charging.Configuration.MysqlDbPassword();
+
+        Charging.ChargeMysqlStore chargeStore = new(dbHost, dbName, dbUser, dbPassword);
+        Repository.GenericStore<Charging.Charge> store = new(chargeStore);
+        foreach (Charging.Charge charge in charges)
+        {
+            if (charge.SessionId is null)
+            {
+                continue;
+            }
+            Charging.Charge? storedCharge = store.FindBy("SessionId", charge.SessionId);
+            if (storedCharge is null)
+            {
+                charge.Id ??= Guid.NewGuid().ToString();
+                charge.Version = 1;
+                store.Insert(charge);
+                storedCount++;
+            }
+            else
+            {
+                charge.Id = storedCharge.Id;
+                charge.Version = storedCharge.Version;
+                if (!charge.Equals(storedCharge))
+                {
+                    // storedCharge.Version += 1;
+                    storedCharge.Kwh = charge.Kwh;
+                    storedCharge.MeterStart = charge.MeterStart;
+                    storedCharge.MeterEnd = charge.MeterEnd;
+                    storedCharge.EndTime = charge.EndTime;
+                    storedCharge.SecondsCharged = charge.SecondsCharged;
+                    store.Update(storedCharge);
                     updatedCount++;
                 }
             }
@@ -109,6 +160,7 @@ public class GoEDataParser
         List<Charging.Charge> charges = [];
         // args = args.Append("-csv").ToArray();
         // args = args.Append("-json").ToArray();
+        // args = args.Append("-mysql").ToArray();
 
         if (args.Contains("-csv"))
         {
@@ -132,10 +184,20 @@ public class GoEDataParser
 
         if (!args.Contains("-nostore"))
         {
-            Charging.Utils.Time.MeasureTimeVoid(
-                "Store charges ... ",
-                codeBlock: () => storeCharges(charges)
-            );
+            if (args.Contains("-mysql"))
+            {
+                Charging.Utils.Time.MeasureTimeVoid(
+                    "Store charges in MySQL... ",
+                    codeBlock: () => storeChargesInMySql(charges)
+                );
+            }
+            else
+            {
+                Charging.Utils.Time.MeasureTimeVoid(
+                    "Store charges in MongoDB... ",
+                    codeBlock: () => storeChargesInMongo(charges)
+                );
+            }
         }
 
         if (args.Contains("-list"))

@@ -1,5 +1,4 @@
 using System.Collections;
-using MySql.Data.MySqlClient;
 using Repository;
 using Xunit;
 
@@ -19,9 +18,9 @@ public class GenericMysqlStoreTest
         store.Clear();
     }
 
-    internal TestEntity CreateEntity(string name, string? id = null)
+    internal TestEntity CreateEntity(string name, string? id = null, int version = 1)
     {
-        TestEntity te = new(name, id);
+        TestEntity te = new(name, id, version);
 
         store.Insert(te);
 
@@ -43,11 +42,12 @@ public class GenericMysqlStoreTest
         string id = "0c8af010-a101-4fef-957c-1c78977524cc";
         var te = CreateEntity("Daniel", id);
 
-        te.Name = "Michael";
-        var updatedEntity = store.Update(te);
+        TestEntity? ut = store.Find(id);
+        Assert.NotNull(ut);
+        ut.Name = "Michael";
+        var updatedEntity = store.Update(ut);
 
-        var storedEntity = store.Find(id);
-        Assert.Equal(store.Find(id), updatedEntity);
+        Assert.Equal(store.Find(id), ut);
         Assert.Equal(1, store.Count());
     }
 
@@ -87,9 +87,19 @@ public class GenericMysqlStoreTest
     [Fact]
     public void FindByInt()
     {
-        var TestEntity = CreateEntity("michael");
+        string id1 = Guid.NewGuid().ToString();
+        string id2 = Guid.NewGuid().ToString();
+        var testEntity1 = CreateEntity("michael", id1);
+        var testEntity2 = CreateEntity("daniel", id2, 2);
 
-        Assert.Equal(store.FindBy("version", 1), TestEntity);
+        var readEntityV1 = store.FindBy("version", 1);
+        var readEntityV2 = store.FindBy("version", 2);
+
+        Assert.Equal(readEntityV2, testEntity2);
+        Assert.NotNull(readEntityV1);
+        Assert.Equal(readEntityV1.Id, id1);
+        Assert.NotNull(readEntityV2);
+        Assert.Equal(readEntityV2.Id, id2);
     }
 
     [Theory]

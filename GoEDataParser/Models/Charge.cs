@@ -4,19 +4,19 @@ namespace Charging
 {
     public class Charge : Repository.BaseEntity
     {
-        public required string SessionId;
-        public required double Kwh;
+        public required string SessionId { get; set; }
+        public required double Kwh { get; set; }
 
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-        public required DateTime StartTime;
+        public required DateTime StartTime { get; set; }
 
         [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-        public required DateTime EndTime;
-        public double? MeterStart;
-        public double? MeterEnd;
-        public double? MeterDiff;
+        public required DateTime EndTime { get; set; }
+        public double? MeterStart { get; set; }
+        public double? MeterEnd { get; set; }
+        public double? MeterDiff { get; set; }
 
-        public long SecondsCharged;
+        public long SecondsCharged { get; set; }
 
         public void Print()
         {

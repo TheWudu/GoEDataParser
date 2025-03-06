@@ -4,7 +4,7 @@ using Repository;
 
 namespace GoEDataParserTest;
 
-public class TestEntity : BaseEntity
+public class TestEntity : Repository.BaseEntity
 {
     public string? Name { get; set; }
 
@@ -26,6 +26,13 @@ public class TestEntity : BaseEntity
         Name = name;
         Id = id is not null ? id : Guid.NewGuid().ToString();
         Version = 1;
+    }
+
+    public TestEntity(string name, string? id, int version)
+    {
+        Name = name;
+        Id = id is not null ? id : Guid.NewGuid().ToString();
+        Version = version;
     }
 
     public override bool Equals(object? obj)
