@@ -2,20 +2,20 @@ namespace Charging
 {
     public class CsvDownloader
     {
-        readonly string base_url = "https://data.v3.go-e.io/api/v1/direct_export";
-        readonly string? token = Configuration.Token();
-        readonly string parameters =
+        readonly string _baseUrl = "https://data.v3.go-e.io/api/v1/direct_export";
+        readonly string? _token = Configuration.Token();
+        readonly string _parameters =
             "from=1682892000000&to=1767218340000&timezone=Europe%2FVienna&delimiter=%2C&decimalpoint=.";
-        public string filepath = "tmp.csv";
+        public string Filepath = "tmp.csv";
 
-        public void run()
+        public void Run()
         {
-            string url = base_url + "?e=" + token + "&" + parameters;
+            string url = _baseUrl + "?e=" + _token + "&" + _parameters;
 
             HttpClient client = new();
             Task<Stream> stream = client.GetStreamAsync(url);
 
-            FileStream fs = new(filepath, FileMode.OpenOrCreate);
+            FileStream fs = new(Filepath, FileMode.OpenOrCreate);
             stream.Result.CopyTo(fs);
         }
     }

@@ -23,7 +23,7 @@ public class JsonParserTests
         HttpClient client = mockHttp.ToHttpClient();
 
         Charging.JsonParser parser = new(client);
-        parser.load();
+        parser.Load();
         charges = parser.GetCharges();
     }
 

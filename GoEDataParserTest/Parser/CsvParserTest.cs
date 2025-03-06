@@ -4,22 +4,22 @@ namespace GoEDataParserTest;
 
 public class CsvParserTests
 {
-    string appPath = Base.AppDirectory();
+    string _appPath = Base.AppDirectory();
 
-    List<Charging.Charge> charges = [];
-    Charging.Parser.CsvParser parser;
+    List<Charging.Charge> _charges = [];
+    Charging.Parser.CsvParser _parser;
 
     public CsvParserTests()
     {
-        parser = new();
+        _parser = new();
     }
 
     internal void Initialize(string filename)
     {
-        string filepath = String.Join("/", appPath, "../fixtures/csv", filename);
+        string filepath = String.Join("/", _appPath, "../fixtures/csv", filename);
 
-        parser.Parse(filepath);
-        charges = parser.GetCharges();
+        _parser.Parse(filepath);
+        _charges = _parser.GetCharges();
     }
 
     [Theory]
@@ -34,8 +34,8 @@ public class CsvParserTests
     {
         Initialize(filename);
 
-        Assert.Equal(expectedCount, charges.Count);
-        Assert.Equal(expectedSum, charges.Sum(item => item.Kwh), 3);
+        Assert.Equal(expectedCount, _charges.Count);
+        Assert.Equal(expectedSum, _charges.Sum(item => item.Kwh), 3);
     }
 
     [Fact]
@@ -45,9 +45,9 @@ public class CsvParserTests
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(0.071, charges[0].Kwh);
-            Assert.Equal(10.001, charges[254].Kwh);
-            Assert.Equal(256, charges.Count);
+            Assert.Equal(0.071, _charges[0].Kwh);
+            Assert.Equal(10.001, _charges[254].Kwh);
+            Assert.Equal(256, _charges.Count);
         });
     }
 }

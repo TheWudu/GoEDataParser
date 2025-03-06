@@ -40,94 +40,88 @@ namespace Charging
 
     public class JsonParser
     {
-        public List<Charge> charges = [];
-        string base_url = "https://data.v3.go-e.io/api/v1/direct_json";
-        string? token = null; // fetched from App.config
-        string timezone = "Europe%2FVienna";
-        long from = 1682892000000; // 01.05.2023
-        long to = 1767218340000; // 31.12.2025
+        private readonly List<Charge> _charges = [];
+        private const string BaseUrl = "https://data.v3.go-e.io/api/v1/direct_json";
+        private readonly string? _token = null; // fetched from App.config
+        private const string Timezone = "Europe%2FVienna";
+        private const long From = 1682892000000; // 01.05.2023
+        private const long To = 1767218340000; // 31.12.2025
 
-        private HttpClient? client;
-        private CultureInfo culture = CultureInfo.CreateSpecificCulture(Configuration.Culture());
+        private readonly HttpClient? _client;
+        private readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture(Configuration.Culture());
 
         public JsonParser(HttpClient? client)
         {
-            this.client = client;
-            this.token = Charging.Configuration.Token();
+            this._client = client;
+            this._token = Charging.Configuration.Token();
         }
 
         public List<Charge> GetCharges()
         {
-            return charges;
+            return _charges;
         }
 
-        public void load()
+        public void Load()
         {
-            string json_data = Utils.Time.MeasureTime("Fetching ... ", codeBlock: FetchJson);
+            string jsonData = Utils.Time.MeasureTime("Fetching ... ", codeBlock: FetchJson);
             JsonData? data = Utils.Time.MeasureTime(
                 "Deserializing ... ",
-                codeBlock: () => Deserialize(json_data)
+                codeBlock: () => Deserialize(jsonData)
             );
             Utils.Time.MeasureTimeVoid("Parsing ... ", codeBlock: () => ParseData(data));
         }
 
         private string FetchJson()
         {
-            if (client is not null)
-            {
-                // Console.WriteLine("uRL: {0}", Url());
-                Task<string> stream = client.GetStringAsync(Url());
-                return stream.Result;
-            }
+            if (_client is null) throw new NullReferenceException("No client configured");
+            
+            Task<string> stream = _client.GetStringAsync(Url());
+            return stream.Result;
 
-            throw new NullReferenceException("No client configured");
         }
 
         private string Url()
         {
-            return base_url
+            return BaseUrl
                 + "?e="
-                + token
+                + _token
                 + "&timezone="
-                + timezone
+                + Timezone
                 + "&from="
-                + from.ToString()
+                + From.ToString()
                 + "&to="
-                + to.ToString();
+                + To.ToString();
         }
 
-        private JsonData? Deserialize(string json_data)
+        private JsonData? Deserialize(string jsonData)
         {
-            return JsonSerializer.Deserialize<JsonData>(json_data);
+            return JsonSerializer.Deserialize<JsonData>(jsonData);
         }
 
         private void ParseData(JsonData? data)
         {
-            if (data is null || data.data is null)
+            if (data?.data is null)
             {
                 return;
             }
 
-            double kwhSum = 0.0F;
             foreach (Item item in data.data)
             {
                 if (item.start is null || item.end is null)
                 {
                     continue;
                 }
-                string SessionId = item.session_identifier is not null
-                    ? item.session_identifier
-                    : Guid.NewGuid().ToString();
+                string sessionId = item.session_identifier ?? Guid.NewGuid().ToString();
                 Charge charge = new()
                 {
-                    SessionId = SessionId,
-                    Kwh = item.energy is double v ? v : 0.0F,
+                    SessionId = sessionId,
+                    Kwh = item.energy is { } v ? v : 0.0F,
                     StartTime = DateTime.Parse(
                         (string)item.start,
-                        culture,
+                        _culture,
                         DateTimeStyles.AssumeLocal
                     ),
-                    EndTime = DateTime.Parse((string)item.end, culture, DateTimeStyles.AssumeLocal),
+                    EndTime = DateTime.Parse((string)item.end, _culture, DateTimeStyles.AssumeLocal),
                     MeterDiff = item.eto_diff,
                     MeterStart = item.eto_start,
                     MeterEnd = item.eto_end,
@@ -135,10 +129,8 @@ namespace Charging
                         ? (long)TimeOnly.Parse(item.seconds_charged).ToTimeSpan().TotalSeconds
                         : 0,
                 };
-                kwhSum += charge.Kwh;
-                charges.Add(charge);
+                _charges.Add(charge);
             }
-            // Console.WriteLine("Kwh sum: {0:F2}", kwhSum);
         }
     }
 }

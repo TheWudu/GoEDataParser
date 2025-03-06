@@ -5,21 +5,21 @@ namespace GoEDataParserTest;
 
 public class GenericMongoStoreTest
 {
-    GenericMongoStore<TestEntity> store;
+    GenericMongoStore<TestEntity> _store;
 
     public GenericMongoStoreTest()
     {
         string dbHost = Charging.Configuration.MongoDbHost();
         string dbName = Charging.Configuration.MongoDbName();
-        store = new(dbHost, dbName, "test_entities");
-        store.Clear();
+        _store = new(dbHost, dbName, "test_entities");
+        _store.Clear();
     }
 
     internal TestEntity CreateEntity(string name, string? id = null)
     {
         TestEntity te = new(name, id);
 
-        te = store.Insert(te);
+        te = _store.Insert(te);
 
         return te;
     }
@@ -28,9 +28,9 @@ public class GenericMongoStoreTest
     public void InsertTest()
     {
         TestEntity testEntity = new("Martin");
-        store.Insert(testEntity);
+        _store.Insert(testEntity);
 
-        Assert.Equal(1, store.Count());
+        Assert.Equal(1, _store.Count());
     }
 
     [Fact]
@@ -40,10 +40,10 @@ public class GenericMongoStoreTest
         var te = CreateEntity("Daniel", id);
 
         te.Name = "Michael";
-        var updatedEntity = store.Update(te);
+        var updatedEntity = _store.Update(te);
 
-        Assert.Equal(store.Find(id), updatedEntity);
-        Assert.Equal(1, store.Count());
+        Assert.Equal(_store.Find(id), updatedEntity);
+        Assert.Equal(1, _store.Count());
     }
 
     [Fact]
@@ -52,7 +52,7 @@ public class GenericMongoStoreTest
         string id = "0c8af010-a101-4fef-957c-1c78977524ae";
         var te = CreateEntity("Daniel", id);
 
-        Assert.True(store.Delete(id));
+        Assert.True(_store.Delete(id));
     }
 
     [Theory]
@@ -65,23 +65,23 @@ public class GenericMongoStoreTest
             CreateEntity("Test" + i.ToString());
         }
 
-        Assert.Equal(store.Count(), amount);
+        Assert.Equal(_store.Count(), amount);
     }
 
     [Fact]
     public void FindByString()
     {
-        var TestEntity = CreateEntity("michael");
+        var testEntity = CreateEntity("michael");
 
-        Assert.Equal(store.FindBy("Name", "michael"), TestEntity);
+        Assert.Equal(_store.FindBy("Name", "michael"), testEntity);
     }
 
     [Fact]
     public void FindByInt()
     {
-        var TestEntity = CreateEntity("michael");
+        var testEntity = CreateEntity("michael");
 
-        Assert.Equal(store.FindBy("Version", 1), TestEntity);
+        Assert.Equal(_store.FindBy("Version", 1), testEntity);
     }
 
     [Theory]
@@ -95,7 +95,7 @@ public class GenericMongoStoreTest
             CreateEntity("Test" + i.ToString());
         }
 
-        Assert.Equal(store.ReadAll().Count, amount);
+        Assert.Equal(_store.ReadAll().Count, amount);
     }
 
     [Fact]
@@ -106,8 +106,8 @@ public class GenericMongoStoreTest
         string id2 = "0a4b5010-a101-4fef-957c-1c7897752400";
         var te2 = CreateEntity("Michael", id2);
 
-        Assert.Equal(store.Find(id), te);
-        Assert.Equal(store.Find(id2), te2);
-        Assert.Null(store.Find("not-existing-id"));
+        Assert.Equal(_store.Find(id), te);
+        Assert.Equal(_store.Find(id2), te2);
+        Assert.Null(_store.Find("not-existing-id"));
     }
 }

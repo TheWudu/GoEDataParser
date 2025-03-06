@@ -2,25 +2,25 @@ namespace Charging
 {
     public class Evaluator
     {
-        public void run(List<Charge> charges)
+        public void Run(List<Charge> charges)
         {
-            Dictionary<string, ChargeInfo> monthly = groupMonthly(charges);
+            Dictionary<string, ChargeInfo> monthly = GroupMonthly(charges);
             PrintGroup(monthly, "month");
         }
 
-        public Dictionary<string, ChargeInfo> groupMonthly(List<Charge> charges)
+        public Dictionary<string, ChargeInfo> GroupMonthly(List<Charge> charges)
         {
-            return groupBy(charges, "yyyy.MM");
+            return GroupBy(charges, "yyyy.MM");
         }
 
-        public Dictionary<string, ChargeInfo> groupYearly(List<Charge> charges)
+        public Dictionary<string, ChargeInfo> GroupYearly(List<Charge> charges)
         {
-            return groupBy(charges, "yyyy");
+            return GroupBy(charges, "yyyy");
         }
 
-        private Dictionary<string, ChargeInfo> groupBy(List<Charge> charges, string timecode)
+        private Dictionary<string, ChargeInfo> GroupBy(List<Charge> charges, string timecode)
         {
-            Dictionary<string, ChargeInfo> dict_monthly = [];
+            Dictionary<string, ChargeInfo> dictMonthly = [];
             Charge? prev = null;
 
             foreach (Charge c in charges)
@@ -33,7 +33,7 @@ namespace Charging
                 }
 
                 string key = c.StartTime.ToString(timecode);
-                if (dict_monthly.TryGetValue(key, out ChargeInfo? info))
+                if (dictMonthly.TryGetValue(key, out ChargeInfo? info))
                 {
                     info.KwhSum += c.Kwh;
                     info.Count += 1;
@@ -43,13 +43,13 @@ namespace Charging
                 }
                 else
                 {
-                    dict_monthly.Add(key, new ChargeInfo(key, c.Kwh, 1, c.SecondsCharged, missing));
+                    dictMonthly.Add(key, new ChargeInfo(key, c.Kwh, 1, c.SecondsCharged, missing));
                 }
 
                 prev = c;
             }
 
-            return dict_monthly;
+            return dictMonthly;
         }
 
         public void PrintGroup(Dictionary<string, ChargeInfo> dict, string grouping)

@@ -1,10 +1,5 @@
-using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Bson;
-using MongoDB.Driver.Linq;
-using MySql.Data;
-using MySql.Data.MySqlClient;
-using Org.BouncyCastle.Math.EC.Rfc7748;
+using Repository;
 
 namespace Repository
 {
@@ -16,7 +11,7 @@ namespace Repository
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseMySQL(
-                $"server={dbHost};database={dbName};user={dbUser};password={dbPassword}"
+                $"server={DbHost};database={DbName};user={DbUser};password={DbPassword}"
             );
         }
 
@@ -24,15 +19,15 @@ namespace Repository
         {
             modelBuilder.Entity<T>(entity =>
             {
-                entity.ToTable(dbTablename);
+                entity.ToTable(DbTablename);
             });
         }
 
-        private string dbTablename { get; }
-        private string dbHost { get; }
-        private string dbName { get; }
-        private string dbUser { get; }
-        private string dbPassword { get; }
+        private string DbTablename { get; }
+        private string DbHost { get; }
+        private string DbName { get; }
+        private string DbUser { get; }
+        private string DbPassword { get; }
 
         public GenericMysqlStore(
             string dbHost,
@@ -42,11 +37,13 @@ namespace Repository
             string dbPassword
         )
         {
-            this.dbTablename = dbTablename;
-            this.dbHost = dbHost;
-            this.dbName = dbName;
-            this.dbUser = dbUser;
-            this.dbPassword = dbPassword;
+            this.DbTablename = dbTablename;
+            this.DbHost = dbHost;
+            this.DbName = dbName;
+            this.DbUser = dbUser;
+            this.DbPassword = dbPassword;
+
+            Database.EnsureCreated();
         }
 
         ~GenericMysqlStore() { }
@@ -77,9 +74,9 @@ namespace Repository
             return Dataset.Find(id);
         }
 
-        public T? FindBy<V>(string key, V value)
+        public T? FindBy<TV>(string key, TV value)
         {
-            string q = $"SELECT * FROM {dbTablename} WHERE {key} = '{value}'";
+            string q = $"SELECT * FROM {DbTablename} WHERE {key} = '{value}'";
 
             return Dataset.FromSqlRaw(q).ToList().FirstOrDefault<T>();
         }

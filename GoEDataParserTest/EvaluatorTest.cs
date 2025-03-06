@@ -5,13 +5,13 @@ namespace GoEDataParserTest
 {
     public class EvaluatorTests
     {
-        List<Charge> charges;
+        List<Charge> _charges;
 
         public EvaluatorTests()
         {
             Console.WriteLine("Setup in EvaluatorTests");
 
-            charges = new()
+            _charges = new()
             {
                 new Charge()
                 {
@@ -45,10 +45,10 @@ namespace GoEDataParserTest
         }
 
         [Fact]
-        public void testMonthly()
+        public void TestMonthly()
         {
             Evaluator evaluator = new();
-            Dictionary<string, ChargeInfo> monthly = evaluator.groupMonthly(charges);
+            Dictionary<string, ChargeInfo> monthly = evaluator.GroupMonthly(_charges);
 
             Assert.Multiple(() =>
             {
@@ -59,10 +59,10 @@ namespace GoEDataParserTest
         }
 
         [Fact]
-        public void testYearly()
+        public void TestYearly()
         {
             Evaluator evaluator = new();
-            Dictionary<string, ChargeInfo> monthly = evaluator.groupYearly(charges);
+            Dictionary<string, ChargeInfo> monthly = evaluator.GroupYearly(_charges);
 
             Assert.Multiple(() =>
             {

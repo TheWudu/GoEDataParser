@@ -15,7 +15,7 @@ namespace Charging
                 Builders<Charge>.Filter.Gte(c => c.StartTime, start)
                 & Builders<Charge>.Filter.Lt(c => c.StartTime, end);
 
-            var documents = collection.Find(filter);
+            var documents = Collection.Find(filter);
 
             return documents.ToList<Charge>();
         }
@@ -46,7 +46,7 @@ namespace Charging
 
             // Console.WriteLine(pipeline);
 
-            var documents = collection.Aggregate(pipeline).ToList();
+            var documents = Collection.Aggregate(pipeline).ToList();
             Dictionary<string, ChargeInfo> infos = new();
 
             foreach (var item in documents)

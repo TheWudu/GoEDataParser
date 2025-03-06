@@ -7,14 +7,14 @@ namespace Charging
     {
         public class CsvParser
         {
-            private readonly List<Charge> charges = [];
-            private readonly CultureInfo culture = CultureInfo.CreateSpecificCulture(
+            private readonly List<Charge> _charges = [];
+            private readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture(
                 Charging.Configuration.Culture()
             );
 
             public List<Charge> GetCharges()
             {
-                return charges;
+                return _charges;
             }
 
             public void Parse(string filepath)
@@ -43,10 +43,10 @@ namespace Charging
                     }
 
                     string sessionId = currentRow[1];
-                    DateTime StartTime = DateTime.Parse(currentRow[5], culture);
-                    DateTime EndTime = DateTime.Parse(currentRow[6], culture);
-                    double Kwh = Double.Parse(currentRow[11], NumberStyles.Any, culture);
-                    long SecondsCharged = (long)
+                    DateTime startTime = DateTime.Parse(currentRow[5], _culture);
+                    DateTime endTime = DateTime.Parse(currentRow[6], _culture);
+                    double kwh = Double.Parse(currentRow[11], NumberStyles.Any, _culture);
+                    long secondsCharged = (long)
                         TimeOnly.Parse(currentRow[8]).ToTimeSpan().TotalSeconds;
                     // Console.WriteLine(
                     //     "{0} - {1}: {2} / {3}",
@@ -59,12 +59,12 @@ namespace Charging
                     Charge charge = new()
                     {
                         SessionId = sessionId,
-                        Kwh = Kwh,
-                        StartTime = StartTime,
-                        EndTime = EndTime,
-                        SecondsCharged = SecondsCharged,
+                        Kwh = kwh,
+                        StartTime = startTime,
+                        EndTime = endTime,
+                        SecondsCharged = secondsCharged,
                     };
-                    charges.Add(charge);
+                    _charges.Add(charge);
                 }
             }
         }

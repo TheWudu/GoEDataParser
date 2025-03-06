@@ -8,24 +8,24 @@ namespace Repository
     public class GenericMongoStore<T> : IGenericStore<T>
         where T : BaseEntity
     {
-        private readonly MongoClient client;
-        protected readonly IMongoCollection<T> collection;
+        private readonly MongoClient _client;
+        protected readonly IMongoCollection<T> Collection;
 
         public GenericMongoStore(string dbHost, string dbName, string dbCollection)
         {
             string? connectionString = "mongodb://" + dbHost + "/?retryWrites=true&w=majority";
-            client = new MongoClient(connectionString);
-            collection = client.GetDatabase(dbName).GetCollection<T>(dbCollection);
+            _client = new MongoClient(connectionString);
+            Collection = _client.GetDatabase(dbName).GetCollection<T>(dbCollection);
         }
 
         public long Count()
         {
-            return collection.CountDocuments(Builders<T>.Filter.Empty);
+            return Collection.CountDocuments(Builders<T>.Filter.Empty);
         }
 
         public T Insert(T entity)
         {
-            collection.InsertOne(entity);
+            Collection.InsertOne(entity);
 
             return entity;
         }
@@ -36,7 +36,7 @@ namespace Repository
                 Builders<T>.Filter.Eq("_id", entity.Id)
                 & Builders<T>.Filter.Eq("Version", entity.Version);
 
-            var resp = collection.ReplaceOne(filter, entity);
+            var resp = Collection.ReplaceOne(filter, entity);
             if (resp.ModifiedCount != 1)
             {
                 string message =
@@ -51,21 +51,21 @@ namespace Repository
             return entity;
         }
 
-        public T? FindBy<V>(string key, V value)
+        public T? FindBy<TV>(string key, TV value)
         {
             var filter = Builders<T>.Filter.Eq(key, value);
 
-            return collection.Find(filter).FirstOrDefault();
+            return Collection.Find(filter).FirstOrDefault();
         }
 
         public void Clear()
         {
-            collection.DeleteMany(Builders<T>.Filter.Empty);
+            Collection.DeleteMany(Builders<T>.Filter.Empty);
         }
 
         public List<T> ReadAll()
         {
-            return collection.Find(Builders<T>.Filter.Empty).ToList();
+            return Collection.Find(Builders<T>.Filter.Empty).ToList();
         }
 
         public T? Find(string id)
@@ -76,7 +76,7 @@ namespace Repository
         public bool Delete(string id)
         {
             var filter = Builders<T>.Filter.Eq(e => e.Id, id);
-            var res = collection.DeleteOne(filter);
+            var res = Collection.DeleteOne(filter);
 
             return res.DeletedCount == 1;
         }

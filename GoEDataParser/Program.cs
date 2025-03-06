@@ -2,13 +2,13 @@
 
 public class GoEDataParser
 {
-    public static List<Charging.Charge> useCsv()
+    public static List<Charging.Charge> UseCsv()
     {
         Console.WriteLine("Using CSV downloader and parser");
 
         Charging.CsvDownloader downloader = new Charging.CsvDownloader();
-        downloader.run();
-        string filepath = downloader.filepath;
+        downloader.Run();
+        string filepath = downloader.Filepath;
 
         Charging.Parser.CsvParser csvParser = new Charging.Parser.CsvParser();
         csvParser.Parse(filepath);
@@ -16,17 +16,17 @@ public class GoEDataParser
         return csvParser.GetCharges();
     }
 
-    public static List<Charging.Charge> useJson()
+    public static List<Charging.Charge> UseJson()
     {
         Console.WriteLine("Using JSON downloader and parser");
 
         Charging.JsonParser parser = new(new HttpClient());
-        parser.load();
+        parser.Load();
 
         return parser.GetCharges();
     }
 
-    public static int storeChargesInMongo(List<Charging.Charge> charges)
+    public static int StoreChargesInMongo(List<Charging.Charge> charges)
     {
         int storedCount = 0;
         int updatedCount = 0;
@@ -67,7 +67,7 @@ public class GoEDataParser
         return storedCount;
     }
 
-    public static int storeChargesInMySql(List<Charging.Charge> charges)
+    public static int StoreChargesInMySql(List<Charging.Charge> charges)
     {
         int storedCount = 0;
         int updatedCount = 0;
@@ -115,7 +115,7 @@ public class GoEDataParser
         return storedCount;
     }
 
-    public static List<Charging.Charge> useMongo()
+    public static List<Charging.Charge> UseMongo()
     {
         string dbHost = Charging.Configuration.MongoDbHost();
         string dbName = Charging.Configuration.MongoDbName();
@@ -126,7 +126,7 @@ public class GoEDataParser
         return Charging.Utils.Time.MeasureTime("Read from database ... ", codeBlock: store.ReadAll);
     }
 
-    public static List<Charging.Charge> useMysql()
+    public static List<Charging.Charge> UseMysql()
     {
         List<Charging.Charge> list = new();
 
@@ -144,7 +144,7 @@ public class GoEDataParser
         return chargeStore.GroupMonthly();
     }
 
-    public static void listCharges(List<Charging.Charge> charges)
+    public static void ListCharges(List<Charging.Charge> charges)
     {
         foreach (Charging.Charge charge in charges)
         {
@@ -164,21 +164,21 @@ public class GoEDataParser
 
         if (args.Contains("-csv"))
         {
-            charges = useCsv();
+            charges = UseCsv();
         }
         else if (args.Contains("-json"))
         {
-            charges = useJson();
+            charges = UseJson();
         }
         else if (args.Contains("-mysql"))
         {
-            charges = useMysql();
+            charges = UseMysql();
         }
         else
         {
             charges = Charging.Utils.Time.MeasureTime(
                 "Read charges from database ...",
-                codeBlock: useMongo
+                codeBlock: UseMongo
             );
         }
 
@@ -188,14 +188,14 @@ public class GoEDataParser
             {
                 Charging.Utils.Time.MeasureTimeVoid(
                     "Store charges in MySQL... ",
-                    codeBlock: () => storeChargesInMySql(charges)
+                    codeBlock: () => StoreChargesInMySql(charges)
                 );
             }
             else
             {
                 Charging.Utils.Time.MeasureTimeVoid(
                     "Store charges in MongoDB... ",
-                    codeBlock: () => storeChargesInMongo(charges)
+                    codeBlock: () => StoreChargesInMongo(charges)
                 );
             }
         }
@@ -204,20 +204,20 @@ public class GoEDataParser
         {
             Charging.Utils.Time.MeasureTimeVoid(
                 "List charges ... ",
-                codeBlock: () => listCharges(charges)
+                codeBlock: () => ListCharges(charges)
             );
         }
 
         Charging.Evaluator evaluator = new Charging.Evaluator();
         var monthly = Charging.Utils.Time.MeasureTime(
             "Group monthly ... ",
-            codeBlock: () => evaluator.groupMonthly(charges)
+            codeBlock: () => evaluator.GroupMonthly(charges)
         );
         evaluator.PrintGroup(monthly, "month");
 
         var yearly = Charging.Utils.Time.MeasureTime(
             "Group yearly ... ",
-            codeBlock: () => evaluator.groupYearly(charges)
+            codeBlock: () => evaluator.GroupYearly(charges)
         );
         evaluator.PrintGroup(yearly, "year");
 

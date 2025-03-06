@@ -6,7 +6,7 @@ namespace GoEDataParserTest;
 
 public class GenericMysqlStoreTest
 {
-    GenericMysqlStore<TestEntity> store;
+    GenericMysqlStore<TestEntity> _store;
 
     public GenericMysqlStoreTest()
     {
@@ -14,15 +14,15 @@ public class GenericMysqlStoreTest
         string dbName = Charging.Configuration.MysqlDbName();
         string dbUser = Charging.Configuration.MysqlDbUser();
         string dbPassword = Charging.Configuration.MysqlDbPassword();
-        store = new(dbHost, dbName, "test_entities", dbUser, dbPassword);
-        store.Clear();
+        _store = new(dbHost, dbName, (string)"test_entities", dbUser, dbPassword);
+        _store.Clear();
     }
 
     internal TestEntity CreateEntity(string name, string? id = null, int version = 1)
     {
         TestEntity te = new(name, id, version);
 
-        store.Insert(te);
+        _store.Insert(te);
 
         return te;
     }
@@ -31,9 +31,9 @@ public class GenericMysqlStoreTest
     public void MysqlInsertTest()
     {
         TestEntity testEntity = new("Martin");
-        store.Insert(testEntity);
+        _store.Insert(testEntity);
 
-        Assert.Equal(1, store.Count());
+        Assert.Equal(1, _store.Count());
     }
 
     [Fact]
@@ -42,13 +42,13 @@ public class GenericMysqlStoreTest
         string id = "0c8af010-a101-4fef-957c-1c78977524cc";
         var te = CreateEntity("Daniel", id);
 
-        TestEntity? ut = store.Find(id);
+        TestEntity? ut = _store.Find(id);
         Assert.NotNull(ut);
         ut.Name = "Michael";
-        var updatedEntity = store.Update(ut);
+        var updatedEntity = _store.Update(ut);
 
-        Assert.Equal(store.Find(id), ut);
-        Assert.Equal(1, store.Count());
+        Assert.Equal(_store.Find(id), ut);
+        Assert.Equal(1, _store.Count());
     }
 
     [Fact]
@@ -59,7 +59,7 @@ public class GenericMysqlStoreTest
 
         Console.WriteLine("{0} - {1}", te.Id, te.Name);
 
-        Assert.True(store.Delete(id));
+        Assert.True(_store.Delete(id));
     }
 
     [Theory]
@@ -73,15 +73,15 @@ public class GenericMysqlStoreTest
             CreateEntity("Test" + i.ToString());
         }
 
-        Assert.Equal(store.Count(), amount);
+        Assert.Equal(_store.Count(), amount);
     }
 
     [Fact]
     public void FindByString()
     {
-        var TestEntity = CreateEntity("michael");
+        var testEntity = CreateEntity("michael");
 
-        Assert.Equal(store.FindBy("name", "michael"), TestEntity);
+        Assert.Equal(_store.FindBy("name", "michael"), testEntity);
     }
 
     [Fact]
@@ -92,8 +92,8 @@ public class GenericMysqlStoreTest
         var testEntity1 = CreateEntity("michael", id1);
         var testEntity2 = CreateEntity("daniel", id2, 2);
 
-        var readEntityV1 = store.FindBy("version", 1);
-        var readEntityV2 = store.FindBy("version", 2);
+        var readEntityV1 = _store.FindBy("version", 1);
+        var readEntityV2 = _store.FindBy("version", 2);
 
         Assert.Equal(readEntityV2, testEntity2);
         Assert.NotNull(readEntityV1);
@@ -113,7 +113,7 @@ public class GenericMysqlStoreTest
             CreateEntity("Test" + i.ToString());
         }
 
-        Assert.Equal(store.ReadAll().Count, amount);
+        Assert.Equal(_store.ReadAll().Count, amount);
     }
 
     [Fact]
@@ -124,8 +124,8 @@ public class GenericMysqlStoreTest
         string id2 = "0a4b5010-a101-4fef-957c-1c7897752400";
         var te2 = CreateEntity("Michael", id2);
 
-        Assert.Equal(store.Find(id), te);
-        Assert.Equal(store.Find(id2), te2);
-        Assert.Null(store.Find("not-existing-id"));
+        Assert.Equal(_store.Find(id), te);
+        Assert.Equal(_store.Find(id2), te2);
+        Assert.Null(_store.Find("not-existing-id"));
     }
 }
