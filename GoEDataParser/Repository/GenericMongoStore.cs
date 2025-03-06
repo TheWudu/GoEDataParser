@@ -25,9 +25,6 @@ namespace Repository
 
         public T Insert(T entity)
         {
-            entity.Id ??= Guid.NewGuid().ToString();
-            entity.Version = 1;
-
             collection.InsertOne(entity);
 
             return entity;

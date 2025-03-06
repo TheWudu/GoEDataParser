@@ -63,7 +63,7 @@ namespace Charging
 
         public void load()
         {
-            string json_data = Utils.Time.MeasureTime("Fetching ... ", codeBlock: () => FetchJson());
+            string json_data = Utils.Time.MeasureTime("Fetching ... ", codeBlock: FetchJson);
             JsonData? data = Utils.Time.MeasureTime(
                 "Deserializing ... ",
                 codeBlock: () => Deserialize(json_data)
@@ -98,11 +98,7 @@ namespace Charging
 
         private JsonData? Deserialize(string json_data)
         {
-            var result = Utils.Time.MeasureTime(
-                "Deserializing ... ",
-                codeBlock: () => JsonSerializer.Deserialize<JsonData>(json_data)
-            );
-            return (JsonData?)result;
+            return JsonSerializer.Deserialize<JsonData>(json_data);
         }
 
         private void ParseData(JsonData? data)

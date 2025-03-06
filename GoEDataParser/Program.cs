@@ -5,6 +5,7 @@ public class GoEDataParser
     public static List<Charging.Charge> useCsv()
     {
         Console.WriteLine("Using CSV downloader and parser");
+
         Charging.CsvDownloader downloader = new Charging.CsvDownloader();
         downloader.run();
         string filepath = downloader.filepath;
@@ -63,7 +64,7 @@ public class GoEDataParser
         return storedCount;
     }
 
-    public static List<Charging.Charge> useDatabase()
+    public static List<Charging.Charge> useMongo()
     {
         string dbHost = Charging.Configuration.MongoDbHost();
         string dbName = Charging.Configuration.MongoDbName();
@@ -72,6 +73,13 @@ public class GoEDataParser
         Repository.GenericStore<Charging.Charge> store = new(chargeStore);
 
         return Charging.Utils.Time.MeasureTime("Read from database ... ", codeBlock: store.ReadAll);
+    }
+
+    public static List<Charging.Charge> useMysql()
+    {
+        List<Charging.Charge> list = new();
+
+        return list;
     }
 
     public static Dictionary<string, Charging.ChargeInfo> StatsViaMongo()
@@ -100,7 +108,7 @@ public class GoEDataParser
 
         List<Charging.Charge> charges = [];
         // args = args.Append("-csv").ToArray();
-        //args = args.Append("-json").ToArray();
+        // args = args.Append("-json").ToArray();
 
         if (args.Contains("-csv"))
         {
@@ -110,11 +118,15 @@ public class GoEDataParser
         {
             charges = useJson();
         }
+        else if (args.Contains("-mysql"))
+        {
+            charges = useMysql();
+        }
         else
         {
             charges = Charging.Utils.Time.MeasureTime(
                 "Read charges from database ...",
-                codeBlock: useDatabase
+                codeBlock: useMongo
             );
         }
 
