@@ -125,7 +125,7 @@ public class GenericMysqlStoreTest
         var te2 = CreateEntity("Michael", id2);
 
         Assert.Equal(store.Find(id), te);
-        //Assert.Equal(store.Find(id2), te2);
-        //Assert.Null(store.Find("not-existing-id"));
+        Assert.Equal(store.Find(id2), te2);
+        Assert.Null(store.Find("not-existing-id"));
     }
 }
