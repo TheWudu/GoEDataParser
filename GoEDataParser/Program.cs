@@ -37,10 +37,6 @@ public class GoEDataParser
         Repository.GenericStore<Charging.Charge> store = new(chargeStore);
         foreach (Charging.Charge charge in charges)
         {
-            if (charge.SessionId is null)
-            {
-                continue;
-            }
             Charging.Charge? storedCharge = store.FindBy("SessionId", charge.SessionId);
             if (storedCharge is null)
             {

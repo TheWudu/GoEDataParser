@@ -42,7 +42,9 @@ public class GenericMongoStoreTest
         te.Name = "Michael";
         var updatedEntity = _store.Update(te);
 
-        Assert.Equal(_store.Find(id), updatedEntity);
+        var storedEntity = _store.Find(id);
+        Assert.Equal(storedEntity, updatedEntity);
+        Assert.Equal(storedEntity?.Version, 2);
         Assert.Equal(1, _store.Count());
     }
 

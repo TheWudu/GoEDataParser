@@ -15,6 +15,7 @@ public class GenericMysqlStoreTest
         string dbUser = Charging.Configuration.MysqlDbUser();
         string dbPassword = Charging.Configuration.MysqlDbPassword();
         _store = new(dbHost, dbName, (string)"test_entities", dbUser, dbPassword);
+
         _store.Clear();
     }
 
@@ -47,7 +48,9 @@ public class GenericMysqlStoreTest
         ut.Name = "Michael";
         var updatedEntity = _store.Update(ut);
 
-        Assert.Equal(_store.Find(id), ut);
+        var storedEntity = _store.Find(id);
+        Assert.Equal(storedEntity, ut);
+        Assert.Equal(storedEntity?.Version, 2);
         Assert.Equal(1, _store.Count());
     }
 

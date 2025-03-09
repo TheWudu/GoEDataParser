@@ -30,6 +30,7 @@
   <Target Name="CopyCustomContent" AfterTargets="AfterBuild">
     <!-- Command Line (dotnet test) -->
     <Copy SourceFiles="App.config" DestinationFiles="$(OutDir)\testhost.dll.config" />
+    <Copy SourceFiles="App.config" DestinationFiles="$(OutDir)\ReSharperTestRunner.dll.config" />
     <!-- Visual Studio Test Explorer -->
     <!-- <Copy SourceFiles="App.config" DestinationFiles="$(OutDir)\testhost.x86.dll.config" /> -->
   </Target>

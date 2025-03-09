@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using Repository;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
+using MySql.Data.MySqlClient;
 
 namespace Repository
 {
@@ -37,36 +39,44 @@ namespace Repository
             string dbPassword
         )
         {
-            this.DbTablename = dbTablename;
-            this.DbHost = dbHost;
-            this.DbName = dbName;
-            this.DbUser = dbUser;
-            this.DbPassword = dbPassword;
+            DbTablename = dbTablename;
+            DbHost = dbHost;
+            DbName = dbName;
+            DbUser = dbUser;
+            DbPassword = dbPassword;
 
             Database.EnsureCreated();
-        }
 
-        ~GenericMysqlStore() { }
+            try
+            {
+                var databaseCreator = this.GetService<IRelationalDatabaseCreator>();
+                databaseCreator.CreateTables();
+            }
+            catch (MySqlException)
+            {
+                // nothing   
+            }
+        }
 
         public void Clear()
         {
             Dataset.ExecuteDelete();
+            SaveChanges();
         }
 
         public long Count()
         {
-            return Dataset.Count<T>();
+            return Dataset.Count();
         }
 
         public bool Delete(string id)
         {
             T? entity = Dataset.Find(id);
-            if (entity is not null)
-            {
-                Dataset.Remove(entity);
-                return true;
-            }
-            return false;
+            if (entity is null) return false;
+            
+            Dataset.Remove(entity);
+            var cnt = this.SaveChanges();
+            return cnt == 1;
         }
 
         public T? Find(string id)
@@ -78,13 +88,13 @@ namespace Repository
         {
             string q = $"SELECT * FROM {DbTablename} WHERE {key} = '{value}'";
 
-            return Dataset.FromSqlRaw(q).ToList().FirstOrDefault<T>();
+            return Dataset.FromSqlRaw(q).ToList().FirstOrDefault();
         }
 
         public T Insert(T entity)
         {
             Dataset.Add(entity);
-            this.SaveChanges();
+            SaveChanges();
 
             return entity;
         }
@@ -98,8 +108,10 @@ namespace Repository
 
         public T Update(T entity)
         {
+            entity.Version += 1;
+            
             Dataset.Update(entity);
-            this.SaveChanges();
+            SaveChanges();
 
             return entity;
         }

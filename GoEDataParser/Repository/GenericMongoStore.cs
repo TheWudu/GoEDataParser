@@ -35,7 +35,8 @@ namespace Repository
             var filter =
                 Builders<T>.Filter.Eq("_id", entity.Id)
                 & Builders<T>.Filter.Eq("Version", entity.Version);
-
+            
+            entity.Version += 1;
             var resp = Collection.ReplaceOne(filter, entity);
             if (resp.ModifiedCount != 1)
             {
