@@ -54,7 +54,7 @@ namespace Repository
             }
             catch (MySqlException)
             {
-                // nothing   
+                // nothing
             }
         }
 
@@ -72,8 +72,9 @@ namespace Repository
         public bool Delete(string id)
         {
             T? entity = Dataset.Find(id);
-            if (entity is null) return false;
-            
+            if (entity is null)
+                return false;
+
             Dataset.Remove(entity);
             var cnt = this.SaveChanges();
             return cnt == 1;
@@ -109,7 +110,7 @@ namespace Repository
         public T Update(T entity)
         {
             entity.Version += 1;
-            
+
             Dataset.Update(entity);
             SaveChanges();
 
