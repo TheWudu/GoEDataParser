@@ -1,11 +1,11 @@
-using System.Security.Cryptography.X509Certificates;
-using MongoDB.Bson;
+using GoEDataParser.Models;
 using MongoDB.Driver;
+using Repository;
 
-namespace Charging
+namespace GoEDataParser.Repository
 {
     public class ChargeMongoStore(string dbHost, string dbName)
-        : Repository.GenericMongoStore<Charge>(dbHost, dbName, "charges")
+        : GenericMongoStore<Charge>(dbHost, dbName, "charges")
     {
         public List<Charge> FindByStartDate(DateTime dateTime)
         {

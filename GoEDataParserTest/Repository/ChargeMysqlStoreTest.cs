@@ -1,21 +1,22 @@
-using System.Globalization;
-using Charging;
+using GoEDataParser;
+using GoEDataParser.Models;
+using GoEDataParser.Repository;
 using Xunit;
 
-namespace GoEDataParserTest;
+namespace GoEDataParserTest.Repository;
 
 public class ChargeMysqlStoreTest
 {
-    Charging.ChargeMysqlStore _store;
+    readonly ChargeMysqlStore _store;
 
     public ChargeMysqlStoreTest()
     {
-        string dbHost = Charging.Configuration.MysqlDbHost();
-        string dbName = Charging.Configuration.MysqlDbName();
-        string dbUser = Charging.Configuration.MysqlDbUser();
-        string dbPassword = Charging.Configuration.MysqlDbPassword();
+        string dbHost = Configuration.MysqlDbHost();
+        string dbName = Configuration.MysqlDbName();
+        string dbUser = Configuration.MysqlDbUser();
+        string dbPassword = Configuration.MysqlDbPassword();
         _store = new(dbHost, dbName, dbUser, dbPassword);
-        
+
         _store.Clear();
     }
 
@@ -23,7 +24,7 @@ public class ChargeMysqlStoreTest
     [Fact]
     public void InsertSimple()
     {
-        Charging.Charge charge = new()
+        Charge charge = new()
         {
             Id = Guid.NewGuid().ToString(),
             Version = 1,
@@ -38,12 +39,12 @@ public class ChargeMysqlStoreTest
         Assert.Equal(1, _store.Count());
     }
 
-    Charging.Charge CreateCharge(int day, string? id = null)
+    Charge CreateCharge(int day, string? id = null)
     {
-        Charging.Charge charge = new()
+        Charge charge = new()
         {
             Id = id ?? Guid.NewGuid().ToString(),
-            SessionId = "sessionId_1234_" + day.ToString(),
+            SessionId = "sessionId_1234_" + day,
             Kwh = 10.123,
             StartTime = new DateTime(2025, 01, day, 09, 01, 02, DateTimeKind.Utc),
             EndTime = new DateTime(2025, 01, day, 11, 05, 47, DateTimeKind.Utc),
@@ -57,7 +58,7 @@ public class ChargeMysqlStoreTest
     [Fact]
     public void FindBySuccess()
     {
-        Charging.Charge charge = CreateCharge(10);
+        Charge charge = CreateCharge(10);
 
         Assert.Equal(_store.FindBy("SessionId", "sessionId_1234_10"), charge);
     }
@@ -101,13 +102,13 @@ public class ChargeMysqlStoreTest
     [InlineData(29)]
     public void ReadAll(int amount)
     {
-        List<Charging.Charge> insertedCharges = new();
+        List<Charge> insertedCharges = new();
 
         for (int i = 0; i < amount; i++)
         {
             insertedCharges.Add(CreateCharge(i + 1));
         }
-        List<Charging.Charge> charges = _store.ReadAll();
+        List<Charge> charges = _store.ReadAll();
 
         Assert.Multiple(() =>
         {
@@ -121,12 +122,12 @@ public class ChargeMysqlStoreTest
     public void UpdateExisting()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charging.Charge charge = CreateCharge(14, id);
+        Charge charge = CreateCharge(14, id);
 
         charge.Kwh += 10.0F;
         charge = _store.Update(charge);
 
-        Charging.Charge? updatedCharge = _store.Find(id);
+        Charge? updatedCharge = _store.Find(id);
         Assert.NotNull(charge);
         Assert.Equal(updatedCharge, charge);
     }
@@ -135,9 +136,9 @@ public class ChargeMysqlStoreTest
     public void UpdateTheCorrectOne()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charging.Charge charge = CreateCharge(14, id);
+        Charge charge = CreateCharge(14, id);
         string unchangedId = "8da64b25-5522-4ded-8c0f-ffcdd4331840";
-        Charging.Charge unchanged = CreateCharge(15, unchangedId);
+        Charge unchanged = CreateCharge(15, unchangedId);
 
         charge.Kwh += 10.0F;
         charge = _store.Update(charge);
@@ -150,7 +151,7 @@ public class ChargeMysqlStoreTest
     public void DeleteExisting()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charging.Charge charge = CreateCharge(14, id);
+        _ = CreateCharge(14, id);
 
         Assert.True(_store.Delete(id));
     }
@@ -163,19 +164,19 @@ public class ChargeMysqlStoreTest
         Assert.False(_store.Delete(id));
     }
 
-     [Fact]
-     public void TestMonthly()
-     {
-         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-         Charging.Charge charge = CreateCharge(14, id);
+    [Fact]
+    public void TestMonthly()
+    {
+        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+        _ = CreateCharge(14, id);
 
-         var monthly = _store.GroupMonthly();
+        var monthly = _store.GroupMonthly();
 
-         Assert.Multiple(() =>
-         {
-             Assert.Single(monthly);
-             Assert.Equal(10.123, monthly["2025.01"].KwhSum);
-             Assert.False(monthly.ContainsKey("2025.02"));
-         });
-     }
+        Assert.Multiple(() =>
+        {
+            Assert.Single(monthly);
+            Assert.Equal(10.123, monthly["2025.01"].KwhSum);
+            Assert.False(monthly.ContainsKey("2025.02"));
+        });
+    }
 }

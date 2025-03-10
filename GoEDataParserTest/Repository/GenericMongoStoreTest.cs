@@ -1,7 +1,8 @@
+using GoEDataParser;
 using Repository;
 using Xunit;
 
-namespace GoEDataParserTest;
+namespace GoEDataParserTest.Repository;
 
 public class GenericMongoStoreTest
 {
@@ -9,8 +10,8 @@ public class GenericMongoStoreTest
 
     public GenericMongoStoreTest()
     {
-        string dbHost = Charging.Configuration.MongoDbHost();
-        string dbName = Charging.Configuration.MongoDbName();
+        string dbHost = Configuration.MongoDbHost();
+        string dbName = Configuration.MongoDbName();
         _store = new(dbHost, dbName, "test_entities");
         _store.Clear();
     }

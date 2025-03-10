@@ -1,17 +1,18 @@
-using System.Globalization;
-using Charging;
+using GoEDataParser;
+using GoEDataParser.Models;
+using GoEDataParser.Repository;
 using Xunit;
 
-namespace GoEDataParserTest;
+namespace GoEDataParserTest.Repository;
 
 public class MongoStoreTest
 {
-    Charging.ChargeMongoStore _store;
+    ChargeMongoStore _store;
 
     public MongoStoreTest()
     {
-        string dbHost = Charging.Configuration.MongoDbHost();
-        string dbName = Charging.Configuration.MongoDbName();
+        string dbHost = Configuration.MongoDbHost();
+        string dbName = Configuration.MongoDbName();
         _store = new(dbHost, dbName);
         _store.Clear();
     }
@@ -20,7 +21,7 @@ public class MongoStoreTest
     [Fact]
     public void InsertSimple()
     {
-        Charging.Charge charge = new()
+        Charge charge = new()
         {
             SessionId = "212234_1685716486",
             Kwh = 10.123F,
@@ -33,9 +34,9 @@ public class MongoStoreTest
         Assert.Equal(1, _store.Count());
     }
 
-    Charging.Charge CreateCharge(int day, string? id = null)
+    Charge CreateCharge(int day, string? id = null)
     {
-        Charging.Charge charge = new()
+        Charge charge = new()
         {
             Id = id is not null ? id : Guid.NewGuid().ToString(),
             SessionId = "sessionId_1234_" + day.ToString(),
@@ -52,7 +53,7 @@ public class MongoStoreTest
     [Fact]
     public void FindBySuccess()
     {
-        Charging.Charge charge = CreateCharge(10);
+        Charge charge = CreateCharge(10);
 
         Assert.Equal(_store.FindBy("SessionId", "sessionId_1234_10"), charge);
     }
@@ -96,13 +97,13 @@ public class MongoStoreTest
     [InlineData(29)]
     public void ReadAll(int amount)
     {
-        List<Charging.Charge> insertedCharges = new();
+        List<Charge> insertedCharges = new();
 
         for (int i = 0; i < amount; i++)
         {
             insertedCharges.Add(CreateCharge(i + 1));
         }
-        List<Charging.Charge> charges = _store.ReadAll();
+        List<Charge> charges = _store.ReadAll();
 
         Assert.Multiple(() =>
         {
@@ -116,12 +117,12 @@ public class MongoStoreTest
     public void UpdateExisting()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charging.Charge charge = CreateCharge(14, id);
+        Charge charge = CreateCharge(14, id);
 
         charge.Kwh += 10.0F;
         charge = _store.Update(charge);
 
-        Charging.Charge? updatedCharge = _store.Find(id);
+        Charge? updatedCharge = _store.Find(id);
         Assert.NotNull(charge);
         Assert.Equal(updatedCharge, charge);
     }
@@ -130,9 +131,9 @@ public class MongoStoreTest
     public void UpdateTheCorrectOne()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charging.Charge charge = CreateCharge(14, id);
+        Charge charge = CreateCharge(14, id);
         string unchangedId = "8da64b25-5522-4ded-8c0f-ffcdd4331840";
-        Charging.Charge unchanged = CreateCharge(15, unchangedId);
+        Charge unchanged = CreateCharge(15, unchangedId);
 
         charge.Kwh += 10.0F;
         charge = _store.Update(charge);
@@ -145,12 +146,12 @@ public class MongoStoreTest
     public void UpdateOnlyWithProperVersion()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charging.Charge charge = CreateCharge(14, id);
+        Charge charge = CreateCharge(14, id);
 
         charge.Kwh += 10.0F;
         charge.Version = 5;
 
-        Assert.Throws<Repository.EntityNotFoundException>(
+        Assert.Throws<global::Repository.EntityNotFoundException>(
             delegate
             {
                 _ = _store.Update(charge);
@@ -162,7 +163,7 @@ public class MongoStoreTest
     public void DeleteExisting()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charging.Charge charge = CreateCharge(14, id);
+        Charge charge = CreateCharge(14, id);
 
         Assert.True(_store.Delete(id));
     }
@@ -179,7 +180,7 @@ public class MongoStoreTest
     public void TestMonthly()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charging.Charge charge = CreateCharge(14, id);
+        Charge charge = CreateCharge(14, id);
 
         var monthly = _store.GroupMonthly();
 

@@ -1,4 +1,5 @@
-﻿using Charging;
+﻿using GoEDataParser;
+using GoEDataParser.Models;
 using Xunit;
 
 namespace GoEDataParserTest

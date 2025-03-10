@@ -1,4 +1,3 @@
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Repository
@@ -13,7 +12,7 @@ namespace Repository
 
         public GenericMongoStore(string dbHost, string dbName, string dbCollection)
         {
-            string? connectionString = "mongodb://" + dbHost + "/?retryWrites=true&w=majority";
+            string connectionString = "mongodb://" + dbHost + "/?retryWrites=true&w=majority";
             _client = new MongoClient(connectionString);
             Collection = _client.GetDatabase(dbName).GetCollection<T>(dbCollection);
         }
@@ -35,7 +34,7 @@ namespace Repository
             var filter =
                 Builders<T>.Filter.Eq("_id", entity.Id)
                 & Builders<T>.Filter.Eq("Version", entity.Version);
-            
+
             entity.Version += 1;
             var resp = Collection.ReplaceOne(filter, entity);
             if (resp.ModifiedCount != 1)

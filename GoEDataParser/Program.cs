@@ -1,43 +1,49 @@
-﻿using System.Configuration;
+﻿using GoEDataParser.Models;
+using GoEDataParser.Parser;
+using GoEDataParser.Parser.Parser;
+using GoEDataParser.Repository;
+using GoEDataParser.Utils.Utils;
 
-public class GoEDataParser
+namespace GoEDataParser;
+
+public class ChargeData
 {
-    public static List<Charging.Charge> UseCsv()
+    public static List<Charge> UseCsv()
     {
         Console.WriteLine("Using CSV downloader and parser");
 
-        Charging.CsvDownloader downloader = new Charging.CsvDownloader();
+        CsvDownloader downloader = new CsvDownloader();
         downloader.Run();
         string filepath = downloader.Filepath;
 
-        Charging.Parser.CsvParser csvParser = new Charging.Parser.CsvParser();
+        CsvParser csvParser = new CsvParser();
         csvParser.Parse(filepath);
 
         return csvParser.GetCharges();
     }
 
-    public static List<Charging.Charge> UseJson()
+    public static List<Charge> UseJson()
     {
         Console.WriteLine("Using JSON downloader and parser");
 
-        Charging.JsonParser parser = new(new HttpClient());
+        JsonParser parser = new(new HttpClient());
         parser.Load();
 
         return parser.GetCharges();
     }
 
-    public static int StoreChargesInMongo(List<Charging.Charge> charges)
+    public static int StoreChargesInMongo(List<Charge> charges)
     {
         int storedCount = 0;
         int updatedCount = 0;
-        string dbHost = Charging.Configuration.MongoDbHost();
-        string dbName = Charging.Configuration.MongoDbName();
+        string dbHost = Configuration.MongoDbHost();
+        string dbName = Configuration.MongoDbName();
 
-        Charging.ChargeMongoStore chargeStore = new(dbHost, dbName);
-        Repository.GenericStore<Charging.Charge> store = new(chargeStore);
-        foreach (Charging.Charge charge in charges)
+        ChargeMongoStore chargeStore = new(dbHost, dbName);
+        global::Repository.GenericStore<Charge> store = new(chargeStore);
+        foreach (Charge charge in charges)
         {
-            Charging.Charge? storedCharge = store.FindBy("SessionId", charge.SessionId);
+            Charge? storedCharge = store.FindBy("SessionId", charge.SessionId);
             if (storedCharge is null)
             {
                 charge.Id ??= Guid.NewGuid().ToString();
@@ -63,24 +69,24 @@ public class GoEDataParser
         return storedCount;
     }
 
-    public static int StoreChargesInMySql(List<Charging.Charge> charges)
+    public static int StoreChargesInMySql(List<Charge> charges)
     {
         int storedCount = 0;
         int updatedCount = 0;
-        string dbHost = Charging.Configuration.MysqlDbHost();
-        string dbName = Charging.Configuration.MysqlDbName();
-        string dbUser = Charging.Configuration.MysqlDbUser();
-        string dbPassword = Charging.Configuration.MysqlDbPassword();
+        string dbHost = Configuration.MysqlDbHost();
+        string dbName = Configuration.MysqlDbName();
+        string dbUser = Configuration.MysqlDbUser();
+        string dbPassword = Configuration.MysqlDbPassword();
 
-        Charging.ChargeMysqlStore chargeStore = new(dbHost, dbName, dbUser, dbPassword);
-        Repository.GenericStore<Charging.Charge> store = new(chargeStore);
-        foreach (Charging.Charge charge in charges)
+        ChargeMysqlStore chargeStore = new(dbHost, dbName, dbUser, dbPassword);
+        global::Repository.GenericStore<Charge> store = new(chargeStore);
+        foreach (Charge charge in charges)
         {
             if (charge.SessionId is null)
             {
                 continue;
             }
-            Charging.Charge? storedCharge = store.FindBy("SessionId", charge.SessionId);
+            Charge? storedCharge = store.FindBy("SessionId", charge.SessionId);
             if (storedCharge is null)
             {
                 charge.Id ??= Guid.NewGuid().ToString();
@@ -111,38 +117,38 @@ public class GoEDataParser
         return storedCount;
     }
 
-    public static List<Charging.Charge> UseMongo()
+    public static List<Charge> UseMongo()
     {
-        string dbHost = Charging.Configuration.MongoDbHost();
-        string dbName = Charging.Configuration.MongoDbName();
+        string dbHost = Configuration.MongoDbHost();
+        string dbName = Configuration.MongoDbName();
 
-        Charging.ChargeMongoStore chargeStore = new(dbHost, dbName);
-        Repository.GenericStore<Charging.Charge> store = new(chargeStore);
+        ChargeMongoStore chargeStore = new(dbHost, dbName);
+        global::Repository.GenericStore<Charge> store = new(chargeStore);
 
-        return Charging.Utils.Time.MeasureTime("Read from database ... ", codeBlock: store.ReadAll);
+        return Time.MeasureTime("Read from database ... ", codeBlock: store.ReadAll);
     }
 
-    public static List<Charging.Charge> UseMysql()
+    public static List<Charge> UseMysql()
     {
-        List<Charging.Charge> list = new();
+        List<Charge> list = new();
 
         return list;
     }
 
-    public static Dictionary<string, Charging.ChargeInfo> StatsViaMongo()
+    public static Dictionary<string, ChargeInfo> StatsViaMongo()
     {
-        string dbHost = Charging.Configuration.MongoDbHost();
-        string dbName = Charging.Configuration.MongoDbName();
+        string dbHost = Configuration.MongoDbHost();
+        string dbName = Configuration.MongoDbName();
 
-        Charging.ChargeMongoStore chargeStore = new(dbHost, dbName);
-        Repository.GenericStore<Charging.Charge> store = new(chargeStore);
+        ChargeMongoStore chargeStore = new(dbHost, dbName);
+        global::Repository.GenericStore<Charge> store = new(chargeStore);
 
         return chargeStore.GroupMonthly();
     }
 
-    public static void ListCharges(List<Charging.Charge> charges)
+    public static void ListCharges(List<Charge> charges)
     {
-        foreach (Charging.Charge charge in charges)
+        foreach (Charge charge in charges)
         {
             charge.Print();
         }
@@ -153,7 +159,7 @@ public class GoEDataParser
     {
         Console.WriteLine("Hello Charger-Data-Parser !");
 
-        List<Charging.Charge> charges = [];
+        List<Charge> charges = [];
         // args = args.Append("-csv").ToArray();
         // args = args.Append("-json").ToArray();
         // args = args.Append("-mysql").ToArray();
@@ -172,24 +178,21 @@ public class GoEDataParser
         }
         else
         {
-            charges = Charging.Utils.Time.MeasureTime(
-                "Read charges from database ...",
-                codeBlock: UseMongo
-            );
+            charges = Time.MeasureTime("Read charges from database ...", codeBlock: UseMongo);
         }
 
         if (!args.Contains("-nostore"))
         {
             if (args.Contains("-mysql"))
             {
-                Charging.Utils.Time.MeasureTimeVoid(
+                Time.MeasureTimeVoid(
                     "Store charges in MySQL... ",
                     codeBlock: () => StoreChargesInMySql(charges)
                 );
             }
             else
             {
-                Charging.Utils.Time.MeasureTimeVoid(
+                Time.MeasureTimeVoid(
                     "Store charges in MongoDB... ",
                     codeBlock: () => StoreChargesInMongo(charges)
                 );
@@ -198,29 +201,23 @@ public class GoEDataParser
 
         if (args.Contains("-list"))
         {
-            Charging.Utils.Time.MeasureTimeVoid(
-                "List charges ... ",
-                codeBlock: () => ListCharges(charges)
-            );
+            Time.MeasureTimeVoid("List charges ... ", codeBlock: () => ListCharges(charges));
         }
 
-        Charging.Evaluator evaluator = new Charging.Evaluator();
-        var monthly = Charging.Utils.Time.MeasureTime(
+        Evaluator evaluator = new Evaluator();
+        var monthly = Time.MeasureTime(
             "Group monthly ... ",
             codeBlock: () => evaluator.GroupMonthly(charges)
         );
         evaluator.PrintGroup(monthly, "month");
 
-        var yearly = Charging.Utils.Time.MeasureTime(
+        var yearly = Time.MeasureTime(
             "Group yearly ... ",
             codeBlock: () => evaluator.GroupYearly(charges)
         );
         evaluator.PrintGroup(yearly, "year");
 
-        var docs = Charging.Utils.Time.MeasureTime(
-            "Get stats by mongo ... ",
-            codeBlock: StatsViaMongo
-        );
+        var docs = Time.MeasureTime("Get stats by mongo ... ", codeBlock: StatsViaMongo);
         evaluator.PrintGroup(docs, "month");
     }
 }

@@ -1,7 +1,8 @@
 using System.Globalization;
+using GoEDataParser.Models;
 using Microsoft.VisualBasic.FileIO;
 
-namespace Charging
+namespace GoEDataParser.Parser
 {
     namespace Parser
     {
@@ -9,7 +10,7 @@ namespace Charging
         {
             private readonly List<Charge> _charges = [];
             private readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture(
-                Charging.Configuration.Culture()
+                Configuration.Culture()
             );
 
             public List<Charge> GetCharges()

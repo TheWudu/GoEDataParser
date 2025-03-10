@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MongoDB.Driver" Version="3.2.1" />
+        <PackageReference Include="EntityFramework" Version="6.5.1" />
+        <PackageReference Include="MySql.Data" Version="9.2.0" />
+        <PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="EntityFramework">
+        <HintPath>..\..\..\.nuget\packages\entityframework\6.5.1\lib\netstandard2.1\EntityFramework.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+</Project>

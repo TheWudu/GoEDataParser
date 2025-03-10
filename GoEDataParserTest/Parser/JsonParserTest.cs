@@ -1,7 +1,9 @@
-﻿using RichardSzalay.MockHttp;
+﻿using GoEDataParser.Models;
+using GoEDataParser.Parser;
+using RichardSzalay.MockHttp;
 using Xunit;
 
-namespace GoEDataParserTest;
+namespace GoEDataParserTest.Parser;
 
 public class JsonParserTests
 {
@@ -10,7 +12,7 @@ public class JsonParserTests
 
     private MockHttpMessageHandler mockHttp;
 
-    private List<Charging.Charge> charges = [];
+    private List<Charge> charges = [];
 
     public JsonParserTests()
     {
@@ -22,7 +24,7 @@ public class JsonParserTests
         _ = mockHttp.When(mock_url).Respond(media_type, json_data);
         HttpClient client = mockHttp.ToHttpClient();
 
-        Charging.JsonParser parser = new(client);
+        JsonParser parser = new(client);
         parser.Load();
         charges = parser.GetCharges();
     }

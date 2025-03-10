@@ -1,8 +1,9 @@
 using MongoDB.Bson.Serialization.Attributes;
+using Repository;
 
-namespace Charging
+namespace GoEDataParser.Models
 {
-    public class Charge : Repository.BaseEntity
+    public class Charge : BaseEntity
     {
         public required string SessionId { get; set; }
         public required double Kwh { get; set; }

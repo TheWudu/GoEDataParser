@@ -1,13 +1,15 @@
-﻿using Xunit;
+﻿using GoEDataParser.Models;
+using GoEDataParser.Parser.Parser;
+using Xunit;
 
-namespace GoEDataParserTest;
+namespace GoEDataParserTest.Parser;
 
 public class CsvParserTests
 {
     string _appPath = Base.AppDirectory();
 
-    List<Charging.Charge> _charges = [];
-    Charging.Parser.CsvParser _parser;
+    List<Charge> _charges = [];
+    CsvParser _parser;
 
     public CsvParserTests()
     {

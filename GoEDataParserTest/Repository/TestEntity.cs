@@ -1,10 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 using Repository;
 
-namespace GoEDataParserTest;
+namespace GoEDataParserTest.Repository;
 
-public class TestEntity : Repository.BaseEntity
+public class TestEntity : BaseEntity
 {
     public string? Name { get; set; }
 

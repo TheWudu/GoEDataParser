@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Charging
+namespace GoEDataParser.Utils
 {
     namespace Utils
     {

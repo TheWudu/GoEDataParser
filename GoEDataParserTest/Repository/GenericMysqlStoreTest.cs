@@ -1,8 +1,8 @@
-using System.Collections;
+using GoEDataParser;
 using Repository;
 using Xunit;
 
-namespace GoEDataParserTest;
+namespace GoEDataParserTest.Repository;
 
 public class GenericMysqlStoreTest
 {
@@ -10,10 +10,10 @@ public class GenericMysqlStoreTest
 
     public GenericMysqlStoreTest()
     {
-        string dbHost = Charging.Configuration.MysqlDbHost();
-        string dbName = Charging.Configuration.MysqlDbName();
-        string dbUser = Charging.Configuration.MysqlDbUser();
-        string dbPassword = Charging.Configuration.MysqlDbPassword();
+        string dbHost = Configuration.MysqlDbHost();
+        string dbName = Configuration.MysqlDbName();
+        string dbUser = Configuration.MysqlDbUser();
+        string dbPassword = Configuration.MysqlDbPassword();
         _store = new(dbHost, dbName, (string)"test_entities", dbUser, dbPassword);
 
         _store.Clear();

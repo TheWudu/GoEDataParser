@@ -1,4 +1,4 @@
-namespace Charging
+namespace GoEDataParser.Models
 {
     public class ChargeInfo
     {

@@ -1,6 +1,6 @@
 using System.Configuration;
 
-namespace Charging
+namespace GoEDataParser
 {
     public class Configuration
     {

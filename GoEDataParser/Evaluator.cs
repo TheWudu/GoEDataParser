@@ -1,4 +1,6 @@
-namespace Charging
+using GoEDataParser.Models;
+
+namespace GoEDataParser
 {
     public class Evaluator
     {

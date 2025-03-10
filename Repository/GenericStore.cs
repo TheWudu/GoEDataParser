@@ -1,6 +1,6 @@
 namespace Repository
 {
-    class GenericStore<T> : IGenericStore<T>
+    public class GenericStore<T> : IGenericStore<T>
         where T : BaseEntity
     {
         private readonly IGenericStore<T> _store;

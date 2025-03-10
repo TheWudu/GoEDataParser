@@ -1,7 +1,9 @@
 using System.Globalization;
 using System.Text.Json;
+using GoEDataParser.Models;
+using GoEDataParser.Utils.Utils;
 
-namespace Charging
+namespace GoEDataParser.Parser
 {
     public class JsonData
     {
@@ -48,12 +50,14 @@ namespace Charging
         private const long To = 1767218340000; // 31.12.2025
 
         private readonly HttpClient? _client;
-        private readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture(Configuration.Culture());
+        private readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture(
+            Configuration.Culture()
+        );
 
         public JsonParser(HttpClient? client)
         {
             this._client = client;
-            this._token = Charging.Configuration.Token();
+            this._token = Configuration.Token();
         }
 
         public List<Charge> GetCharges()
@@ -63,21 +67,21 @@ namespace Charging
 
         public void Load()
         {
-            string jsonData = Utils.Time.MeasureTime("Fetching ... ", codeBlock: FetchJson);
-            JsonData? data = Utils.Time.MeasureTime(
+            string jsonData = Time.MeasureTime("Fetching ... ", codeBlock: FetchJson);
+            JsonData? data = Time.MeasureTime(
                 "Deserializing ... ",
                 codeBlock: () => Deserialize(jsonData)
             );
-            Utils.Time.MeasureTimeVoid("Parsing ... ", codeBlock: () => ParseData(data));
+            Time.MeasureTimeVoid("Parsing ... ", codeBlock: () => ParseData(data));
         }
 
         private string FetchJson()
         {
-            if (_client is null) throw new NullReferenceException("No client configured");
-            
+            if (_client is null)
+                throw new NullReferenceException("No client configured");
+
             Task<string> stream = _client.GetStringAsync(Url());
             return stream.Result;
-
         }
 
         private string Url()
@@ -121,7 +125,11 @@ namespace Charging
                         _culture,
                         DateTimeStyles.AssumeLocal
                     ),
-                    EndTime = DateTime.Parse((string)item.end, _culture, DateTimeStyles.AssumeLocal),
+                    EndTime = DateTime.Parse(
+                        (string)item.end,
+                        _culture,
+                        DateTimeStyles.AssumeLocal
+                    ),
                     MeterDiff = item.eto_diff,
                     MeterStart = item.eto_start,
                     MeterEnd = item.eto_end,
