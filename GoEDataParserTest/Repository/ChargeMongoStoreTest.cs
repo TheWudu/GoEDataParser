@@ -5,11 +5,11 @@ using Xunit;
 
 namespace GoEDataParserTest.Repository;
 
-public class MongoStoreTest
+public class ChargeMongoStoreTest
 {
     ChargeMongoStore _store;
 
-    public MongoStoreTest()
+    public ChargeMongoStoreTest()
     {
         string dbHost = Configuration.MongoDbHost();
         string dbName = Configuration.MongoDbName();

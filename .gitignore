@@ -1,0 +1,8 @@
+bin/
+tmp/
+obj/
+
+.idea
+.vscode
+
+tmp.csv

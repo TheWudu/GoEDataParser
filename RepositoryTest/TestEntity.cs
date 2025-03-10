@@ -1,6 +1,6 @@
 using Repository;
 
-namespace GoEDataParserTest.Repository;
+namespace RepositoryTest;
 
 public class TestEntity : BaseEntity
 {

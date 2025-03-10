@@ -1,8 +1,7 @@
-using GoEDataParser;
 using Repository;
 using Xunit;
 
-namespace GoEDataParserTest.Repository;
+namespace RepositoryTest;
 
 public class GenericMysqlStoreTest
 {
