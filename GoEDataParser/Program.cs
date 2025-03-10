@@ -40,15 +40,15 @@ public class ChargeData
         string dbName = Configuration.MongoDbName();
 
         ChargeMongoStore chargeStore = new(dbHost, dbName);
-        global::Repository.GenericStore<Charge> store = new(chargeStore);
+
         foreach (Charge charge in charges)
         {
-            Charge? storedCharge = store.FindBy("SessionId", charge.SessionId);
+            Charge? storedCharge = chargeStore.FindBy("SessionId", charge.SessionId);
             if (storedCharge is null)
             {
                 charge.Id ??= Guid.NewGuid().ToString();
                 charge.Version = 1;
-                store.Insert(charge);
+                chargeStore.Insert(charge);
                 storedCount++;
             }
             else
@@ -58,7 +58,7 @@ public class ChargeData
                 if (!charge.Equals(storedCharge))
                 {
                     // charge.Version += 1;
-                    store.Update(charge);
+                    chargeStore.Update(charge);
                     updatedCount++;
                 }
             }
@@ -79,19 +79,14 @@ public class ChargeData
         string dbPassword = Configuration.MysqlDbPassword();
 
         ChargeMysqlStore chargeStore = new(dbHost, dbName, dbUser, dbPassword);
-        global::Repository.GenericStore<Charge> store = new(chargeStore);
         foreach (Charge charge in charges)
         {
-            if (charge.SessionId is null)
-            {
-                continue;
-            }
-            Charge? storedCharge = store.FindBy("SessionId", charge.SessionId);
+            Charge? storedCharge = chargeStore.FindBy("SessionId", charge.SessionId);
             if (storedCharge is null)
             {
                 charge.Id ??= Guid.NewGuid().ToString();
                 charge.Version = 1;
-                store.Insert(charge);
+                chargeStore.Insert(charge);
                 storedCount++;
             }
             else
@@ -106,7 +101,7 @@ public class ChargeData
                     storedCharge.MeterEnd = charge.MeterEnd;
                     storedCharge.EndTime = charge.EndTime;
                     storedCharge.SecondsCharged = charge.SecondsCharged;
-                    store.Update(storedCharge);
+                    chargeStore.Update(storedCharge);
                     updatedCount++;
                 }
             }
@@ -123,16 +118,20 @@ public class ChargeData
         string dbName = Configuration.MongoDbName();
 
         ChargeMongoStore chargeStore = new(dbHost, dbName);
-        global::Repository.GenericStore<Charge> store = new(chargeStore);
 
-        return Time.MeasureTime("Read from database ... ", codeBlock: store.ReadAll);
+        return Time.MeasureTime("Read from database ... ", codeBlock: chargeStore.ReadAll);
     }
 
     public static List<Charge> UseMysql()
     {
-        List<Charge> list = new();
+        string dbHost = Configuration.MysqlDbHost();
+        string dbName = Configuration.MysqlDbName();
+        string dbUser = Configuration.MysqlDbUser();
+        string dbPassword = Configuration.MysqlDbPassword();
 
-        return list;
+        ChargeMysqlStore chargeStore = new(dbHost, dbName, dbUser, dbPassword);
+
+        return chargeStore.ReadAll();
     }
 
     public static Dictionary<string, ChargeInfo> StatsViaMongo()
@@ -141,7 +140,6 @@ public class ChargeData
         string dbName = Configuration.MongoDbName();
 
         ChargeMongoStore chargeStore = new(dbHost, dbName);
-        global::Repository.GenericStore<Charge> store = new(chargeStore);
 
         return chargeStore.GroupMonthly();
     }
