@@ -55,12 +55,11 @@ public class ChargeData
             {
                 charge.Id = storedCharge.Id;
                 charge.Version = storedCharge.Version;
-                if (!charge.Equals(storedCharge))
-                {
-                    // charge.Version += 1;
-                    chargeStore.Update(charge);
-                    updatedCount++;
-                }
+                if (charge.Equals(storedCharge))
+                    continue;
+
+                chargeStore.Update(charge);
+                updatedCount++;
             }
         }
 
@@ -95,7 +94,6 @@ public class ChargeData
                 charge.Version = storedCharge.Version;
                 if (!charge.Equals(storedCharge))
                 {
-                    // storedCharge.Version += 1;
                     storedCharge.Kwh = charge.Kwh;
                     storedCharge.MeterStart = charge.MeterStart;
                     storedCharge.MeterEnd = charge.MeterEnd;

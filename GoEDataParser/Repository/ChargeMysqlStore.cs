@@ -20,37 +20,27 @@ namespace GoEDataParser.Repository
 
         public Dictionary<string, ChargeInfo> GroupMonthly()
         {
-            var documents = Dataset
+            Dictionary<string, ChargeInfo> documents = Dataset
                 .Select(e => new
                 {
                     Start = e.StartTime.Year.ToString() + "." + e.StartTime.Month.ToString(),
+                    Year = e.StartTime.Year,
+                    Month = e.StartTime.Month,
                     Kwh = e.Kwh,
                     SecondsCharged = e.SecondsCharged,
                 })
-                .GroupBy(e => e.Start)
+                .GroupBy(e => new { Year = e.Year, Month = e.Month })
                 .Select(g => new ChargeInfo()
                 {
-                    TimeKey = g.Key,
+                    TimeKey = g.Key.Year + "." + g.Key.Month.ToString("00"),
                     KwhSum = g.Sum(c => c.Kwh),
                     TimeSum = g.Sum(c => c.SecondsCharged),
                     Count = g.Count(),
                     KwhValues = g.Select(c => c.Kwh).ToList(),
                 })
-                .ToList();
+                .ToDictionary(e => e.TimeKey, e => e);
 
-            Dictionary<string, ChargeInfo> infos = new();
-
-            foreach (var item in documents)
-            {
-                // Workaround as i did not find a way to use
-                // DATE_FORMAT in select directly
-                var keys = item.TimeKey.Split(".");
-                keys[1] = Convert.ToInt32(keys[1]).ToString("00");
-                var key = String.Join(".", keys);
-                infos.Add(key, item);
-            }
-
-            return infos;
+            return documents;
         }
     }
 }
