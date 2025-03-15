@@ -18,7 +18,7 @@ namespace GoEDataParser.Parser
                 return _charges;
             }
 
-            public void Parse(string filepath)
+            public void Parse(string? filepath)
             {
                 if (!File.Exists(filepath))
                 {

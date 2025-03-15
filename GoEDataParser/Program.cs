@@ -14,7 +14,7 @@ public class ChargeData
 
         CsvDownloader downloader = new CsvDownloader();
         downloader.Run();
-        string filepath = downloader.Filepath;
+        string? filepath = downloader.Filepath;
 
         CsvParser csvParser = new CsvParser();
         csvParser.Parse(filepath);

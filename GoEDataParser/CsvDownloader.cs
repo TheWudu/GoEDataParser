@@ -6,7 +6,8 @@ namespace GoEDataParser
         readonly string? _token = Configuration.Token();
         readonly string _parameters =
             "from=1682892000000&to=1767218340000&timezone=Europe%2FVienna&delimiter=%2C&decimalpoint=.";
-        public string Filepath = "tmp.csv";
+
+        public string? Filepath;
 
         public void Run()
         {
@@ -15,6 +16,7 @@ namespace GoEDataParser
             HttpClient client = new();
             Task<Stream> stream = client.GetStreamAsync(url);
 
+            Filepath = "tmp/" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".csv";
             FileStream fs = new(Filepath, FileMode.OpenOrCreate);
             stream.Result.CopyTo(fs);
         }
