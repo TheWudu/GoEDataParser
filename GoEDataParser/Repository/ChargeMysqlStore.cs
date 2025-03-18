@@ -23,14 +23,14 @@ namespace GoEDataParser.Repository
             Dictionary<string, ChargeInfo> documents = Dataset
                 .Select(e => new
                 {
-                    Start = e.StartTime.Year.ToString() + "." + e.StartTime.Month.ToString(),
-                    Year = e.StartTime.Year,
-                    Month = e.StartTime.Month,
-                    Kwh = e.Kwh,
-                    SecondsCharged = e.SecondsCharged,
+                    Start = e.StartTime.Year + "." + e.StartTime.Month,
+                    e.StartTime.Year,
+                    e.StartTime.Month,
+                    e.Kwh,
+                    e.SecondsCharged,
                 })
-                .GroupBy(e => new { Year = e.Year, Month = e.Month })
-                .Select(g => new ChargeInfo()
+                .GroupBy(e => new { e.Year, e.Month })
+                .Select(g => new ChargeInfo
                 {
                     TimeKey = g.Key.Year + "." + g.Key.Month.ToString("00"),
                     KwhSum = g.Sum(c => c.Kwh),
