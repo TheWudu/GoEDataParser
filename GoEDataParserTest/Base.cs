@@ -9,7 +9,7 @@ namespace GoEDataParserTest
             string? directory = Path.GetDirectoryName(fileName);
             if (directory is null)
             {
-                directory = System.AppDomain.CurrentDomain.BaseDirectory;
+                directory = AppDomain.CurrentDomain.BaseDirectory;
             }
             return directory;
         }

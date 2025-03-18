@@ -7,14 +7,13 @@ namespace Repository
     public class GenericMongoStore<T> : IGenericStore<T>
         where T : BaseEntity
     {
-        private readonly MongoClient _client;
         protected readonly IMongoCollection<T> Collection;
 
         public GenericMongoStore(string dbHost, string dbName, string dbCollection)
         {
             string connectionString = "mongodb://" + dbHost + "/?retryWrites=true&w=majority";
-            _client = new MongoClient(connectionString);
-            Collection = _client.GetDatabase(dbName).GetCollection<T>(dbCollection);
+            var client = new MongoClient(connectionString);
+            Collection = client.GetDatabase(dbName).GetCollection<T>(dbCollection);
         }
 
         public long Count()

@@ -16,7 +16,6 @@ namespace GoEDataParser.Models
         public double? MeterStart { get; set; }
         public double? MeterEnd { get; set; }
         public double? MeterDiff { get; set; }
-
         public long SecondsCharged { get; set; }
 
         public void Print()
@@ -45,7 +44,7 @@ namespace GoEDataParser.Models
 
             if (
                 this.Id != other.Id
-                || this.Version != this.Version
+                || this.Version != Version
                 || this.Kwh != other.Kwh
                 || this.SessionId != other.SessionId
                 || this.StartTime.ToUniversalTime() != other.StartTime.ToUniversalTime()

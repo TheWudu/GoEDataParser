@@ -40,12 +40,12 @@ public class GenericMysqlStoreTest
     public void UpdateTest()
     {
         string id = "0c8af010-a101-4fef-957c-1c78977524cc";
-        var te = CreateEntity("Daniel", id);
+        _ = CreateEntity("Daniel", id);
 
         TestEntity? ut = _store.Find(id);
         Assert.NotNull(ut);
         ut.Name = "Michael";
-        var updatedEntity = _store.Update(ut);
+        _ = _store.Update(ut);
 
         var storedEntity = _store.Find(id);
         Assert.Equal(storedEntity, ut);

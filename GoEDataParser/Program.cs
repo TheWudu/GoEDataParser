@@ -155,7 +155,7 @@ public class ChargeData
     {
         Console.WriteLine("Hello Charger-Data-Parser !");
 
-        List<Charge> charges = [];
+        List<Charge> charges;
         // args = args.Append("-csv").ToArray();
         // args = args.Append("-json").ToArray();
         // args = args.Append("-mysql").ToArray();

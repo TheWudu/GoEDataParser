@@ -44,7 +44,7 @@ namespace GoEDataParser.Parser
     {
         private readonly List<Charge> _charges = [];
         private const string BaseUrl = "https://data.v3.go-e.io/api/v1/direct_json";
-        private readonly string? _token = null; // fetched from App.config
+        private readonly string? _token; // fetched from App.config
         private const string Timezone = "Europe%2FVienna";
         private const long From = 1682892000000; // 01.05.2023
         private const long To = 1767218340000; // 31.12.2025
@@ -120,16 +120,8 @@ namespace GoEDataParser.Parser
                 {
                     SessionId = sessionId,
                     Kwh = item.energy is { } v ? v : 0.0F,
-                    StartTime = DateTime.Parse(
-                        (string)item.start,
-                        _culture,
-                        DateTimeStyles.AssumeLocal
-                    ),
-                    EndTime = DateTime.Parse(
-                        (string)item.end,
-                        _culture,
-                        DateTimeStyles.AssumeLocal
-                    ),
+                    StartTime = DateTime.Parse(item.start, _culture, DateTimeStyles.AssumeLocal),
+                    EndTime = DateTime.Parse(item.end, _culture, DateTimeStyles.AssumeLocal),
                     MeterDiff = item.eto_diff,
                     MeterStart = item.eto_start,
                     MeterEnd = item.eto_end,

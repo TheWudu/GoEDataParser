@@ -7,45 +7,45 @@ namespace GoEDataParserTest.Parser;
 
 public class JsonParserTests
 {
-    private string mock_url = "https://data.v3.go-e.io/api/v1/direct_json";
-    private string media_type = "application/json";
+    private string _mockUrl = "https://data.v3.go-e.io/api/v1/direct_json";
+    private string _mediaType = "application/json";
 
-    private MockHttpMessageHandler mockHttp;
+    private MockHttpMessageHandler _mockHttp;
 
-    private List<Charge> charges = [];
+    private List<Charge> _charges = [];
 
     public JsonParserTests()
     {
-        mockHttp = new();
+        _mockHttp = new();
     }
 
-    internal void Initialize(string json_data)
+    internal void Initialize(string jsonData)
     {
-        _ = mockHttp.When(mock_url).Respond(media_type, json_data);
-        HttpClient client = mockHttp.ToHttpClient();
+        _ = _mockHttp.When(_mockUrl).Respond(_mediaType, jsonData);
+        HttpClient client = _mockHttp.ToHttpClient();
 
         JsonParser parser = new(client);
         parser.Load();
-        charges = parser.GetCharges();
+        _charges = parser.GetCharges();
     }
 
     [Fact]
     public void JsonParserTestSimple()
     {
-        string json_data =
+        string jsonData =
             /*lang=json,strict*/@"{""columns"":[], ""data"":[
                 {""session_identifier"":""abcd_1234"",""start"":""02.06.2023 16:34:46"",""end"":""02.06.2023 16:36:00"",""energy"":0.071},
                 {""session_identifier"":""abcd_5678"",""start"":""05.06.2023 10:34:00"",""end"":""05.06.2023 12:15:00"",""energy"":10.012}
                 ]}";
 
-        Initialize(json_data);
+        Initialize(jsonData);
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(2, charges.Count);
-            Assert.Equal(0.071, charges[0].Kwh);
-            Assert.Equal(10.012, charges[1].Kwh);
-            Assert.Equal("abcd_1234", charges.ElementAt(0).SessionId);
+            Assert.Equal(2, _charges.Count);
+            Assert.Equal(0.071, _charges[0].Kwh);
+            Assert.Equal(10.012, _charges[1].Kwh);
+            Assert.Equal("abcd_1234", _charges.ElementAt(0).SessionId);
         });
     }
 
@@ -58,16 +58,16 @@ public class JsonParserTests
     public void JsonParserFull(string filename, int expectedCount, double? expectedFirstValue)
     {
         string filepath = String.Join("/", Base.AppDirectory(), "../fixtures/json", filename);
-        string json_data = File.ReadAllText(filepath);
+        string jsonData = File.ReadAllText(filepath);
 
-        Initialize(json_data);
+        Initialize(jsonData);
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(charges.Count, expectedCount);
+            Assert.Equal(_charges.Count, expectedCount);
             if (expectedFirstValue is not null)
             {
-                Assert.Equal(charges[0].Kwh, expectedFirstValue);
+                Assert.Equal(_charges[0].Kwh, expectedFirstValue);
             }
         });
     }

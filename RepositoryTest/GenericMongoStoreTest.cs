@@ -52,7 +52,7 @@ public class GenericMongoStoreTest
     public void DeleteTest()
     {
         string id = "0c8af010-a101-4fef-957c-1c78977524ae";
-        var te = CreateEntity("Daniel", id);
+        _ = CreateEntity("Daniel", id);
 
         Assert.True(_store.Delete(id));
     }

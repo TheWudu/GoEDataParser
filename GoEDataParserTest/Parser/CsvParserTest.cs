@@ -18,7 +18,7 @@ public class CsvParserTests
 
     internal void Initialize(string filename)
     {
-        string? filepath = String.Join("/", _appPath, "../fixtures/csv", filename);
+        string filepath = String.Join("/", _appPath, "../fixtures/csv", filename);
 
         _parser.Parse(filepath);
         _charges = _parser.GetCharges();
