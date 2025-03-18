@@ -163,7 +163,7 @@ public class ChargeMongoStoreTest
     public void DeleteExisting()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charge charge = CreateCharge(14, id);
+        _ = CreateCharge(14, id);
 
         Assert.True(_store.Delete(id));
     }
@@ -180,7 +180,7 @@ public class ChargeMongoStoreTest
     public void TestMonthly()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charge charge = CreateCharge(14, id);
+        _ = CreateCharge(14, id);
 
         var monthly = _store.GroupMonthly();
 
