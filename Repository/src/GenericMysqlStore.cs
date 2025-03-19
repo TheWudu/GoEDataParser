@@ -44,7 +44,10 @@ namespace Repository
             DbName = dbName;
             DbUser = dbUser;
             DbPassword = dbPassword;
+        }
 
+        public void Setup()
+        {
             Database.EnsureCreated();
 
             try

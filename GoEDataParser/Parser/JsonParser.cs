@@ -5,6 +5,7 @@ using GoEDataParser.Utils.Utils;
 
 namespace GoEDataParser.Parser
 {
+    // ReSharper disable InconsistentNaming
     public class JsonData
     {
         public List<ColumnItem>? columns { get; set; }
@@ -29,7 +30,9 @@ namespace GoEDataParser.Parser
         public string? start { get; set; }
         public string? end { get; set; }
         public string? seconds_total { get; set; }
+
         public string? seconds_charged { get; set; }
+
         public double? max_power { get; set; }
         public double? max_current { get; set; }
         public double? energy { get; set; }
@@ -38,6 +41,7 @@ namespace GoEDataParser.Parser
         public double? eto_end { get; set; }
         public string? wifi { get; set; }
         public string? link { get; set; }
+        // ReSharper restore InconsistentNaming
     }
 
     public class JsonParser

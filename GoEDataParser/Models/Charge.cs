@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using MongoDB.Bson.Serialization.Attributes;
 using Repository;
 
@@ -5,6 +6,7 @@ namespace GoEDataParser.Models
 {
     public class Charge : BaseEntity
     {
+        [MaxLength(100)]
         public required string SessionId { get; set; }
         public required double Kwh { get; set; }
 
@@ -45,7 +47,7 @@ namespace GoEDataParser.Models
             if (
                 this.Id != other.Id
                 || this.Version != Version
-                || this.Kwh != other.Kwh
+                || Math.Abs(this.Kwh - other.Kwh) > Tolerance
                 || this.SessionId != other.SessionId
                 || this.StartTime.ToUniversalTime() != other.StartTime.ToUniversalTime()
                 || this.EndTime.ToUniversalTime() != other.EndTime.ToUniversalTime()
@@ -57,18 +59,15 @@ namespace GoEDataParser.Models
             return true;
         }
 
+        private const double Tolerance = 0.000001;
+
         public override int GetHashCode()
         {
             int magicPrime = 23;
 
-            return magicPrime
-                * (Id is null ? 1 : Id.GetHashCode())
-                * Version.GetHashCode()
-                * SessionId.GetHashCode()
-                * Kwh.GetHashCode()
-                * StartTime.GetHashCode()
-                * EndTime.GetHashCode()
-                * SecondsCharged.GetHashCode();
+            // ReSharper disable NonReadonlyMemberInGetHashCode
+            return magicPrime * Version.GetHashCode() * SessionId.GetHashCode();
+            // ReSharper enable NonReadonlyMemberInGetHashCode
         }
     }
 }

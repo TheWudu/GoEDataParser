@@ -29,7 +29,7 @@ public class TestEntity : BaseEntity
     public TestEntity(string name, string? id, int version)
     {
         Name = name;
-        Id = id is not null ? id : Guid.NewGuid().ToString();
+        Id = id ?? Guid.NewGuid().ToString();
         Version = version;
     }
 
@@ -48,6 +48,7 @@ public class TestEntity : BaseEntity
 
     public override int GetHashCode()
     {
+        // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
         return base.GetHashCode();
     }
 }

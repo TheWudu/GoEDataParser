@@ -15,6 +15,7 @@ public class GenericMysqlStoreTest
         string dbPassword = Configuration.MysqlDbPassword();
         _store = new(dbHost, dbName, (string)"test_entities", dbUser, dbPassword);
 
+        _store.Setup();
         _store.Clear();
     }
 
@@ -91,7 +92,7 @@ public class GenericMysqlStoreTest
     {
         string id1 = Guid.NewGuid().ToString();
         string id2 = Guid.NewGuid().ToString();
-        var testEntity1 = CreateEntity("michael", id1);
+        _ = CreateEntity("michael", id1);
         var testEntity2 = CreateEntity("daniel", id2, 2);
 
         var readEntityV1 = _store.FindBy("version", 1);
