@@ -22,7 +22,7 @@ public class TestEntity : BaseEntity
     public TestEntity(string name, string? id)
     {
         Name = name;
-        Id = id is not null ? id : Guid.NewGuid().ToString();
+        Id = id ?? Guid.NewGuid().ToString();
         Version = 1;
     }
 

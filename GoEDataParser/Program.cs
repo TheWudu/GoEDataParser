@@ -200,7 +200,10 @@ public class ChargeData
             Time.MeasureTimeVoid("List charges ... ", codeBlock: () => ListCharges(charges));
         }
 
-        Evaluator evaluator = new Evaluator();
+        ConsumptionParser cp = new();
+        Time.MeasureTimeVoid("Read consumptions...", codeBlock: () => cp.Parse("manager.csv"));
+
+        Evaluator evaluator = new Evaluator(cp);
         var monthly = Time.MeasureTime(
             "Group monthly ... ",
             codeBlock: () => evaluator.GroupMonthly(charges)
