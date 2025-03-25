@@ -13,7 +13,7 @@ namespace GoEDataParser.Parser
                 Configuration.Culture()
             );
 
-            public List<Consumption> GetCharges()
+            public List<Consumption> GetConsumptions()
             {
                 return _consumptions;
             }
