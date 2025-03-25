@@ -5,7 +5,7 @@ namespace GoEDataParser
 {
     public class Evaluator
     {
-        private ConsumptionParser _consumptionParser;
+        private readonly ConsumptionParser? _consumptionParser;
 
         public Evaluator() { }
 
