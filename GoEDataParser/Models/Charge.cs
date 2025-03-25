@@ -23,12 +23,13 @@ namespace GoEDataParser.Models
         public void Print()
         {
             Console.WriteLine(
-                "{0}: {1} - {2} ({4}) => {3}",
+                "{0}: {1} - {2} ({5}) ({4}) => {3}",
                 SessionId,
-                StartTime.ToLocalTime(),
-                EndTime.ToLocalTime(),
+                StartTime, // .ToLocalTime(),
+                EndTime, // .ToLocalTime(),
                 Kwh,
-                SecondsCharged
+                SecondsCharged,
+                StartTime.Kind
             );
         }
 

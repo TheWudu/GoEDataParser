@@ -124,8 +124,12 @@ namespace GoEDataParser.Parser
                 {
                     SessionId = sessionId,
                     Kwh = item.energy is { } v ? v : 0.0F,
-                    StartTime = DateTime.Parse(item.start, _culture, DateTimeStyles.AssumeLocal),
-                    EndTime = DateTime.Parse(item.end, _culture, DateTimeStyles.AssumeLocal),
+                    StartTime = DateTime
+                        .Parse(item.start, _culture, DateTimeStyles.AssumeLocal)
+                        .ToUniversalTime(),
+                    EndTime = DateTime
+                        .Parse(item.end, _culture, DateTimeStyles.AssumeLocal)
+                        .ToUniversalTime(),
                     MeterDiff = item.eto_diff,
                     MeterStart = item.eto_start,
                     MeterEnd = item.eto_end,
