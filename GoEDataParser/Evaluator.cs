@@ -98,13 +98,39 @@ namespace GoEDataParser
             return dictMonthly;
         }
 
+        public void PrintMissing(string key, string? lastKey)
+        {
+            if (lastKey == null)
+                return;
+
+            if (key.Split(".").Length == 1)
+                return;
+
+            int year = Convert.ToInt32(key.Split(".")[0]);
+            int month = Convert.ToInt32(key.Split(".")[1]);
+
+            int lastYear = Convert.ToInt32(lastKey.Split(".")[0]);
+            int lastMonth = Convert.ToInt32(lastKey.Split(".")[1]);
+
+            if (((lastYear + 1) < year) || ((lastMonth + 1) < month && lastMonth != 12))
+            {
+                for (int m = lastMonth + 1; m < month; m++)
+                {
+                    Console.WriteLine("{0}.{1,2}: data missing", lastYear, m.ToString("00"));
+                }
+            }
+        }
+
         public void PrintGroup(Dictionary<string, ChargeInfo> dict, string grouping)
         {
+            string? lastKey = null;
             double kwhSum = 0.0F;
             long timeSum = 0;
             Console.WriteLine("\nSums per {0}: ", grouping);
             foreach (KeyValuePair<string, ChargeInfo> kv in dict)
             {
+                PrintMissing(kv.Key, lastKey);
+                lastKey = kv.Key;
                 kwhSum += kv.Value.KwhSum;
                 timeSum += kv.Value.TimeSum;
                 double kwhAvg = kv.Value.KwhValues.Average();

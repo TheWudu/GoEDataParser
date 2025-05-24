@@ -1,5 +1,6 @@
 using System.Globalization;
 using GoEDataParser.Models;
+using GoEDataParser.Repository;
 using Microsoft.VisualBasic.FileIO;
 
 namespace GoEDataParser.Parser
@@ -13,12 +14,24 @@ namespace GoEDataParser.Parser
                 Configuration.Culture()
             );
 
+            private readonly string defaultFilePath = "manager_data_";
+
             public List<Consumption> GetConsumptions()
             {
                 return _consumptions;
             }
 
-            public void Parse(string? filepath)
+            public void ParseFiles(int startYear = 2023)
+            {
+                int endYear = DateTime.Today.Year;
+
+                for (int year = startYear; year <= endYear; year++)
+                {
+                    ReadFile(defaultFilePath + year + ".csv");
+                }
+            }
+
+            public void ReadFile(string filepath)
             {
                 if (!File.Exists(filepath))
                 {
@@ -43,17 +56,24 @@ namespace GoEDataParser.Parser
                         break;
                     }
                     // skip head row
-                    if (currentRow[0] == "Datum")
+                    if (currentRow[0] == "Ende Ablesezeitraum")
                     {
                         continue;
                     }
 
-                    DateTime startTime = DateTime
-                        .Parse(currentRow[0], _culture, DateTimeStyles.AssumeLocal)
+                    DateTime endTime = DateTime
+                        .Parse(currentRow[0], _culture, DateTimeStyles.AssumeUniversal)
                         .ToUniversalTime();
-                    DateTime endTime = startTime.Add(new TimeSpan(0, 15, 0));
-                    double kwh = Double.Parse(currentRow[1], NumberStyles.Any, _culture);
-                    // Console.WriteLine("{0} - {1}: {2}", startTime, endTime, kwh);
+                    DateTime startTime = endTime.Subtract(new TimeSpan(0, 15, 0));
+                    double kwh = Double.Parse(currentRow[3], NumberStyles.Any, _culture);
+
+                    // Console.WriteLine(
+                    //     "C: {3} == {0} / {2}: {1}",
+                    //     startTime,
+                    //     kwh,
+                    //     endTime,
+                    //     currentRow[0]
+                    // );
 
                     Consumption consumption = new()
                     {
@@ -65,27 +85,48 @@ namespace GoEDataParser.Parser
                 }
             }
 
-            public double ConsumpationWhile(DateTime chargeStart, DateTime chargeEnd)
+            public double ConsumpationFromList(DateTime chargeStart, DateTime chargeEnd)
             {
-                //
-                // ---------CS---------CE---------
-                // -------S---S---S---S---S-------
-                // ---|---|---|---|---|---|---|---
                 var list = _consumptions.FindAll(c =>
                     (c.StartTime > chargeStart && c.StartTime < chargeEnd)
                     || (c.EndTime > chargeStart && c.EndTime < chargeEnd)
                 );
-                double val = list.Sum(c => c.Kwh);
-                // if (
-                //     list.Count > 0
-                //     && list.ElementAt(0).StartTime.Month == 6
-                //     && list.ElementAt(0).StartTime.Day == 6
-                // )
-                // {
-                //     Console.WriteLine("Found {0} entries: {1}", list.Count, val);
-                // }
+                return list.Sum(c => c.Kwh);
+            }
 
-                return val;
+            public double ConsumptionFromDb(DateTime chargeStart, DateTime chargeEnd)
+            {
+                string dbHost = Configuration.MongoDbHost();
+                string dbName = Configuration.MongoDbName();
+                var consumptionStore = new ConsumptionMongoStore(dbHost, dbName);
+
+                var list = consumptionStore.FindConsumptions(chargeStart, chargeEnd);
+
+                return list.Sum(c => c.Kwh);
+            }
+
+            public double ConsumpationWhile(DateTime chargeStart, DateTime chargeEnd)
+            {
+                if (_consumptions.Count > 0)
+                {
+                    return ConsumpationFromList(chargeStart, chargeEnd);
+                }
+                else
+                {
+                    return ConsumptionFromDb(chargeStart, chargeEnd);
+                }
+            }
+
+            public void StoreConsumptions()
+            {
+                string dbHost = Configuration.MongoDbHost();
+                string dbName = Configuration.MongoDbName();
+                var consumptionStore = new ConsumptionMongoStore(dbHost, dbName);
+
+                foreach (var consumption in (_consumptions))
+                {
+                    consumptionStore.Upsert(consumption);
+                }
             }
         }
     }

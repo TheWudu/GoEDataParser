@@ -1,4 +1,5 @@
-﻿using GoEDataParser.Models;
+﻿using System.Globalization;
+using GoEDataParser.Models;
 using GoEDataParser.Parser;
 using GoEDataParser.Parser.Parser;
 using GoEDataParser.Repository;
@@ -151,6 +152,19 @@ public class ChargeData
         Console.WriteLine("");
     }
 
+    // public static void parseDate(string dateString, string text)
+    // {
+    //     CultureInfo _culture = CultureInfo.CreateSpecificCulture(Configuration.Culture());
+    //
+    //     Console.WriteLine(
+    //         "{0}: string: {1} - AssumeLocal (in UTC): {2} - AssumeUtc (in UTC): {3}",
+    //         text,
+    //         dateString,
+    //         DateTime.Parse(dateString, _culture, DateTimeStyles.AssumeLocal).ToUniversalTime(),
+    //         DateTime.Parse(dateString, _culture, DateTimeStyles.AssumeUniversal).ToUniversalTime()
+    //     );
+    // }
+
     public static void Main(string[] args)
     {
         Console.WriteLine("Hello Charger-Data-Parser !");
@@ -201,7 +215,15 @@ public class ChargeData
         }
 
         ConsumptionParser cp = new();
-        Time.MeasureTimeVoid("Read consumptions...", codeBlock: () => cp.Parse("manager.csv"));
+        if (args.Contains("-read-consumptions"))
+        {
+            Time.MeasureTimeVoid("Read consumptions from files", codeBlock: () => cp.ParseFiles());
+        }
+
+        if (args.Contains("-update-consumptions"))
+        {
+            Time.MeasureTimeVoid("Store consumptions", codeBlock: () => cp.StoreConsumptions());
+        }
 
         Evaluator evaluator = new Evaluator(cp);
         var monthly = Time.MeasureTime(
