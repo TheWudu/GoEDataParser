@@ -1,5 +1,4 @@
 using GoEDataParser.Models;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using Repository;
 
@@ -22,17 +21,22 @@ namespace GoEDataParser.Repository
 
         public List<Consumption> FindConsumptions(DateTime chargeStart, DateTime chargeEnd)
         {
-            var filter =
+            var filter = Builders<Consumption>.Filter.Or(
                 (
                     Builders<Consumption>.Filter.Gt(c => c.StartTime, chargeStart)
                     & Builders<Consumption>.Filter.Lt(c => c.StartTime, chargeEnd)
-                )
-                | (
+                ),
+                (
                     Builders<Consumption>.Filter.Gt(c => c.EndTime, chargeStart)
                     & Builders<Consumption>.Filter.Lt(c => c.EndTime, chargeEnd)
-                );
+                )
+            );
 
-            var documents = Collection.Find(filter);
+            var documents = Collection.Find(
+                filter //,
+            //new FindOptions { Hint = "StartTime_-1_EndTime_-1" }
+            );
+            Console.WriteLine(documents);
 
             return documents.ToList();
         }

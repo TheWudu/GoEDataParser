@@ -215,6 +215,13 @@ public class ChargeData
         }
 
         ConsumptionParser cp = new();
+        if (args.Contains("-read-consumptions-from-db"))
+        {
+            Time.MeasureTimeVoid(
+                "Read consumptions from DB",
+                codeBlock: () => cp.ReadConsumptionsFromDb()
+            );
+        }
         if (args.Contains("-read-consumptions"))
         {
             Time.MeasureTimeVoid("Read consumptions from files", codeBlock: () => cp.ParseFiles());

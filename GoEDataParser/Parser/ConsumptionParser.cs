@@ -9,6 +9,14 @@ namespace GoEDataParser.Parser
     {
         public class ConsumptionParser
         {
+            public ConsumptionParser()
+            {
+                string dbHost = Configuration.MongoDbHost();
+                string dbName = Configuration.MongoDbName();
+                consumptionStore = new ConsumptionMongoStore(dbHost, dbName);
+            }
+
+            private ConsumptionMongoStore consumptionStore;
             private readonly List<Consumption> _consumptions = [];
             private readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture(
                 Configuration.Culture()
@@ -105,6 +113,11 @@ namespace GoEDataParser.Parser
                 return list.Sum(c => c.Kwh);
             }
 
+            public void ReadConsumptionsFromDb()
+            {
+                _consumptions.AddRange(consumptionStore.ReadAll());
+            }
+
             public double ConsumpationWhile(DateTime chargeStart, DateTime chargeEnd)
             {
                 if (_consumptions.Count > 0)
@@ -119,10 +132,6 @@ namespace GoEDataParser.Parser
 
             public void StoreConsumptions()
             {
-                string dbHost = Configuration.MongoDbHost();
-                string dbName = Configuration.MongoDbName();
-                var consumptionStore = new ConsumptionMongoStore(dbHost, dbName);
-
                 foreach (var consumption in (_consumptions))
                 {
                     consumptionStore.Upsert(consumption);
