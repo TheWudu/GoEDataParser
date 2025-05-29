@@ -215,21 +215,22 @@ public class ChargeData
         }
 
         ConsumptionParser cp = new();
-        if (args.Contains("-read-consumptions-from-db"))
+
+        if (args.Contains("-read-consumptions"))
+        {
+            Time.MeasureTimeVoid("Read consumptions from files", codeBlock: () => cp.ParseFiles());
+
+            if (args.Contains("-update-consumptions"))
+            {
+                Time.MeasureTimeVoid("Store consumptions", codeBlock: () => cp.StoreConsumptions());
+            }
+        }
+        else
         {
             Time.MeasureTimeVoid(
                 "Read consumptions from DB",
                 codeBlock: () => cp.ReadConsumptionsFromDb()
             );
-        }
-        if (args.Contains("-read-consumptions"))
-        {
-            Time.MeasureTimeVoid("Read consumptions from files", codeBlock: () => cp.ParseFiles());
-        }
-
-        if (args.Contains("-update-consumptions"))
-        {
-            Time.MeasureTimeVoid("Store consumptions", codeBlock: () => cp.StoreConsumptions());
         }
 
         Evaluator evaluator = new Evaluator(cp);

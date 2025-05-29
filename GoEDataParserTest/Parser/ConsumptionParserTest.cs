@@ -20,7 +20,7 @@ public class ConsumptionParserTests
     {
         string filepath = String.Join("/", _appPath, "../fixtures/csv", filename);
 
-        _parser.Parse(filepath);
+        _parser.ReadFile(filepath);
         _consumptions = _parser.GetConsumptions();
     }
 
@@ -41,10 +41,10 @@ public class ConsumptionParserTests
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(0.042999999999999997, _consumptions[0].Kwh);
-            Assert.Equal(0.0089999999999999993, _consumptions[63458].Kwh);
-            Assert.Equal(4231.1880000017845, _consumptions.Sum(c => c.Kwh));
-            Assert.Equal(63460, _consumptions.Count);
+            Assert.Equal(14108, _consumptions.Count);
+            Assert.Equal(0.001, _consumptions[0].Kwh);
+            Assert.Equal(0.005, _consumptions[14107].Kwh);
+            Assert.Equal(893.21799999990776, _consumptions.Sum(c => c.Kwh));
         });
     }
 }
