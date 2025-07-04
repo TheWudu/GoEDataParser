@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using GoEDataParser.Models;
+﻿using GoEDataParser.Models;
 using GoEDataParser.Parser;
 using GoEDataParser.Parser.Parser;
 using GoEDataParser.Repository;

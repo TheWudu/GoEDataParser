@@ -36,7 +36,7 @@ namespace GoEDataParser.Repository
                 filter //,
             //new FindOptions { Hint = "StartTime_-1_EndTime_-1" }
             );
-            Console.WriteLine(documents);
+            // Console.WriteLine(documents);
 
             return documents.ToList();
         }
