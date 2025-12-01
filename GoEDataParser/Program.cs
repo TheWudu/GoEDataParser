@@ -215,6 +215,19 @@ public class ChargeData
 
         ConsumptionParser cp = new();
 
+        if (args.Contains("-import-consumptionfile"))
+        {
+            var index = args.ToList().IndexOf("-import-consumptionfile");
+            var filename = args[index + 1];
+            // var filename = "/home/martin/Downloads/manager_eg_202509.csv";
+
+            Time.MeasureTimeVoid(
+                "Read consumptions from file",
+                codeBlock: () => cp.ReadFile(filename)
+            );
+            Time.MeasureTimeVoid("Store consumptions", codeBlock: () => cp.StoreConsumptions());
+        }
+
         if (args.Contains("-read-consumptions"))
         {
             Time.MeasureTimeVoid("Read consumptions from files", codeBlock: () => cp.ParseFiles());

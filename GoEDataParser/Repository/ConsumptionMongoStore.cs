@@ -43,7 +43,8 @@ namespace GoEDataParser.Repository
 
         public Consumption Upsert(Consumption consumption)
         {
-            if (FindByStartTime(consumption.StartTime) is null)
+            var cons = FindByStartTime(consumption.StartTime);
+            if (cons is null)
             {
                 consumption.Id = Guid.NewGuid().ToString();
                 consumption.Version = 1;
@@ -51,6 +52,15 @@ namespace GoEDataParser.Repository
                 Console.Write(".");
 
                 return Insert(consumption);
+            }
+            else
+            {
+                consumption.Id = cons.Id;
+                consumption.Version = cons.Version;
+
+                Console.Write("+");
+
+                return Update(consumption);
             }
             return consumption;
         }

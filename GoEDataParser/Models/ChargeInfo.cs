@@ -8,6 +8,7 @@ namespace GoEDataParser.Models
         public long TimeSum;
         public double Missing;
         public double Consumption;
+        public double ConsumptionFromEg;
         public List<double> KwhValues = [];
 
         public ChargeInfo() { }
@@ -18,7 +19,8 @@ namespace GoEDataParser.Models
             int count,
             long timeSum,
             double missing,
-            double consumption = 0.0
+            double consumption = 0.0,
+            double consumptionFromEg = 0.0
         )
         {
             TimeKey = timeKey;
@@ -27,6 +29,7 @@ namespace GoEDataParser.Models
             TimeSum = timeSum;
             Missing = missing;
             Consumption = consumption;
+            ConsumptionFromEg = consumptionFromEg;
             KwhValues.Add(KwhSum);
         }
     }

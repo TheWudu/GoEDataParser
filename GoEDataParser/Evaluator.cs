@@ -45,10 +45,11 @@ namespace GoEDataParser
                 }
 
                 double consumption = 0.0;
+                double consumptionFromEg = 0.0;
 
                 if (_consumptionParser is not null)
                 {
-                    consumption = _consumptionParser.ConsumpationWhile(
+                    (consumption, consumptionFromEg) = _consumptionParser.ConsumpationWhile(
                         c.StartTime,
                         c.StartTime.Add(new TimeSpan(0, 0, (int)c.SecondsCharged))
                     );
@@ -83,12 +84,21 @@ namespace GoEDataParser
                     info.TimeSum += c.SecondsCharged;
                     info.Missing += missing;
                     info.Consumption += consumption;
+                    info.ConsumptionFromEg = consumptionFromEg;
                 }
                 else
                 {
                     dictMonthly.Add(
                         key,
-                        new ChargeInfo(key, c.Kwh, 1, c.SecondsCharged, missing, consumption)
+                        new ChargeInfo(
+                            key,
+                            c.Kwh,
+                            1,
+                            c.SecondsCharged,
+                            missing,
+                            consumption,
+                            consumptionFromEg
+                        )
                     );
                 }
 
@@ -136,7 +146,7 @@ namespace GoEDataParser
                 double kwhAvg = kv.Value.KwhValues.Average();
                 double kwhMax = kv.Value.KwhValues.Max();
                 Console.WriteLine(
-                    "{0}: {1,7:F2}, {2,7:F2} (Count: {3,3}, Max: {4:F2} kWh, Avg: {5,5:F2} kWh, TimeSum: {6,11}, Missing: {7,6:F2} kWh, Consumption: {8,7:F2} ({9,5:F2})",
+                    "{0}: {1,7:F2}, {2,7:F2} (Count: {3,3}, Max: {4:F2} kWh, Avg: {5,5:F2} kWh, TimeSum: {6,11}, Missing: {7,6:F2} kWh, Consumption: {8,7:F2} / {10,5:F2} kWh ({9,5:F2} %)",
                     kv.Key,
                     kv.Value.KwhSum,
                     kwhSum,
@@ -146,7 +156,8 @@ namespace GoEDataParser
                     TimeSpan.FromSeconds(kv.Value.TimeSum).ToString(),
                     kv.Value.Missing,
                     kv.Value.Consumption,
-                    ((kv.Value.Consumption / kv.Value.KwhSum) * 100)
+                    ((kv.Value.Consumption / kv.Value.KwhSum) * 100),
+                    kv.Value.ConsumptionFromEg
                 );
             }
             Console.WriteLine(

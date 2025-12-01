@@ -1,7 +1,6 @@
 using System.Globalization;
 using GoEDataParser.Models;
 using GoEDataParser.Repository;
-using GoEDataParser.Utils.Utils;
 using Microsoft.VisualBasic.FileIO;
 
 namespace GoEDataParser.Parser
@@ -71,15 +70,22 @@ namespace GoEDataParser.Parser
                         mode = 1;
                         continue;
                     }
-                    if (currentRow[0] == "Datum")
+                    else if (currentRow[0] == "Datum")
                     {
                         mode = 2;
+                        continue;
+                    }
+                    else if (currentRow[0] == "Startdatum")
+                    {
+                        mode = 3;
                         continue;
                     }
 
                     DateTime endTime = DateTime.Now;
                     DateTime startTime = DateTime.Now;
                     double kwh = 0;
+                    double kwhFromEg = 0;
+                    double kwhFromNet = 0;
 
                     if (mode == 1)
                     {
@@ -88,6 +94,18 @@ namespace GoEDataParser.Parser
                             .ToUniversalTime();
                         startTime = endTime.Subtract(new TimeSpan(0, 15, 0));
                         kwh = Double.Parse(currentRow[3], NumberStyles.Any, _culture);
+                        kwhFromNet = kwh;
+                        kwhFromEg = 0;
+
+                        var consumption = new Consumption()
+                        {
+                            Kwh = kwh,
+                            KwhFromEg = kwhFromEg,
+                            KwhFromNet = kwhFromNet,
+                            StartTime = startTime,
+                            EndTime = endTime,
+                        };
+                        _consumptions.Add(consumption);
                     }
                     else if (mode == 2)
                     {
@@ -96,6 +114,60 @@ namespace GoEDataParser.Parser
                             .ToUniversalTime();
                         endTime = startTime.Add(new TimeSpan(0, 15, 0));
                         kwh = Double.Parse(currentRow[1], NumberStyles.Any, _culture);
+                        kwhFromNet = kwh;
+                        kwhFromEg = 0;
+
+                        var consumption = new Consumption()
+                        {
+                            Kwh = kwh,
+                            KwhFromEg = kwhFromEg,
+                            KwhFromNet = kwhFromNet,
+                            StartTime = startTime,
+                            EndTime = endTime,
+                        };
+                        _consumptions.Add(consumption);
+                    }
+                    else if (mode == 3)
+                    {
+                        startTime = DateTime
+                            .Parse(currentRow[0], _culture, DateTimeStyles.AssumeLocal)
+                            .ToUniversalTime();
+                        endTime = startTime.Add(new TimeSpan(0, 15, 0));
+
+                        var consumption = _consumptions.FirstOrDefault(c =>
+                            c.StartTime == startTime
+                        );
+                        if (consumption == null)
+                        {
+                            consumption = new()
+                            {
+                                Kwh = kwh,
+                                KwhFromEg = kwhFromEg,
+                                KwhFromNet = kwhFromNet,
+                                StartTime = startTime,
+                                EndTime = endTime,
+                            };
+                            _consumptions.Add(consumption);
+                        }
+
+                        if (currentRow[6] == "Gesamtverbrauch laut Messung")
+                            consumption.Kwh = Double.Parse(
+                                currentRow[7],
+                                NumberStyles.Any,
+                                _culture
+                            );
+                        else if (currentRow[6] == "Bezug aus der Energiegemeinschaft")
+                            consumption.KwhFromEg = Double.Parse(
+                                currentRow[7],
+                                NumberStyles.Any,
+                                _culture
+                            );
+                        else if (currentRow[6] == "Bezug vom Energielieferanten")
+                            consumption.KwhFromNet = Double.Parse(
+                                currentRow[7],
+                                NumberStyles.Any,
+                                _culture
+                            );
                     }
 
                     // Console.WriteLine(
@@ -105,31 +177,23 @@ namespace GoEDataParser.Parser
                     //     endTime,
                     //     currentRow[0]
                     // );
-
-                    Consumption consumption = new()
-                    {
-                        Kwh = kwh,
-                        StartTime = startTime,
-                        EndTime = endTime,
-                    };
-                    _consumptions.Add(consumption);
                 }
             }
 
-            public double ConsumpationFromList(DateTime chargeStart, DateTime chargeEnd)
+            public (double, double) ConsumpationFromList(DateTime chargeStart, DateTime chargeEnd)
             {
                 var list = _consumptions.FindAll(c =>
                     (c.StartTime > chargeStart && c.StartTime < chargeEnd)
                     || (c.EndTime > chargeStart && c.EndTime < chargeEnd)
                 );
-                return list.Sum(c => c.Kwh);
+                return (list.Sum(c => c.Kwh), list.Sum(c => c.KwhFromEg));
             }
 
-            public double ConsumptionFromDb(DateTime chargeStart, DateTime chargeEnd)
+            public (double, double) ConsumptionFromDb(DateTime chargeStart, DateTime chargeEnd)
             {
                 var list = _consumptionStore.FindConsumptions(chargeStart, chargeEnd);
 
-                return list.Sum(c => c.Kwh);
+                return (list.Sum(c => c.Kwh), list.Sum(c => c.KwhFromEg));
             }
 
             public void ReadConsumptionsFromDb()
@@ -137,7 +201,7 @@ namespace GoEDataParser.Parser
                 _consumptions.AddRange(_consumptionStore.ReadAll());
             }
 
-            public double ConsumpationWhile(DateTime chargeStart, DateTime chargeEnd)
+            public (double, double) ConsumpationWhile(DateTime chargeStart, DateTime chargeEnd)
             {
                 if (_consumptions.Count > 0)
                 {
