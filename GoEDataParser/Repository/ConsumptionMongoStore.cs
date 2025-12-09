@@ -62,7 +62,6 @@ namespace GoEDataParser.Repository
 
                 return Update(consumption);
             }
-            return consumption;
         }
     }
 }

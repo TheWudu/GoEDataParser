@@ -8,7 +8,7 @@ namespace GoEDataParser;
 
 public class ChargeData
 {
-    public static List<Charge> UseCsv()
+    public static List<Charge> LoadViaCsv()
     {
         Console.WriteLine("Using CSV downloader and parser");
 
@@ -22,7 +22,7 @@ public class ChargeData
         return csvParser.GetCharges();
     }
 
-    public static List<Charge> UseJson()
+    public static List<Charge> LoadViaJson()
     {
         Console.WriteLine("Using JSON downloader and parser");
 
@@ -32,52 +32,11 @@ public class ChargeData
         return parser.GetCharges();
     }
 
-    public static int StoreChargesInMongo(List<Charge> charges)
+    public static int StoreCharges(IChargeStore chargeStore, List<Charge> charges)
     {
         int storedCount = 0;
         int updatedCount = 0;
-        string dbHost = Configuration.MongoDbHost();
-        string dbName = Configuration.MongoDbName();
 
-        ChargeMongoStore chargeStore = new(dbHost, dbName);
-
-        foreach (Charge charge in charges)
-        {
-            Charge? storedCharge = chargeStore.FindBy("SessionId", charge.SessionId);
-            if (storedCharge is null)
-            {
-                charge.Id ??= Guid.NewGuid().ToString();
-                charge.Version = 1;
-                chargeStore.Insert(charge);
-                storedCount++;
-            }
-            else
-            {
-                charge.Id = storedCharge.Id;
-                charge.Version = storedCharge.Version;
-                if (charge.Equals(storedCharge))
-                    continue;
-
-                chargeStore.Update(charge);
-                updatedCount++;
-            }
-        }
-
-        Console.WriteLine("Stored {0} and updated {1} charges in db", storedCount, updatedCount);
-
-        return storedCount;
-    }
-
-    public static int StoreChargesInMySql(List<Charge> charges)
-    {
-        int storedCount = 0;
-        int updatedCount = 0;
-        string dbHost = Configuration.MysqlDbHost();
-        string dbName = Configuration.MysqlDbName();
-        string dbUser = Configuration.MysqlDbUser();
-        string dbPassword = Configuration.MysqlDbPassword();
-
-        ChargeMysqlStore chargeStore = new(dbHost, dbName, dbUser, dbPassword);
         foreach (Charge charge in charges)
         {
             Charge? storedCharge = chargeStore.FindBy("SessionId", charge.SessionId);
@@ -110,17 +69,17 @@ public class ChargeData
         return storedCount;
     }
 
-    public static List<Charge> UseMongo()
+    public static IChargeStore MongoStore()
     {
         string dbHost = Configuration.MongoDbHost();
         string dbName = Configuration.MongoDbName();
 
         ChargeMongoStore chargeStore = new(dbHost, dbName);
 
-        return Time.MeasureTime("Read from database ... ", codeBlock: chargeStore.ReadAll);
+        return chargeStore;
     }
 
-    public static List<Charge> UseMysql()
+    public static IChargeStore MysqlStore()
     {
         string dbHost = Configuration.MysqlDbHost();
         string dbName = Configuration.MysqlDbName();
@@ -129,17 +88,20 @@ public class ChargeData
 
         ChargeMysqlStore chargeStore = new(dbHost, dbName, dbUser, dbPassword);
 
-        return chargeStore.ReadAll();
+        return chargeStore;
     }
 
-    public static Dictionary<string, ChargeInfo> StatsViaMongo()
+    public static void ListChargesWithConsumptions(List<Charge> charges, ConsumptionParser cp)
     {
-        string dbHost = Configuration.MongoDbHost();
-        string dbName = Configuration.MongoDbName();
-
-        ChargeMongoStore chargeStore = new(dbHost, dbName);
-
-        return chargeStore.GroupMonthly();
+        foreach (Charge charge in charges)
+        {
+            (var consumption, var consumptionFromEg) = cp.ConsumpationWhile(
+                charge.StartTime,
+                charge.StartTime.Add(new TimeSpan(0, 0, (int)charge.SecondsCharged))
+            );
+            charge.PrintWithConsumption(consumption, consumptionFromEg);
+        }
+        Console.WriteLine("");
     }
 
     public static void ListCharges(List<Charge> charges)
@@ -164,56 +126,89 @@ public class ChargeData
     //     );
     // }
 
+    private static void PrintHelp()
+    {
+        Console.WriteLine(
+            """
+            Usage: dotnet run --project GoEDataParser/GoEDataParser.csproj <options>
+                    
+            Options: 
+                -csv    Download charge data as CSV file and parse it
+                -json   Download charge data as JSON and parse it
+                -mysql                          Use MySQL instead of mongo to store charges
+                -nostore                        Do not store charges in db    
+                -import-consumptionfile <file>  Import consumption file and store in db
+                -list                           List charges
+                -listeg                         List charges with consumptions data (slow)
+                -read-consumptions              Read consumptions from file instead of db
+                -update-consumptions            Update read consumptions from file in db
+            """
+        );
+    }
+
     public static void Main(string[] args)
     {
         Console.WriteLine("Hello Charger-Data-Parser !");
 
+        IChargeStore store = null;
         List<Charge> charges;
+
         // args = args.Append("-csv").ToArray();
         // args = args.Append("-json").ToArray();
         // args = args.Append("-mysql").ToArray();
 
-        if (args.Contains("-csv"))
+        if (args.Contains("-help"))
         {
-            charges = UseCsv();
+            PrintHelp();
+            return;
         }
-        else if (args.Contains("-json"))
+
+        if (args.Contains("-mysql"))
         {
-            charges = UseJson();
-        }
-        else if (args.Contains("-mysql"))
-        {
-            charges = UseMysql();
+            Console.WriteLine("Use MySQL database");
+            store = MysqlStore();
         }
         else
         {
-            charges = Time.MeasureTime("Read charges from database ...", codeBlock: UseMongo);
+            Console.WriteLine("Use Mongo database");
+            store = MongoStore();
+        }
+
+        // Read charges from csv, json mysql or mongo
+        if (args.Contains("-csv"))
+        {
+            charges = LoadViaCsv();
+        }
+        else if (args.Contains("-json"))
+        {
+            charges = LoadViaJson();
+        }
+        else
+        {
+            charges = Time.MeasureTime("Read charges from database ...", codeBlock: store.ReadAll);
         }
 
         if (!args.Contains("-nostore"))
         {
-            if (args.Contains("-mysql"))
-            {
-                Time.MeasureTimeVoid(
-                    "Store charges in MySQL... ",
-                    codeBlock: () => StoreChargesInMySql(charges)
-                );
-            }
-            else
-            {
-                Time.MeasureTimeVoid(
-                    "Store charges in MongoDB... ",
-                    codeBlock: () => StoreChargesInMongo(charges)
-                );
-            }
+            Time.MeasureTimeVoid(
+                "Store charges in DB... ",
+                codeBlock: () => StoreCharges(store, charges)
+            );
         }
+
+        ConsumptionParser cp = new();
 
         if (args.Contains("-list"))
         {
             Time.MeasureTimeVoid("List charges ... ", codeBlock: () => ListCharges(charges));
         }
-
-        ConsumptionParser cp = new();
+        if (args.Contains("-listeg"))
+        {
+            Time.MeasureTimeVoid(
+                "List charges ... ",
+                codeBlock: () => ListChargesWithConsumptions(charges, cp)
+            );
+        }
 
         if (args.Contains("-import-consumptionfile"))
         {
@@ -258,7 +253,7 @@ public class ChargeData
         );
         evaluator.PrintGroup(yearly, "year");
 
-        var docs = Time.MeasureTime("Get stats by mongo ... ", codeBlock: StatsViaMongo);
+        var docs = Time.MeasureTime("Get stats by DB ... ", codeBlock: store.GroupMonthly);
         evaluator.PrintGroup(docs, "month");
     }
 }

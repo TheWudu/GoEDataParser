@@ -4,7 +4,8 @@ using Repository;
 namespace GoEDataParser.Repository
 {
     public class ChargeMysqlStore(string dbHost, string dbName, string dbUser, string dbPassword)
-        : GenericMysqlStore<Charge>(dbHost, dbName, "charges", dbUser, dbPassword)
+        : GenericMysqlStore<Charge>(dbHost, dbName, "charges", dbUser, dbPassword),
+            IChargeStore
     {
         public List<Charge> FindByStartDate(DateTime dateTime)
         {

@@ -33,6 +33,26 @@ namespace GoEDataParser.Models
             );
         }
 
+        public void PrintWithConsumption(double consumption, double consumptionFromEg)
+        {
+            var consFromEg = 0.0;
+            if (consumption != 0)
+                consFromEg = ((consumptionFromEg / consumption) * 100);
+
+            Console.WriteLine(
+                "{0}: {1} - {2} ({5}) ({4,5}) => {3,6:F}; ({6,5:F2} kWh, {7,5:F2} kWh {8,5:F2})",
+                SessionId,
+                StartTime.ToString("u"), // .ToLocalTime(),
+                EndTime.ToString("u"), // .ToLocalTime(),
+                Kwh,
+                SecondsCharged,
+                StartTime.Kind,
+                consumption,
+                consumptionFromEg,
+                consFromEg
+            );
+        }
+
         public override bool Equals(object? obj)
         {
             return this.Equals(obj as Charge);

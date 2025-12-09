@@ -53,27 +53,10 @@ namespace GoEDataParser
                         c.StartTime,
                         c.StartTime.Add(new TimeSpan(0, 0, (int)c.SecondsCharged))
                     );
-                    // if (consumption > 0.0)
-                    // {
-                    //     var consumptionRate = 1.0;
-                    //     if (consumption < c.Kwh)
-                    //         consumptionRate = (consumption / c.Kwh);
-                    //
-                    //     Console.WriteLine(
-                    //         "Consumption: {0} / {3} ({4,4:F2} %) at {1} - {2}",
-                    //         consumption,
-                    //         c.StartTime,
-                    //         c.StartTime.Add(new TimeSpan(0, 0, (int)c.SecondsCharged)),
-                    //         c.Kwh,
-                    //         consumptionRate * 100
-                    //     );
-                    // }
                 }
 
                 if (consumption > c.Kwh)
-                {
                     consumption = c.Kwh;
-                }
 
                 string key = c.StartTime.ToString(timecode);
                 if (dictMonthly.TryGetValue(key, out ChargeInfo? info))
@@ -84,7 +67,7 @@ namespace GoEDataParser
                     info.TimeSum += c.SecondsCharged;
                     info.Missing += missing;
                     info.Consumption += consumption;
-                    info.ConsumptionFromEg = consumptionFromEg;
+                    info.ConsumptionFromEg += consumptionFromEg;
                 }
                 else
                 {
@@ -145,8 +128,12 @@ namespace GoEDataParser
                 timeSum += kv.Value.TimeSum;
                 double kwhAvg = kv.Value.KwhValues.Average();
                 double kwhMax = kv.Value.KwhValues.Max();
+                double consFromEg =
+                    kv.Value.Consumption != 0
+                        ? (kv.Value.ConsumptionFromEg / kv.Value.Consumption) * 100
+                        : 0.0;
                 Console.WriteLine(
-                    "{0}: {1,7:F2}, {2,7:F2} (Count: {3,3}, Max: {4:F2} kWh, Avg: {5,5:F2} kWh, TimeSum: {6,11}, Missing: {7,6:F2} kWh, Consumption: {8,7:F2} / {10,5:F2} kWh ({9,5:F2} %)",
+                    "{0}: {1,7:F2}, {2,7:F2} (Count: {3,3}, Max: {4:F2} kWh, Avg: {5,5:F2} kWh, TimeSum: {6,11}, Missing: {7,6:F2} kWh, Consumption: {8,7:F2} / {10,5:F2} kWh ({9,5:F2} %, {11,5:F2} % from EG)",
                     kv.Key,
                     kv.Value.KwhSum,
                     kwhSum,
@@ -157,7 +144,8 @@ namespace GoEDataParser
                     kv.Value.Missing,
                     kv.Value.Consumption,
                     ((kv.Value.Consumption / kv.Value.KwhSum) * 100),
-                    kv.Value.ConsumptionFromEg
+                    kv.Value.ConsumptionFromEg,
+                    consFromEg
                 );
             }
             Console.WriteLine(

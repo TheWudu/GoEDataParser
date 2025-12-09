@@ -5,8 +5,15 @@ using Repository;
 
 namespace GoEDataParser.Repository
 {
+    public interface IChargeStore : IGenericStore<Charge>
+    {
+        List<Charge> FindByStartDate(DateTime dateTime);
+        Dictionary<string, ChargeInfo> GroupMonthly();
+    }
+
     public class ChargeMongoStore(string dbHost, string dbName)
-        : GenericMongoStore<Charge>(dbHost, dbName, "charges")
+        : GenericMongoStore<Charge>(dbHost, dbName, "charges"),
+            IChargeStore
     {
         public List<Charge> FindByStartDate(DateTime dateTime)
         {
