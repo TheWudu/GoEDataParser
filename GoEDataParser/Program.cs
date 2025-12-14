@@ -6,9 +6,9 @@ using GoEDataParser.Utils.Utils;
 
 namespace GoEDataParser;
 
-public class ChargeData
+public abstract class ChargeData
 {
-    public static List<Charge> LoadViaCsv()
+    private static List<Charge> LoadViaCsv()
     {
         Console.WriteLine("Using CSV downloader and parser");
 
@@ -22,7 +22,7 @@ public class ChargeData
         return csvParser.GetCharges();
     }
 
-    public static List<Charge> LoadViaJson()
+    private static List<Charge> LoadViaJson()
     {
         Console.WriteLine("Using JSON downloader and parser");
 
@@ -32,7 +32,7 @@ public class ChargeData
         return parser.GetCharges();
     }
 
-    public static int StoreCharges(IChargeStore chargeStore, List<Charge> charges)
+    private static void StoreCharges(IChargeStore chargeStore, List<Charge> charges)
     {
         int storedCount = 0;
         int updatedCount = 0;
@@ -65,11 +65,9 @@ public class ChargeData
         }
 
         Console.WriteLine("Stored {0} and updated {1} charges in db", storedCount, updatedCount);
-
-        return storedCount;
     }
 
-    public static IChargeStore MongoStore()
+    private static IChargeStore MongoStore()
     {
         string dbHost = Configuration.MongoDbHost();
         string dbName = Configuration.MongoDbName();
@@ -79,23 +77,23 @@ public class ChargeData
         return chargeStore;
     }
 
-    public static IChargeStore MysqlStore()
+    private static IChargeStore MysqlStore()
     {
-        string dbHost = Configuration.MysqlDbHost();
-        string dbName = Configuration.MysqlDbName();
-        string dbUser = Configuration.MysqlDbUser();
-        string dbPassword = Configuration.MysqlDbPassword();
+        var dbHost = Configuration.MysqlDbHost();
+        var dbName = Configuration.MysqlDbName();
+        var dbUser = Configuration.MysqlDbUser();
+        var dbPassword = Configuration.MysqlDbPassword();
 
         ChargeMysqlStore chargeStore = new(dbHost, dbName, dbUser, dbPassword);
 
         return chargeStore;
     }
 
-    public static void ListChargesWithConsumptions(List<Charge> charges, ConsumptionParser cp)
+    private static void ListChargesWithConsumptions(List<Charge> charges, ConsumptionParser cp)
     {
         foreach (Charge charge in charges)
         {
-            (var consumption, var consumptionFromEg) = cp.ConsumpationWhile(
+            var (consumption, consumptionFromEg) = cp.ConsumpationWhile(
                 charge.StartTime,
                 charge.StartTime.Add(new TimeSpan(0, 0, (int)charge.SecondsCharged))
             );
@@ -104,7 +102,7 @@ public class ChargeData
         Console.WriteLine("");
     }
 
-    public static void ListCharges(List<Charge> charges)
+    private static void ListCharges(List<Charge> charges)
     {
         foreach (Charge charge in charges)
         {
@@ -136,10 +134,10 @@ public class ChargeData
                 -csv    Download charge data as CSV file and parse it
                 -json   Download charge data as JSON and parse it
                 -mysql                          Use MySQL instead of mongo to store charges
-                -nostore                        Do not store charges in db    
-                -import-consumptionfile <file>  Import consumption file and store in db
+                -no-store                        Do not store charges in db    
+                -import-consumption-file <file>  Import consumption file and store in db
                 -list                           List charges
-                -listeg                         List charges with consumptions data (slow)
+                -list-eg                         List charges with consumptions data (slow)
                 -read-consumptions              Read consumptions from file instead of db
                 -update-consumptions            Update read consumptions from file in db
             """
@@ -150,7 +148,7 @@ public class ChargeData
     {
         Console.WriteLine("Hello Charger-Data-Parser !");
 
-        IChargeStore store = null;
+        IChargeStore store;
         List<Charge> charges;
 
         // args = args.Append("-csv").ToArray();
@@ -174,7 +172,7 @@ public class ChargeData
             store = MongoStore();
         }
 
-        // Read charges from csv, json mysql or mongo
+        // Read charges from csv, JSON mysql or mongo
         if (args.Contains("-csv"))
         {
             charges = LoadViaCsv();
@@ -188,7 +186,7 @@ public class ChargeData
             charges = Time.MeasureTime("Read charges from database ...", codeBlock: store.ReadAll);
         }
 
-        if (!args.Contains("-nostore"))
+        if (!args.Contains("-no-store"))
         {
             Time.MeasureTimeVoid(
                 "Store charges in DB... ",
@@ -202,7 +200,7 @@ public class ChargeData
         {
             Time.MeasureTimeVoid("List charges ... ", codeBlock: () => ListCharges(charges));
         }
-        if (args.Contains("-listeg"))
+        if (args.Contains("-list-eg"))
         {
             Time.MeasureTimeVoid(
                 "List charges ... ",
@@ -210,9 +208,9 @@ public class ChargeData
             );
         }
 
-        if (args.Contains("-import-consumptionfile"))
+        if (args.Contains("-import-consumption-file"))
         {
-            var index = args.ToList().IndexOf("-import-consumptionfile");
+            var index = args.ToList().IndexOf("-import-consumption-file");
             var filename = args[index + 1];
             // var filename = "/home/martin/Downloads/manager_eg_202509.csv";
 

@@ -81,8 +81,8 @@ namespace GoEDataParser.Parser
                         continue;
                     }
 
-                    DateTime endTime = DateTime.Now;
-                    DateTime startTime = DateTime.Now;
+                    DateTime endTime;
+                    DateTime startTime;
                     double kwh = 0;
                     double kwhFromEg = 0;
                     double kwhFromNet = 0;
