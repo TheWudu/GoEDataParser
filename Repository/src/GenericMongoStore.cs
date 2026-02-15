@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using MongoDB.Driver;
 
 namespace Repository
@@ -55,6 +56,11 @@ namespace Repository
             var filter = Builders<T>.Filter.Eq(key, value);
 
             return Collection.Find(filter).FirstOrDefault();
+        }
+
+        public T? FindBy(Expression<Func<T, bool>> expr)
+        {
+            return Collection.AsQueryable().Where(expr).FirstOrDefault();
         }
 
         public void Clear()

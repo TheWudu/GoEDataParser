@@ -86,6 +86,14 @@ public class GenericMongoStoreTest
         Assert.Equal(_store.FindBy("Version", 1), testEntity);
     }
 
+    [Fact]
+    public void FindByExpression()
+    {
+        var testEntity = CreateEntity("michael");
+
+        Assert.Equal(_store.FindBy(e => e.Name == "michael"), testEntity);
+    }
+
     [Theory]
     [InlineData(1)]
     [InlineData(3)]

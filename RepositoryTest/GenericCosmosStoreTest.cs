@@ -3,17 +3,13 @@ using Xunit;
 
 namespace RepositoryTest;
 
-public class GenericMysqlStoreTest
+public class GenericCosmosStoreTest
 {
-    GenericMysqlStore<TestEntity> _store;
+    GenericCosmosStore<TestEntity> _store;
 
-    public GenericMysqlStoreTest()
+    public GenericCosmosStoreTest()
     {
-        string dbHost = Configuration.MysqlDbHost();
-        string dbName = Configuration.MysqlDbName();
-        string dbUser = Configuration.MysqlDbUser();
-        string dbPassword = Configuration.MysqlDbPassword();
-        _store = new(dbHost, dbName, (string)"test_entities", dbUser, dbPassword);
+        _store = new("https://localhost:8081", "testDb", (string)"test_entities");
 
         _store.Setup();
         _store.Clear();
@@ -76,7 +72,7 @@ public class GenericMysqlStoreTest
             CreateEntity("Test" + i.ToString());
         }
 
-        Assert.Equal(_store.Count(), amount);
+        Assert.Equal(amount, _store.Count());
     }
 
     [Fact]
@@ -84,25 +80,7 @@ public class GenericMysqlStoreTest
     {
         var testEntity = CreateEntity("michael");
 
-        Assert.Equal(_store.FindBy("name", "michael"), testEntity);
-    }
-
-    [Fact]
-    public void FindBy_Expression()
-    {
-        string id1 = Guid.NewGuid().ToString();
-        string id2 = Guid.NewGuid().ToString();
-        _ = CreateEntity("michael", id1);
-        var testEntity2 = CreateEntity("daniel", id2, 2);
-
-        var readEntityV1 = _store.FindBy(e => e.Version == 1);
-        var readEntityV2 = _store.FindBy(e => e.Version == 2);
-
-        Assert.Equal(readEntityV2, testEntity2);
-        Assert.NotNull(readEntityV1);
-        Assert.Equal(readEntityV1.Id, id1);
-        Assert.NotNull(readEntityV2);
-        Assert.Equal(readEntityV2.Id, id2);
+        Assert.Equal(testEntity, _store.FindBy(e => e.Name == "michael"));
     }
 
     [Fact]
@@ -113,8 +91,8 @@ public class GenericMysqlStoreTest
         _ = CreateEntity("michael", id1);
         var testEntity2 = CreateEntity("daniel", id2, 2);
 
-        var readEntityV1 = _store.FindBy("version", 1);
-        var readEntityV2 = _store.FindBy("version", 2);
+        var readEntityV1 = _store.FindBy(e => e.Version == 1);
+        var readEntityV2 = _store.FindBy(e => e.Version == 2);
 
         Assert.Equal(readEntityV2, testEntity2);
         Assert.NotNull(readEntityV1);

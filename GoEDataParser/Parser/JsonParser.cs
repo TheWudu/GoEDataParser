@@ -50,8 +50,8 @@ namespace GoEDataParser.Parser
         private const string BaseUrl = "https://data.v3.go-e.io/api/v1/direct_json";
         private readonly string? _token; // fetched from App.config
         private const string Timezone = "Europe%2FVienna";
-        private const long From = 1682892000000; // 01.05.2023
-        private const long To = 1767218340000; // 31.12.2025
+        private const long From = 1767222000000; // 01.01.2026 //  1682892000000; // 01.05.2023
+        private const long To = 1924988399000; // 31.12.2030
 
         private readonly HttpClient? _client;
         private readonly CultureInfo _culture = CultureInfo.CreateSpecificCulture(

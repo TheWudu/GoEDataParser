@@ -39,7 +39,7 @@ public abstract class ChargeData
 
         foreach (Charge charge in charges)
         {
-            Charge? storedCharge = chargeStore.FindBy("SessionId", charge.SessionId);
+            Charge? storedCharge = chargeStore.FindBy(c => c.SessionId == charge.SessionId);
             if (storedCharge is null)
             {
                 charge.Id ??= Guid.NewGuid().ToString();
@@ -85,6 +85,16 @@ public abstract class ChargeData
         var dbPassword = Configuration.MysqlDbPassword();
 
         ChargeMysqlStore chargeStore = new(dbHost, dbName, dbUser, dbPassword);
+
+        return chargeStore;
+    }
+
+    private static IChargeStore CosmosStore()
+    {
+        var dbHost = "https://localhost:8081/";
+        var dbName = "goedataparser";
+
+        ChargeCosmosStore chargeStore = new(dbHost, dbName);
 
         return chargeStore;
     }
@@ -149,7 +159,7 @@ public abstract class ChargeData
         Console.WriteLine("Hello Charger-Data-Parser !");
 
         IChargeStore store;
-        List<Charge> charges;
+        List<Charge> charges = new();
 
         // args = args.Append("-csv").ToArray();
         // args = args.Append("-json").ToArray();
@@ -166,6 +176,11 @@ public abstract class ChargeData
             Console.WriteLine("Use MySQL database");
             store = MysqlStore();
         }
+        else if (args.Contains("-cosmos"))
+        {
+            Console.WriteLine("Use Cosmos database");
+            store = CosmosStore();
+        }
         else
         {
             Console.WriteLine("Use Mongo database");
@@ -181,18 +196,19 @@ public abstract class ChargeData
         {
             charges = LoadViaJson();
         }
-        else
+
+        if (charges.Count != 0)
         {
-            charges = Time.MeasureTime("Read charges from database ...", codeBlock: store.ReadAll);
+            if (!args.Contains("-no-store"))
+            {
+                Time.MeasureTimeVoid(
+                    "Store charges in DB... ",
+                    codeBlock: () => StoreCharges(store, charges)
+                );
+            }
         }
 
-        if (!args.Contains("-no-store"))
-        {
-            Time.MeasureTimeVoid(
-                "Store charges in DB... ",
-                codeBlock: () => StoreCharges(store, charges)
-            );
-        }
+        charges = Time.MeasureTime("Read charges from database ...", codeBlock: store.ReadAll);
 
         ConsumptionParser cp = new();
 
@@ -251,7 +267,7 @@ public abstract class ChargeData
         );
         evaluator.PrintGroup(yearly, "year");
 
-        var docs = Time.MeasureTime("Get stats by DB ... ", codeBlock: store.GroupMonthly);
-        evaluator.PrintGroup(docs, "month");
+        // var docs = Time.MeasureTime("Get stats by DB ... ", codeBlock: store.GroupMonthly);
+        // evaluator.PrintGroup(docs, "month");
     }
 }

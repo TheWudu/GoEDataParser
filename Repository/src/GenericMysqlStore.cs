@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -88,11 +89,16 @@ namespace Repository
             return Dataset.Find(id);
         }
 
+        public T? FindBy(Expression<Func<T, bool>> expr)
+        {
+            return Dataset.Where(expr).ToListAsync().Result.FirstOrDefault();
+        }
+
         public T? FindBy<TV>(string key, TV value)
         {
             string q = $"SELECT * FROM {DbTablename} WHERE {key} = '{value}'";
 
-            return Dataset.FromSqlRaw(q).ToList().FirstOrDefault();
+            return RelationalQueryableExtensions.FromSqlRaw(Dataset, q).ToList().FirstOrDefault();
         }
 
         public T Insert(T entity)
