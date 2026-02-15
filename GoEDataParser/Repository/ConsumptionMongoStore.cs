@@ -32,16 +32,12 @@ namespace GoEDataParser.Repository
                 )
             );
 
-            var documents = Collection.Find(
-                filter //,
-            //new FindOptions { Hint = "StartTime_-1_EndTime_-1" }
-            );
-            // Console.WriteLine(documents);
+            var documents = Collection.Find(filter);
 
             return documents.ToList();
         }
 
-        public Consumption Upsert(Consumption consumption)
+        public async Task<Consumption> Upsert(Consumption consumption)
         {
             var cons = FindByStartTime(consumption.StartTime);
             if (cons is null)
@@ -51,7 +47,7 @@ namespace GoEDataParser.Repository
 
                 Console.Write(".");
 
-                return Insert(consumption);
+                return await Insert(consumption);
             }
             else
             {
@@ -60,7 +56,7 @@ namespace GoEDataParser.Repository
 
                 Console.Write("+");
 
-                return Update(consumption);
+                return await Update(consumption);
             }
         }
     }

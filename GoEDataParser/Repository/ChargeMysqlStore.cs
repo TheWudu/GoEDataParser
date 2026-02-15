@@ -1,4 +1,5 @@
 using GoEDataParser.Models;
+using Microsoft.EntityFrameworkCore;
 using Repository;
 
 namespace GoEDataParser.Repository
@@ -12,9 +13,9 @@ namespace GoEDataParser.Repository
             return Dataset.Where(e => e.StartTime == dateTime).ToList();
         }
 
-        public new List<Charge> ReadAll()
+        public new async Task<List<Charge>> ReadAll()
         {
-            var list = Dataset.Where(e => true).OrderBy(e => e.StartTime).ToList();
+            var list = await Dataset.Where(e => true).OrderBy(e => e.StartTime).ToListAsync();
 
             return list;
         }

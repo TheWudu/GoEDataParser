@@ -69,17 +69,17 @@ namespace GoEDataParser.Parser
             return _charges;
         }
 
-        public void Load()
+        public async Task Load()
         {
-            string jsonData = Time.MeasureTime("Fetching ... ", codeBlock: FetchJson);
-            JsonData? data = Time.MeasureTime(
+            string jsonData = await Time.MeasureTime<string>("Fetching ... ", codeBlock: FetchJson);
+            JsonData? data = await Time.MeasureTime(
                 "Deserializing ... ",
                 codeBlock: () => Deserialize(jsonData)
             );
             Time.MeasureTimeVoid("Parsing ... ", codeBlock: () => ParseData(data));
         }
 
-        private string FetchJson()
+        private async Task<string> FetchJson()
         {
             if (_client is null)
                 throw new NullReferenceException("No client configured");
@@ -101,16 +101,16 @@ namespace GoEDataParser.Parser
                 + To.ToString();
         }
 
-        private JsonData? Deserialize(string jsonData)
+        private async Task<JsonData?> Deserialize(string jsonData)
         {
             return JsonSerializer.Deserialize<JsonData>(jsonData);
         }
 
-        private void ParseData(JsonData? data)
+        private Task ParseData(JsonData? data)
         {
             if (data?.data is null)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             foreach (Item item in data.data)
@@ -139,6 +139,7 @@ namespace GoEDataParser.Parser
                 };
                 _charges.Add(charge);
             }
+            return Task.CompletedTask;
         }
     }
 }

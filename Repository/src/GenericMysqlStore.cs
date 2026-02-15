@@ -64,64 +64,57 @@ namespace Repository
 
         public void Clear()
         {
-            Dataset.ExecuteDelete();
-            SaveChanges();
+            _ = Dataset.ExecuteDeleteAsync().Result;
+            _ = SaveChangesAsync().Result;
         }
 
-        public long Count()
+        public async Task<long> Count()
         {
-            return Dataset.Count();
+            return await Dataset.CountAsync();
         }
 
-        public bool Delete(string id)
+        public async Task<bool> Delete(string id)
         {
             T? entity = Dataset.Find(id);
             if (entity is null)
                 return false;
 
             Dataset.Remove(entity);
-            var cnt = this.SaveChanges();
+            var cnt = await this.SaveChangesAsync();
             return cnt == 1;
         }
 
-        public T? Find(string id)
+        public async Task<T?> Find(string id)
         {
-            return Dataset.Find(id);
+            return await Dataset.FindAsync(id);
         }
 
-        public T? FindBy(Expression<Func<T, bool>> expr)
+        public async Task<T?> FindBy(Expression<Func<T, bool>> expr)
         {
-            return Dataset.Where(expr).ToListAsync().Result.FirstOrDefault();
+            return (await Dataset.Where(expr).ToListAsync()).FirstOrDefault();
         }
 
-        public T? FindBy<TV>(string key, TV value)
-        {
-            string q = $"SELECT * FROM {DbTablename} WHERE {key} = '{value}'";
-
-            return RelationalQueryableExtensions.FromSqlRaw(Dataset, q).ToList().FirstOrDefault();
-        }
-
-        public T Insert(T entity)
+        public async Task<T> Insert(T entity)
         {
             Dataset.Add(entity);
-            SaveChanges();
+            await SaveChangesAsync();
 
             return entity;
         }
 
-        public List<T> ReadAll()
+        public async Task<List<T>> ReadAll()
         {
-            var list = Dataset.Where(e => true).ToList();
+            var list = await Dataset.Where(e => true).ToListAsync();
 
             return list;
         }
 
-        public T Update(T entity)
+        public async Task<T> Update(T entity)
         {
             entity.Version += 1;
 
             Dataset.Update(entity);
-            SaveChanges();
+            await SaveChangesAsync();
 
             return entity;
         }

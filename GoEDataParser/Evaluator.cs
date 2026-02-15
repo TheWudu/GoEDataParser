@@ -14,23 +14,26 @@ namespace GoEDataParser
             _consumptionParser = cp;
         }
 
-        public void Run(List<Charge> charges)
+        public async Task Run(List<Charge> charges)
         {
-            Dictionary<string, ChargeInfo> monthly = GroupMonthly(charges);
+            Dictionary<string, ChargeInfo> monthly = await GroupMonthly(charges);
             PrintGroup(monthly, "month");
         }
 
-        public Dictionary<string, ChargeInfo> GroupMonthly(List<Charge> charges)
+        public async Task<Dictionary<string, ChargeInfo>> GroupMonthly(List<Charge> charges)
         {
-            return GroupBy(charges, "yyyy.MM");
+            return await GroupBy(charges, "yyyy.MM");
         }
 
-        public Dictionary<string, ChargeInfo> GroupYearly(List<Charge> charges)
+        public async Task<Dictionary<string, ChargeInfo>> GroupYearly(List<Charge> charges)
         {
-            return GroupBy(charges, "yyyy");
+            return await GroupBy(charges, "yyyy");
         }
 
-        private Dictionary<string, ChargeInfo> GroupBy(List<Charge> charges, string timecode)
+        private async Task<Dictionary<string, ChargeInfo>> GroupBy(
+            List<Charge> charges,
+            string timecode
+        )
         {
             Dictionary<string, ChargeInfo> dictMonthly = [];
             Charge? prev = null;
@@ -114,7 +117,7 @@ namespace GoEDataParser
             }
         }
 
-        public void PrintGroup(Dictionary<string, ChargeInfo> dict, string grouping)
+        public Task PrintGroup(Dictionary<string, ChargeInfo> dict, string grouping)
         {
             string? lastKey = null;
             double kwhSum = 0.0F;
@@ -153,6 +156,8 @@ namespace GoEDataParser
                 kwhSum,
                 TimeSpan.FromSeconds(timeSum).ToString()
             );
+
+            return Task.CompletedTask;
         }
 
         public double MissingKwh(Charge prev, Charge curr)

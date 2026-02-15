@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 
 namespace Repository
@@ -17,26 +18,26 @@ namespace Repository
             Collection = client.GetDatabase(dbName).GetCollection<T>(dbCollection);
         }
 
-        public long Count()
+        public async Task<long> Count()
         {
-            return Collection.CountDocuments(Builders<T>.Filter.Empty);
+            return await Collection.CountDocumentsAsync(Builders<T>.Filter.Empty);
         }
 
-        public T Insert(T entity)
+        public async Task<T> Insert(T entity)
         {
-            Collection.InsertOne(entity);
+            await Collection.InsertOneAsync(entity);
 
             return entity;
         }
 
-        public T Update(T entity)
+        public async Task<T> Update(T entity)
         {
             var filter =
                 Builders<T>.Filter.Eq("_id", entity.Id)
                 & Builders<T>.Filter.Eq("Version", entity.Version);
 
             entity.Version += 1;
-            var resp = Collection.ReplaceOne(filter, entity);
+            var resp = await Collection.ReplaceOneAsync(filter, entity);
             if (resp.ModifiedCount != 1)
             {
                 string message =
@@ -51,37 +52,38 @@ namespace Repository
             return entity;
         }
 
-        public T? FindBy<TV>(string key, TV value)
+        public async Task<T?> FindBy<TV>(string key, TV value)
         {
             var filter = Builders<T>.Filter.Eq(key, value);
 
-            return Collection.Find(filter).FirstOrDefault();
+            return (await Collection.FindAsync(filter)).FirstOrDefault();
         }
 
-        public T? FindBy(Expression<Func<T, bool>> expr)
+        public async Task<T?> FindBy(Expression<Func<T, bool>> expr)
         {
-            return Collection.AsQueryable().Where(expr).FirstOrDefault();
+            await Task.CompletedTask;
+            return Collection.AsQueryable().Where(expr).ToList().FirstOrDefault();
         }
 
-        public void Clear()
+        public async Task Clear()
         {
-            Collection.DeleteMany(Builders<T>.Filter.Empty);
+            await Collection.DeleteManyAsync(Builders<T>.Filter.Empty);
         }
 
-        public List<T> ReadAll()
+        public async Task<List<T>> ReadAll()
         {
-            return Collection.Find(Builders<T>.Filter.Empty).ToList();
+            return (await Collection.FindAsync(Builders<T>.Filter.Empty)).ToList();
         }
 
-        public T? Find(string id)
+        public async Task<T?> Find(string id)
         {
-            return FindBy("_id", id);
+            return await FindBy(e => e.Id == id);
         }
 
-        public bool Delete(string id)
+        public async Task<bool> Delete(string id)
         {
             var filter = Builders<T>.Filter.Eq(e => e.Id, id);
-            var res = Collection.DeleteOne(filter);
+            var res = await Collection.DeleteOneAsync(filter);
 
             return res.DeletedCount == 1;
         }

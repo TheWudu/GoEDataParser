@@ -11,15 +11,15 @@ public class ChargeMongoStoreTest
 
     public ChargeMongoStoreTest()
     {
-        string dbHost = Configuration.MongoDbHost();
-        string dbName = Configuration.MongoDbName();
+        var dbHost = Configuration.MongoDbHost();
+        var dbName = Configuration.MongoDbName();
         _store = new(dbHost, dbName);
         _store.Clear();
     }
 
     // Insert
     [Fact]
-    public void InsertSimple()
+    public async Task InsertSimple()
     {
         Charge charge = new()
         {
@@ -29,12 +29,12 @@ public class ChargeMongoStoreTest
             EndTime = DateTime.Parse("2025-01-01T11:05:47Z"),
         };
 
-        _store.Insert(charge);
+        await _store.Insert(charge);
 
-        Assert.Equal(1, _store.Count());
+        Assert.Equal(1, await _store.Count());
     }
 
-    Charge CreateCharge(int day, string? id = null)
+    async Task<Charge> CreateCharge(int day, string? id = null)
     {
         Charge charge = new()
         {
@@ -45,30 +45,30 @@ public class ChargeMongoStoreTest
             EndTime = new DateTime(2025, 01, day, 11, 05, 47, DateTimeKind.Utc),
         };
 
-        _store.Insert(charge);
+        await _store.Insert(charge);
 
         return charge;
     }
 
     [Fact]
-    public void FindBySuccess()
+    public async Task FindBySuccess()
     {
-        Charge charge = CreateCharge(10);
+        var charge = await CreateCharge(10);
 
-        Assert.Equal(_store.FindBy("SessionId", "sessionId_1234_10"), charge);
+        Assert.Equal(charge, await _store.FindBy("SessionId", "sessionId_1234_10"));
     }
 
     [Fact]
-    public void FindByNotFound()
+    public async Task FindByNotFound()
     {
-        Assert.Null(_store.FindBy("SessionId", "not-existing-id"));
+        Assert.Null(await _store.FindBy("SessionId", "not-existing-id"));
     }
 
     [Fact]
-    public void FindByStartDate()
+    public async Task FindByStartDate()
     {
         _ = CreateCharge(10);
-        Charge charge = CreateCharge(22);
+        var charge = await CreateCharge(22);
         _ = CreateCharge(23);
 
         List<Charge> charges = _store.FindByStartDate(charge.StartTime);
@@ -82,28 +82,28 @@ public class ChargeMongoStoreTest
     [Theory]
     [InlineData(1)]
     [InlineData(5)]
-    public void Count(int amount)
+    public async Task Count(int amount)
     {
-        for (int i = 0; i < amount; i++)
+        for (var i = 0; i < amount; i++)
         {
-            _ = CreateCharge(i + 1);
+            _ = await CreateCharge(i + 1);
         }
-        Assert.Equal(_store.Count(), amount);
+        Assert.Equal(amount, await _store.Count());
     }
 
     [Theory]
     [InlineData(1)]
     [InlineData(2)]
     [InlineData(29)]
-    public void ReadAll(int amount)
+    public async Task ReadAll(int amount)
     {
         List<Charge> insertedCharges = new();
 
-        for (int i = 0; i < amount; i++)
+        for (var i = 0; i < amount; i++)
         {
-            insertedCharges.Add(CreateCharge(i + 1));
+            insertedCharges.Add(await CreateCharge(i + 1));
         }
-        List<Charge> charges = _store.ReadAll();
+        var charges = await _store.ReadAll();
 
         Assert.Multiple(() =>
         {
@@ -114,66 +114,63 @@ public class ChargeMongoStoreTest
     }
 
     [Fact]
-    public void UpdateExisting()
+    public async Task UpdateExisting()
     {
         string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charge charge = CreateCharge(14, id);
+        Charge charge = await CreateCharge(14, id);
 
         charge.Kwh += 10.0F;
-        charge = _store.Update(charge);
+        charge = await _store.Update(charge);
 
-        Charge? updatedCharge = _store.Find(id);
+        Charge? updatedCharge = await _store.Find(id);
         Assert.NotNull(charge);
         Assert.Equal(updatedCharge, charge);
     }
 
     [Fact]
-    public void UpdateTheCorrectOne()
+    public async Task UpdateTheCorrectOne()
     {
-        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charge charge = CreateCharge(14, id);
-        string unchangedId = "8da64b25-5522-4ded-8c0f-ffcdd4331840";
-        Charge unchanged = CreateCharge(15, unchangedId);
+        var id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+        var charge = await CreateCharge(14, id);
+        var unchangedId = "8da64b25-5522-4ded-8c0f-ffcdd4331840";
+        var unchanged = await CreateCharge(15, unchangedId);
 
         charge.Kwh += 10.0F;
-        charge = _store.Update(charge);
+        charge = await _store.Update(charge);
 
-        Assert.Equal(_store.Find(id), charge);
-        Assert.Equal(_store.Find(unchangedId), unchanged);
+        Assert.Equal(charge, await _store.Find(id));
+        Assert.Equal(unchanged, await _store.Find(unchangedId));
     }
 
     [Fact]
-    public void UpdateOnlyWithProperVersion()
+    public async Task UpdateOnlyWithProperVersion()
     {
-        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        Charge charge = CreateCharge(14, id);
+        var id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+        var charge = await CreateCharge(14, id);
 
         charge.Kwh += 10.0F;
         charge.Version = 5;
 
-        Assert.Throws<global::Repository.EntityNotFoundException>(
-            delegate
-            {
-                _ = _store.Update(charge);
-            }
+        await Assert.ThrowsAsync<global::Repository.EntityNotFoundException>(
+            () => _store.Update(charge)
         );
     }
 
     [Fact]
-    public void DeleteExisting()
+    public async Task DeleteExisting()
     {
-        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
-        _ = CreateCharge(14, id);
+        var id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+        _ = await CreateCharge(14, id);
 
-        Assert.True(_store.Delete(id));
+        Assert.True(await _store.Delete(id));
     }
 
     [Fact]
-    public void DeleteNonExisting()
+    public async Task DeleteNonExisting()
     {
-        string id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
+        var id = "a3b28d06-f494-46ad-ac89-7927db386fc4";
 
-        Assert.False(_store.Delete(id));
+        Assert.False(await _store.Delete(id));
     }
 
     [Fact]

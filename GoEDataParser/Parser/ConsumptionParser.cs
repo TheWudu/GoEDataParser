@@ -29,7 +29,7 @@ namespace GoEDataParser.Parser
                 return _consumptions;
             }
 
-            public void ParseFiles(int startYear = 2023)
+            public Task ParseFiles(int startYear = 2023)
             {
                 int endYear = DateTime.Today.Year;
 
@@ -37,9 +37,11 @@ namespace GoEDataParser.Parser
                 {
                     ReadFile(_defaultFilePath + year + ".csv");
                 }
+
+                return Task.CompletedTask;
             }
 
-            public void ReadFile(string filepath)
+            public Task ReadFile(string filepath)
             {
                 if (!File.Exists(filepath))
                 {
@@ -48,7 +50,7 @@ namespace GoEDataParser.Parser
                         filepath,
                         Directory.GetCurrentDirectory()
                     );
-                    return;
+                    return Task.CompletedTask;
                 }
 
                 TextFieldParser tfp = new(filepath);
@@ -178,6 +180,8 @@ namespace GoEDataParser.Parser
                     //     currentRow[0]
                     // );
                 }
+
+                return Task.CompletedTask;
             }
 
             public (double, double) ConsumpationFromList(DateTime chargeStart, DateTime chargeEnd)
@@ -196,9 +200,9 @@ namespace GoEDataParser.Parser
                 return (list.Sum(c => c.Kwh), list.Sum(c => c.KwhFromEg));
             }
 
-            public void ReadConsumptionsFromDb()
+            public async Task ReadConsumptionsFromDb()
             {
-                _consumptions.AddRange(_consumptionStore.ReadAll());
+                _consumptions.AddRange(await _consumptionStore.ReadAll());
             }
 
             public (double, double) ConsumpationWhile(DateTime chargeStart, DateTime chargeEnd)
@@ -213,11 +217,11 @@ namespace GoEDataParser.Parser
                 }
             }
 
-            public void StoreConsumptions()
+            public async Task StoreConsumptions()
             {
                 foreach (var consumption in (_consumptions))
                 {
-                    _consumptionStore.Upsert(consumption);
+                    await _consumptionStore.Upsert(consumption);
                 }
             }
         }

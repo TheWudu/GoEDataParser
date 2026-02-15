@@ -4,28 +4,28 @@ namespace GoEDataParser.Utils
 {
     namespace Utils
     {
-        public delegate T CodeBlock<T>();
-        public delegate void CodeBlock();
+        public delegate Task<T> CodeBlock<T>();
+        public delegate Task CodeBlock();
 
         public class Time
         {
-            public static void MeasureTimeVoid(string text, CodeBlock codeBlock)
+            public static async Task MeasureTimeVoid(string text, CodeBlock codeBlock)
             {
                 Stopwatch sw = new();
 
                 sw.Start();
-                codeBlock.Invoke();
+                await codeBlock.Invoke();
                 sw.Stop();
 
                 Console.WriteLine("[{1,4} ms] {0}", text, sw.ElapsedMilliseconds);
             }
 
-            public static T MeasureTime<T>(string text, CodeBlock<T> codeBlock)
+            public static async Task<T> MeasureTime<T>(string text, CodeBlock<T> codeBlock)
             {
                 Stopwatch sw = new();
 
                 sw.Start();
-                var result = codeBlock.Invoke();
+                var result = await codeBlock.Invoke();
                 sw.Stop();
 
                 Console.WriteLine("[{1,4} ms] {0}", text, sw.ElapsedMilliseconds);

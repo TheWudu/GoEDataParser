@@ -32,19 +32,24 @@ public abstract class ChargeData
         return parser.GetCharges();
     }
 
-    private static void StoreCharges(IChargeStore chargeStore, List<Charge> charges)
+    private static async Task<List<Charge>> ReadCharges(IChargeStore chargeStore)
+    {
+        return await chargeStore.ReadAll();
+    }
+
+    private static async Task StoreCharges(IChargeStore chargeStore, List<Charge> charges)
     {
         int storedCount = 0;
         int updatedCount = 0;
 
         foreach (Charge charge in charges)
         {
-            Charge? storedCharge = chargeStore.FindBy(c => c.SessionId == charge.SessionId);
+            Charge? storedCharge = await chargeStore.FindBy(c => c.SessionId == charge.SessionId);
             if (storedCharge is null)
             {
                 charge.Id ??= Guid.NewGuid().ToString();
                 charge.Version = 1;
-                chargeStore.Insert(charge);
+                await chargeStore.Insert(charge);
                 storedCount++;
             }
             else
@@ -58,7 +63,7 @@ public abstract class ChargeData
                     storedCharge.MeterEnd = charge.MeterEnd;
                     storedCharge.EndTime = charge.EndTime;
                     storedCharge.SecondsCharged = charge.SecondsCharged;
-                    chargeStore.Update(storedCharge);
+                    await chargeStore.Update(storedCharge);
                     updatedCount++;
                 }
             }
@@ -69,8 +74,8 @@ public abstract class ChargeData
 
     private static IChargeStore MongoStore()
     {
-        string dbHost = Configuration.MongoDbHost();
-        string dbName = Configuration.MongoDbName();
+        var dbHost = Configuration.MongoDbHost();
+        var dbName = Configuration.MongoDbName();
 
         ChargeMongoStore chargeStore = new(dbHost, dbName);
 
@@ -99,7 +104,7 @@ public abstract class ChargeData
         return chargeStore;
     }
 
-    private static void ListChargesWithConsumptions(List<Charge> charges, ConsumptionParser cp)
+    private static Task ListChargesWithConsumptions(List<Charge> charges, ConsumptionParser cp)
     {
         foreach (Charge charge in charges)
         {
@@ -110,15 +115,18 @@ public abstract class ChargeData
             charge.PrintWithConsumption(consumption, consumptionFromEg);
         }
         Console.WriteLine("");
+        return Task.CompletedTask;
     }
 
-    private static void ListCharges(List<Charge> charges)
+    private static Task ListCharges(List<Charge> charges)
     {
         foreach (Charge charge in charges)
         {
             charge.Print();
         }
         Console.WriteLine("");
+
+        return Task.CompletedTask;
     }
 
     // public static void parseDate(string dateString, string text)
@@ -154,7 +162,7 @@ public abstract class ChargeData
         );
     }
 
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         Console.WriteLine("Hello Charger-Data-Parser !");
 
@@ -201,24 +209,30 @@ public abstract class ChargeData
         {
             if (!args.Contains("-no-store"))
             {
-                Time.MeasureTimeVoid(
+                await Time.MeasureTimeVoid(
                     "Store charges in DB... ",
-                    codeBlock: () => StoreCharges(store, charges)
+                    codeBlock: async Task () => await StoreCharges(store, charges)
                 );
             }
         }
 
-        charges = Time.MeasureTime("Read charges from database ...", codeBlock: store.ReadAll);
+        charges = await Time.MeasureTime(
+            "Read charges from database ...",
+            codeBlock: async Task<List<Charge>> () => await ReadCharges(store)
+        );
 
         ConsumptionParser cp = new();
 
         if (args.Contains("-list"))
         {
-            Time.MeasureTimeVoid("List charges ... ", codeBlock: () => ListCharges(charges));
+            await Time.MeasureTimeVoid(
+                "List charges ... ",
+                codeBlock: async Task () => await ListCharges(charges)
+            );
         }
         if (args.Contains("-list-eg"))
         {
-            Time.MeasureTimeVoid(
+            await Time.MeasureTimeVoid(
                 "List charges ... ",
                 codeBlock: () => ListChargesWithConsumptions(charges, cp)
             );
@@ -230,42 +244,51 @@ public abstract class ChargeData
             var filename = args[index + 1];
             // var filename = "/home/martin/Downloads/manager_eg_202509.csv";
 
-            Time.MeasureTimeVoid(
+            await Time.MeasureTimeVoid(
                 "Read consumptions from file",
                 codeBlock: () => cp.ReadFile(filename)
             );
-            Time.MeasureTimeVoid("Store consumptions", codeBlock: () => cp.StoreConsumptions());
+            await Time.MeasureTimeVoid(
+                "Store consumptions",
+                codeBlock: async Task () => await cp.StoreConsumptions()
+            );
         }
 
         if (args.Contains("-read-consumptions"))
         {
-            Time.MeasureTimeVoid("Read consumptions from files", codeBlock: () => cp.ParseFiles());
+            await Time.MeasureTimeVoid(
+                "Read consumptions from files",
+                codeBlock: () => cp.ParseFiles()
+            );
 
             if (args.Contains("-update-consumptions"))
             {
-                Time.MeasureTimeVoid("Store consumptions", codeBlock: () => cp.StoreConsumptions());
+                await Time.MeasureTimeVoid(
+                    "Store consumptions",
+                    codeBlock: async Task () => await cp.StoreConsumptions()
+                );
             }
         }
         else
         {
-            Time.MeasureTimeVoid(
+            await Time.MeasureTimeVoid(
                 "Read consumptions from DB",
-                codeBlock: () => cp.ReadConsumptionsFromDb()
+                codeBlock: async Task () => await cp.ReadConsumptionsFromDb()
             );
         }
 
         Evaluator evaluator = new Evaluator(cp);
-        var monthly = Time.MeasureTime(
+        var monthly = await Time.MeasureTime(
             "Group monthly ... ",
-            codeBlock: () => evaluator.GroupMonthly(charges)
+            codeBlock: async () => await evaluator.GroupMonthly(charges)
         );
-        evaluator.PrintGroup(monthly, "month");
+        await evaluator.PrintGroup(monthly, "month");
 
-        var yearly = Time.MeasureTime(
+        var yearly = await Time.MeasureTime(
             "Group yearly ... ",
             codeBlock: () => evaluator.GroupYearly(charges)
         );
-        evaluator.PrintGroup(yearly, "year");
+        await evaluator.PrintGroup(yearly, "year");
 
         // var docs = Time.MeasureTime("Get stats by DB ... ", codeBlock: store.GroupMonthly);
         // evaluator.PrintGroup(docs, "month");

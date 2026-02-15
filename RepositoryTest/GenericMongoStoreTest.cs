@@ -12,112 +12,112 @@ public class GenericMongoStoreTest
         string dbHost = Configuration.MongoDbHost();
         string dbName = Configuration.MongoDbName();
         _store = new(dbHost, dbName, "test_entities");
-        _store.Clear();
+        _ = _store.Clear();
     }
 
-    internal TestEntity CreateEntity(string name, string? id = null)
+    private async Task<TestEntity> CreateEntity(string name, string? id = null)
     {
         TestEntity te = new(name, id);
 
-        te = _store.Insert(te);
+        te = await _store.Insert(te);
 
         return te;
     }
 
     [Fact]
-    public void InsertTest()
+    public async Task InsertTest()
     {
         TestEntity testEntity = new("Martin");
-        _store.Insert(testEntity);
+        await _store.Insert(testEntity);
 
-        Assert.Equal(1, _store.Count());
+        Assert.Equal(1, await _store.Count());
     }
 
     [Fact]
-    public void UpdateTest()
+    public async Task UpdateTest()
     {
         string id = "0c8af010-a101-4fef-957c-1c78977524ae";
-        var te = CreateEntity("Daniel", id);
+        var te = await CreateEntity("Daniel", id);
 
         te.Name = "Michael";
-        var updatedEntity = _store.Update(te);
+        var updatedEntity = await _store.Update(te);
 
-        var storedEntity = _store.Find(id);
-        Assert.Equal(storedEntity, updatedEntity);
-        Assert.Equal(storedEntity?.Version, 2);
-        Assert.Equal(1, _store.Count());
+        var storedEntity = await _store.Find(id);
+        Assert.Equal(updatedEntity, storedEntity);
+        Assert.Equal(2, storedEntity?.Version);
+        Assert.Equal(1, await _store.Count());
     }
 
     [Fact]
-    public void DeleteTest()
+    public async Task DeleteTest()
     {
-        string id = "0c8af010-a101-4fef-957c-1c78977524ae";
-        _ = CreateEntity("Daniel", id);
+        var id = "0c8af010-a101-4fef-957c-1c78977524ae";
+        _ = await CreateEntity("Daniel", id);
 
-        Assert.True(_store.Delete(id));
+        Assert.True(await _store.Delete(id));
     }
 
     [Theory]
     [InlineData(3)]
     [InlineData(7)]
-    public void CountTest(int amount)
+    public async Task CountTest(int amount)
     {
-        for (int i = 0; i < amount; i++)
+        for (var i = 0; i < amount; i++)
         {
-            CreateEntity("Test" + i.ToString());
+            await CreateEntity("Test" + i.ToString());
         }
 
-        Assert.Equal(_store.Count(), amount);
+        Assert.Equal(await _store.Count(), amount);
     }
 
     [Fact]
-    public void FindByString()
+    public async Task FindByString()
     {
-        var testEntity = CreateEntity("michael");
+        var testEntity = await CreateEntity("michael");
 
-        Assert.Equal(_store.FindBy("Name", "michael"), testEntity);
+        Assert.Equal(testEntity, await _store.FindBy("Name", "michael"));
     }
 
     [Fact]
-    public void FindByInt()
+    public async Task FindByInt()
     {
-        var testEntity = CreateEntity("michael");
+        var testEntity = await CreateEntity("michael");
 
-        Assert.Equal(_store.FindBy("Version", 1), testEntity);
+        Assert.Equal(testEntity, await _store.FindBy("Version", 1));
     }
 
     [Fact]
-    public void FindByExpression()
+    public async Task FindByExpression()
     {
-        var testEntity = CreateEntity("michael");
+        var testEntity = await CreateEntity("michael");
 
-        Assert.Equal(_store.FindBy(e => e.Name == "michael"), testEntity);
+        Assert.Equal(testEntity, await _store.FindBy(e => e.Name == "michael"));
     }
 
     [Theory]
     [InlineData(1)]
     [InlineData(3)]
     [InlineData(7)]
-    public void ReadAllTest(int amount)
+    public async Task ReadAllTest(int amount)
     {
-        for (int i = 0; i < amount; i++)
+        for (var i = 0; i < amount; i++)
         {
-            CreateEntity("Test" + i.ToString());
+            await CreateEntity("Test" + i.ToString());
         }
 
-        Assert.Equal(_store.ReadAll().Count, amount);
+        Assert.Equal(amount, (await _store.ReadAll()).Count);
     }
 
     [Fact]
-    public void FindTest()
+    public async Task FindTest()
     {
-        string id = "0c8af010-a101-4fef-957c-1c78977524ae";
-        var te = CreateEntity("Daniel", id);
-        string id2 = "0a4b5010-a101-4fef-957c-1c7897752400";
-        var te2 = CreateEntity("Michael", id2);
+        var id = "0c8af010-a101-4fef-957c-1c78977524ae";
+        var te = await CreateEntity("Daniel", id);
+        var id2 = "0a4b5010-a101-4fef-957c-1c7897752400";
+        var te2 = await CreateEntity("Michael", id2);
 
-        Assert.Equal(_store.Find(id), te);
-        Assert.Equal(_store.Find(id2), te2);
-        Assert.Null(_store.Find("not-existing-id"));
+        Assert.Equal(te, await _store.Find(id));
+        Assert.Equal(te2, await _store.Find(id2));
+        Assert.Null(await _store.Find("not-existing-id"));
     }
 }

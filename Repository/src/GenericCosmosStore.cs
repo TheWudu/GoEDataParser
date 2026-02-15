@@ -26,6 +26,7 @@ namespace Repository
                             )
                     );
                     opts.ConnectionMode(Microsoft.Azure.Cosmos.ConnectionMode.Gateway);
+                    opts.LimitToEndpoint(true);
                 }
             );
         }
@@ -65,58 +66,53 @@ namespace Repository
             _ = SaveChangesAsync().Result;
         }
 
-        public long Count()
+        public async Task<long> Count()
         {
-            return Dataset.CountAsync().Result;
+            return await Dataset.CountAsync();
         }
 
-        public bool Delete(string id)
+        public async Task<bool> Delete(string id)
         {
-            T? entity = Dataset.FindAsync(id).Result;
+            T? entity = await Dataset.FindAsync(id);
             if (entity is null)
                 return false;
 
             Dataset.Remove(entity);
-            var cnt = this.SaveChangesAsync().Result;
+            var cnt = await SaveChangesAsync();
             return cnt == 1;
         }
 
-        public T? Find(string id)
+        public async Task<T?> Find(string id)
         {
-            return Dataset.FindAsync(id).Result;
+            return await Dataset.FindAsync(id);
         }
 
-        public T? FindBy(Expression<Func<T, bool>> expr)
+        public async Task<T?> FindBy(Expression<Func<T, bool>> expr)
         {
-            return Dataset.Where(expr).ToListAsync().Result.FirstOrDefault();
+            return await Dataset.Where(expr).FirstOrDefaultAsync();
         }
 
-        public T? FindBy<TV>(string key, TV value)
+        public async Task<T> Insert(T entity)
         {
-            throw new NotImplementedException("Please use expression FindBy instead");
-        }
-
-        public T Insert(T entity)
-        {
-            _ = Dataset.AddAsync(entity).Result;
-            _ = SaveChangesAsync().Result;
+            await Dataset.AddAsync(entity);
+            await SaveChangesAsync();
 
             return entity;
         }
 
-        public List<T> ReadAll()
+        public async Task<List<T>> ReadAll()
         {
-            var list = Dataset.Where(e => true).ToListAsync().Result;
+            var list = await Dataset.Where(e => true).ToListAsync();
 
             return list;
         }
 
-        public T Update(T entity)
+        public async Task<T> Update(T entity)
         {
             entity.Version += 1;
 
             Dataset.Update(entity);
-            _ = SaveChangesAsync().Result;
+            await SaveChangesAsync();
 
             return entity;
         }
