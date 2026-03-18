@@ -19,18 +19,18 @@ public class JsonParserTests
         _mockHttp = new();
     }
 
-    internal void Initialize(string jsonData)
+    internal async Task Initialize(string jsonData)
     {
         _ = _mockHttp.When(_mockUrl).Respond(_mediaType, jsonData);
         HttpClient client = _mockHttp.ToHttpClient();
 
         JsonParser parser = new(client);
-        parser.Load();
+        await parser.Load();
         _charges = parser.GetCharges();
     }
 
     [Fact]
-    public void JsonParserTestSimple()
+    public async Task JsonParserTestSimple()
     {
         string jsonData =
             /*lang=json,strict*/@"{""columns"":[], ""data"":[
@@ -38,7 +38,7 @@ public class JsonParserTests
                 {""session_identifier"":""abcd_5678"",""start"":""05.06.2023 10:34:00"",""end"":""05.06.2023 12:15:00"",""energy"":10.012}
                 ]}";
 
-        Initialize(jsonData);
+        await Initialize(jsonData);
 
         Assert.Multiple(() =>
         {
@@ -55,16 +55,16 @@ public class JsonParserTests
     [InlineData("no_data.json", 0, null)]
     [InlineData("no_columns.json", 0, null)]
     [InlineData("invalid.json", 0, null)]
-    public void JsonParserFull(string filename, int expectedCount, double? expectedFirstValue)
+    public async Task JsonParserFull(string filename, int expectedCount, double? expectedFirstValue)
     {
         string filepath = String.Join("/", Base.AppDirectory(), "../fixtures/json", filename);
         string jsonData = File.ReadAllText(filepath);
 
-        Initialize(jsonData);
+        await Initialize(jsonData);
 
         Assert.Multiple(() =>
         {
-            Assert.Equal(_charges.Count, expectedCount);
+            Assert.Equal(expectedCount, _charges.Count);
             if (expectedFirstValue is not null)
             {
                 Assert.Equal(_charges[0].Kwh, expectedFirstValue);

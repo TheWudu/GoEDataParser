@@ -5,7 +5,7 @@ namespace RepositoryTest;
 
 public class GenericCosmosStoreTest
 {
-    GenericCosmosStore<TestEntity> _store;
+    private readonly GenericCosmosStore<TestEntity> _store;
 
     public GenericCosmosStoreTest()
     {
@@ -25,7 +25,7 @@ public class GenericCosmosStoreTest
     }
 
     [Fact]
-    public async Task MysqlInsertTest()
+    public async Task InsertTest()
     {
         TestEntity testEntity = new("Martin");
         await _store.Insert(testEntity);
