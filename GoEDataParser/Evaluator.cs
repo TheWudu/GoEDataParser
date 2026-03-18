@@ -3,6 +3,14 @@ using GoEDataParser.Parser.Parser;
 
 namespace GoEDataParser
 {
+    public static class Extensions
+    {
+        public static string ToTimeSpan(this long duration)
+        {
+            return TimeSpan.FromSeconds(duration).ToString();
+        }
+    }
+
     public class Evaluator
     {
         private readonly ConsumptionParser? _consumptionParser;
@@ -14,26 +22,23 @@ namespace GoEDataParser
             _consumptionParser = cp;
         }
 
-        public async Task Run(List<Charge> charges)
+        public void Run(List<Charge> charges)
         {
-            Dictionary<string, ChargeInfo> monthly = await GroupMonthly(charges);
+            Dictionary<string, ChargeInfo> monthly = GroupMonthly(charges);
             PrintGroup(monthly, "month");
         }
 
-        public async Task<Dictionary<string, ChargeInfo>> GroupMonthly(List<Charge> charges)
+        public Dictionary<string, ChargeInfo> GroupMonthly(List<Charge> charges)
         {
-            return await GroupBy(charges, "yyyy.MM");
+            return GroupBy(charges, "yyyy.MM");
         }
 
-        public async Task<Dictionary<string, ChargeInfo>> GroupYearly(List<Charge> charges)
+        public Dictionary<string, ChargeInfo> GroupYearly(List<Charge> charges)
         {
-            return await GroupBy(charges, "yyyy");
+            return GroupBy(charges, "yyyy");
         }
 
-        private async Task<Dictionary<string, ChargeInfo>> GroupBy(
-            List<Charge> charges,
-            string timecode
-        )
+        private Dictionary<string, ChargeInfo> GroupBy(List<Charge> charges, string timecode)
         {
             Dictionary<string, ChargeInfo> dictMonthly = [];
             Charge? prev = null;
@@ -64,6 +69,7 @@ namespace GoEDataParser
                 string key = c.StartTime.ToString(timecode);
                 if (dictMonthly.TryGetValue(key, out ChargeInfo? info))
                 {
+                    info.Year = c.StartTime.Year;
                     info.KwhSum += c.Kwh;
                     info.Count += 1;
                     info.KwhValues.Add(c.Kwh);
@@ -76,15 +82,17 @@ namespace GoEDataParser
                 {
                     dictMonthly.Add(
                         key,
-                        new ChargeInfo(
-                            key,
-                            c.Kwh,
-                            1,
-                            c.SecondsCharged,
-                            missing,
-                            consumption,
-                            consumptionFromEg
-                        )
+                        new ChargeInfo()
+                        {
+                            TimeKey = key,
+                            Year = c.StartTime.Year,
+                            KwhSum = c.Kwh,
+                            Count = 1,
+                            TimeSum = c.SecondsCharged,
+                            Missing = missing,
+                            Consumption = consumption,
+                            ConsumptionFromEg = consumptionFromEg,
+                        }
                     );
                 }
 
@@ -117,47 +125,67 @@ namespace GoEDataParser
             }
         }
 
-        public Task PrintGroup(Dictionary<string, ChargeInfo> dict, string grouping)
+        public void PrintGroup(Dictionary<string, ChargeInfo> dict, string grouping)
         {
             string? lastKey = null;
+            int? lastYear = null;
             double kwhSum = 0.0F;
             long timeSum = 0;
+
             Console.WriteLine("\nSums per {0}: ", grouping);
             foreach (KeyValuePair<string, ChargeInfo> kv in dict)
             {
                 PrintMissing(kv.Key, lastKey);
-                lastKey = kv.Key;
+
                 kwhSum += kv.Value.KwhSum;
                 timeSum += kv.Value.TimeSum;
-                double kwhAvg = kv.Value.KwhValues.Average();
-                double kwhMax = kv.Value.KwhValues.Max();
-                double consFromEg =
-                    kv.Value.Consumption != 0
-                        ? (kv.Value.ConsumptionFromEg / kv.Value.Consumption) * 100
-                        : 0.0;
-                Console.WriteLine(
-                    "{0}: {1,7:F2}, {2,7:F2} (Count: {3,3}, Max: {4:F2} kWh, Avg: {5,5:F2} kWh, TimeSum: {6,11}, Missing: {7,6:F2} kWh, Consumption: {8,7:F2} / {10,5:F2} kWh ({9,5:F2} %, {11,5:F2} % from EG)",
-                    kv.Key,
-                    kv.Value.KwhSum,
-                    kwhSum,
-                    kv.Value.Count,
-                    kwhMax,
-                    kwhAvg,
-                    TimeSpan.FromSeconds(kv.Value.TimeSum).ToString(),
-                    kv.Value.Missing,
-                    kv.Value.Consumption,
-                    ((kv.Value.Consumption / kv.Value.KwhSum) * 100),
-                    kv.Value.ConsumptionFromEg,
-                    consFromEg
-                );
+
+                PrintSeparator(grouping, lastYear, kv.Value.Year);
+                PrintLine(kv.Value, kwhSum);
+
+                lastYear = kv.Value.Year;
+                lastKey = kv.Key;
             }
             Console.WriteLine(
                 "\n\e[31mOverall sum:\e[37m {0:F2} in {1}\n",
                 kwhSum,
-                TimeSpan.FromSeconds(timeSum).ToString()
+                timeSum.ToTimeSpan()
             );
+        }
 
-            return Task.CompletedTask;
+        private void PrintSeparator(string grouping, int? lastYear, int thisYear)
+        {
+            if (grouping != "month")
+                return;
+
+            if (lastYear != null && lastYear != thisYear)
+                Console.WriteLine("---");
+        }
+
+        private void PrintLine(ChargeInfo chargeInfo, double kwhSum)
+        {
+            double kwhAvg = chargeInfo.KwhValues.Average();
+            double kwhMax = chargeInfo.KwhValues.Max();
+            double consFromEg =
+                chargeInfo.Consumption != 0
+                    ? (chargeInfo.ConsumptionFromEg / chargeInfo.Consumption) * 100
+                    : 0.0;
+
+            Console.WriteLine(
+                "{0}: {1,7:F2}, {2,7:F2} (Count: {3,3}, Max: {4:F2} kWh, Avg: {5,5:F2} kWh, TimeSum: {6,11}, Missing: {7,6:F2} kWh, Consumption: {8,7:F2} / {10,5:F2} kWh ({9,5:F2} %, {11,5:F2} % from EG)",
+                chargeInfo.TimeKey,
+                chargeInfo.KwhSum,
+                kwhSum,
+                chargeInfo.Count,
+                kwhMax,
+                kwhAvg,
+                chargeInfo.TimeSum.ToTimeSpan(),
+                chargeInfo.Missing,
+                chargeInfo.Consumption,
+                chargeInfo.Consumption / chargeInfo.KwhSum * 100,
+                chargeInfo.ConsumptionFromEg,
+                consFromEg
+            );
         }
 
         public double MissingKwh(Charge prev, Charge curr)

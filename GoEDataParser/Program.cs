@@ -22,12 +22,12 @@ public abstract class ChargeData
         return csvParser.GetCharges();
     }
 
-    private static List<Charge> LoadViaJson()
+    private static async Task<List<Charge>> LoadViaJson()
     {
         Console.WriteLine("Using JSON downloader and parser");
 
         JsonParser parser = new(new HttpClient());
-        parser.Load();
+        await parser.Load();
 
         return parser.GetCharges();
     }
@@ -104,7 +104,7 @@ public abstract class ChargeData
         return chargeStore;
     }
 
-    private static Task ListChargesWithConsumptions(List<Charge> charges, ConsumptionParser cp)
+    private static void ListChargesWithConsumptions(List<Charge> charges, ConsumptionParser cp)
     {
         foreach (Charge charge in charges)
         {
@@ -115,18 +115,15 @@ public abstract class ChargeData
             charge.PrintWithConsumption(consumption, consumptionFromEg);
         }
         Console.WriteLine("");
-        return Task.CompletedTask;
     }
 
-    private static Task ListCharges(List<Charge> charges)
+    private static void ListCharges(List<Charge> charges)
     {
         foreach (Charge charge in charges)
         {
             charge.Print();
         }
         Console.WriteLine("");
-
-        return Task.CompletedTask;
     }
 
     // public static void parseDate(string dateString, string text)
@@ -202,21 +199,21 @@ public abstract class ChargeData
         }
         else if (args.Contains("-json"))
         {
-            charges = LoadViaJson();
+            charges = await LoadViaJson();
         }
 
         if (charges.Count != 0)
         {
             if (!args.Contains("-no-store"))
             {
-                await Time.MeasureTimeVoid(
+                await Time.MeasureTimeVoidAsync(
                     "Store charges in DB... ",
                     codeBlock: async Task () => await StoreCharges(store, charges)
                 );
             }
         }
 
-        charges = await Time.MeasureTime(
+        charges = await Time.MeasureTimeAsync(
             "Read charges from database ...",
             codeBlock: async Task<List<Charge>> () => await ReadCharges(store)
         );
@@ -225,14 +222,11 @@ public abstract class ChargeData
 
         if (args.Contains("-list"))
         {
-            await Time.MeasureTimeVoid(
-                "List charges ... ",
-                codeBlock: async Task () => await ListCharges(charges)
-            );
+            Time.MeasureTimeVoid("List charges ... ", codeBlock: () => ListCharges(charges));
         }
         if (args.Contains("-list-eg"))
         {
-            await Time.MeasureTimeVoid(
+            Time.MeasureTimeVoid(
                 "List charges ... ",
                 codeBlock: () => ListChargesWithConsumptions(charges, cp)
             );
@@ -244,11 +238,11 @@ public abstract class ChargeData
             var filename = args[index + 1];
             // var filename = "/home/martin/Downloads/manager_eg_202509.csv";
 
-            await Time.MeasureTimeVoid(
+            Time.MeasureTimeVoid(
                 "Read consumptions from file",
                 codeBlock: () => cp.ReadFile(filename)
             );
-            await Time.MeasureTimeVoid(
+            await Time.MeasureTimeVoidAsync(
                 "Store consumptions",
                 codeBlock: async Task () => await cp.StoreConsumptions()
             );
@@ -256,14 +250,11 @@ public abstract class ChargeData
 
         if (args.Contains("-read-consumptions"))
         {
-            await Time.MeasureTimeVoid(
-                "Read consumptions from files",
-                codeBlock: () => cp.ParseFiles()
-            );
+            Time.MeasureTimeVoid("Read consumptions from files", codeBlock: () => cp.ParseFiles());
 
             if (args.Contains("-update-consumptions"))
             {
-                await Time.MeasureTimeVoid(
+                await Time.MeasureTimeVoidAsync(
                     "Store consumptions",
                     codeBlock: async Task () => await cp.StoreConsumptions()
                 );
@@ -271,24 +262,24 @@ public abstract class ChargeData
         }
         else
         {
-            await Time.MeasureTimeVoid(
+            await Time.MeasureTimeVoidAsync(
                 "Read consumptions from DB",
                 codeBlock: async Task () => await cp.ReadConsumptionsFromDb()
             );
         }
 
         Evaluator evaluator = new Evaluator(cp);
-        var monthly = await Time.MeasureTime(
+        var monthly = Time.MeasureTime(
             "Group monthly ... ",
-            codeBlock: async () => await evaluator.GroupMonthly(charges)
+            codeBlock: () => evaluator.GroupMonthly(charges)
         );
-        await evaluator.PrintGroup(monthly, "month");
+        evaluator.PrintGroup(monthly, "month");
 
-        var yearly = await Time.MeasureTime(
+        var yearly = Time.MeasureTime(
             "Group yearly ... ",
             codeBlock: () => evaluator.GroupYearly(charges)
         );
-        await evaluator.PrintGroup(yearly, "year");
+        evaluator.PrintGroup(yearly, "year");
 
         // var docs = Time.MeasureTime("Get stats by DB ... ", codeBlock: store.GroupMonthly);
         // evaluator.PrintGroup(docs, "month");

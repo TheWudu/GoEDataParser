@@ -29,7 +29,7 @@ namespace GoEDataParser.Parser
                 return _consumptions;
             }
 
-            public Task ParseFiles(int startYear = 2023)
+            public void ParseFiles(int startYear = 2023)
             {
                 int endYear = DateTime.Today.Year;
 
@@ -37,11 +37,9 @@ namespace GoEDataParser.Parser
                 {
                     ReadFile(_defaultFilePath + year + ".csv");
                 }
-
-                return Task.CompletedTask;
             }
 
-            public Task ReadFile(string filepath)
+            public void ReadFile(string filepath)
             {
                 if (!File.Exists(filepath))
                 {
@@ -50,7 +48,7 @@ namespace GoEDataParser.Parser
                         filepath,
                         Directory.GetCurrentDirectory()
                     );
-                    return Task.CompletedTask;
+                    return;
                 }
 
                 TextFieldParser tfp = new(filepath);
@@ -66,6 +64,7 @@ namespace GoEDataParser.Parser
                     {
                         break;
                     }
+
                     // skip head row
                     if (currentRow[0] == "Ende Ablesezeitraum")
                     {
@@ -180,8 +179,6 @@ namespace GoEDataParser.Parser
                     //     currentRow[0]
                     // );
                 }
-
-                return Task.CompletedTask;
             }
 
             public (double, double) ConsumpationFromList(DateTime chargeStart, DateTime chargeEnd)

@@ -71,12 +71,15 @@ namespace GoEDataParser.Parser
 
         public async Task Load()
         {
-            string jsonData = await Time.MeasureTime<string>("Fetching ... ", codeBlock: FetchJson);
-            JsonData? data = await Time.MeasureTime(
+            string jsonData = await Time.MeasureTimeAsync<string>(
+                "Fetching ... ",
+                codeBlock: FetchJson
+            );
+            JsonData? data = await Time.MeasureTimeAsync(
                 "Deserializing ... ",
                 codeBlock: () => Deserialize(jsonData)
             );
-            Time.MeasureTimeVoid("Parsing ... ", codeBlock: () => ParseData(data));
+            await Time.MeasureTimeVoidAsync("Parsing ... ", codeBlock: () => ParseData(data));
         }
 
         private async Task<string> FetchJson()
@@ -84,8 +87,7 @@ namespace GoEDataParser.Parser
             if (_client is null)
                 throw new NullReferenceException("No client configured");
 
-            Task<string> stream = _client.GetStringAsync(Url());
-            return stream.Result;
+            return await _client.GetStringAsync(Url());
         }
 
         private string Url()
@@ -103,6 +105,7 @@ namespace GoEDataParser.Parser
 
         private async Task<JsonData?> Deserialize(string jsonData)
         {
+            await Task.CompletedTask;
             return JsonSerializer.Deserialize<JsonData>(jsonData);
         }
 

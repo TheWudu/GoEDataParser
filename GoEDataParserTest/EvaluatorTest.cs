@@ -46,10 +46,10 @@ namespace GoEDataParserTest
         }
 
         [Fact]
-        public async Task TestMonthly()
+        public void TestMonthly()
         {
             Evaluator evaluator = new();
-            Dictionary<string, ChargeInfo> monthly = await evaluator.GroupMonthly(_charges);
+            Dictionary<string, ChargeInfo> monthly = evaluator.GroupMonthly(_charges);
 
             Assert.Multiple(() =>
             {
@@ -60,10 +60,10 @@ namespace GoEDataParserTest
         }
 
         [Fact]
-        public async Task TestYearly()
+        public void TestYearly()
         {
             Evaluator evaluator = new();
-            Dictionary<string, ChargeInfo> monthly = await evaluator.GroupYearly(_charges);
+            Dictionary<string, ChargeInfo> monthly = evaluator.GroupYearly(_charges);
 
             Assert.Multiple(() =>
             {
