@@ -10,15 +10,15 @@ public record DashboardResponse
 
 public record ContractAccount
 {
-    public string ContractAccountNumber { get; init; }
-    public string BusinessPartnerNumber { get; init; }
-    public List<Contract> Contracts { get; init; } = [];
+    public required string ContractAccountNumber { get; init; }
+    public required string BusinessPartnerNumber { get; init; }
+    public required List<Contract> Contracts { get; init; }
     public int NumberOfContracts  { get; init; }
-    public string Branch  { get; init; }
+    public string Branch { get; init; } = string.Empty;
 }
 
 public record BusinessPartner
 {
-    public string Type { get; init;  }
-    public string BusinessPartnerNumber { get; init; }
+    public required string Type { get; init;  }
+    public required string BusinessPartnerNumber { get; init; }
 }

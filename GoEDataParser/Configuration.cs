@@ -4,19 +4,30 @@ namespace GoEDataParser
 {
     public class Configuration
     {
-        public static string? Token()
+        public static string Token()
         {
-            return ConfigurationManager.AppSettings.Get("Token");
+            var token = ConfigurationManager.AppSettings.Get("Token");
+            if (string.IsNullOrEmpty(token))
+                throw new Exception("Unable to read Token");
+            
+            return token;
         }
         
-        public static string? ConsumptionUserName()
+        public static string ConsumptionUserName()
         {
-            return ConfigurationManager.AppSettings.Get("ConsumptionUserName");
+            var username = ConfigurationManager.AppSettings.Get("ConsumptionUserName");
+            if (string.IsNullOrEmpty(username))
+                throw new Exception("Unable to read ConsumptionUserName");
+            return username;
         }
         
-        public static string? ConsumptionPassword()
+        public static string ConsumptionPassword()
         {
-            return ConfigurationManager.AppSettings.Get("ConsumptionPassword");
+            var password = ConfigurationManager.AppSettings.Get("ConsumptionPassword");
+            if (string.IsNullOrEmpty(password))
+                throw new Exception("Unable to read ConsumptionPassword");
+                    
+            return password;
         }
 
         public static string Culture()

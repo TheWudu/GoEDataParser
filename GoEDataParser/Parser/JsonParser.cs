@@ -71,7 +71,7 @@ namespace GoEDataParser.Parser
 
         public async Task Load()
         {
-            string jsonData = await Time.MeasureTimeAsync<string>(
+            string jsonData = await Time.MeasureTimeAsync(
                 "Fetching ... ",
                 codeBlock: FetchJson
             );

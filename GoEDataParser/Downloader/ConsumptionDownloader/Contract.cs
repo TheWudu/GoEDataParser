@@ -2,32 +2,32 @@ namespace GoEDataParser.Downloader.ConsumptionDownloader;
 
 public record Contract
 {
-    public string ContractNumber { get; init; } = default!;
-    public string Branch { get; init; } = default!;
-    public string ScaleType { get; init; } = default!;
+    public string ContractNumber { get; init; } = null!;
+    public string Branch { get; init; } = null!;
+    public string ScaleType { get; init; } = null!;
     public bool Active { get; init; }
     public DateOnly MoveInDate { get; init; }
     public DateOnly MoveOutDate { get; init; }
 
-    public Consumptions Consumptions { get; init; } = default!;
-    public ReadingsHistory ReadingsHistory { get; init; } = default!;
-    public EditableReadings EditableReadings { get; init; } = default!;
-    public PointOfDelivery PointOfDelivery { get; init; } = default!;
+    public Consumptions Consumptions { get; init; } = null!;
+    public ReadingsHistory ReadingsHistory { get; init; } = null!;
+    public EditableReadings EditableReadings { get; init; } = null!;
+    public PointOfDelivery PointOfDelivery { get; init; } = null!;
 
-    public string SmartMeterType { get; init; } = default!;
-    public string SmartMeterTypeName { get; init; } = default!;
-    public string SmartMeterTypeHelp { get; init; } = default!;
+    public string SmartMeterType { get; init; } = null!;
+    public string SmartMeterTypeName { get; init; } = null!;
+    public string SmartMeterTypeHelp { get; init; } = null!;
 
     public bool PowerGenerationUnit { get; init; }
 
-    public string Station { get; init; } = default!;
-    public string SubStation { get; init; } = default!;
+    public string Station { get; init; } = null!;
+    public string SubStation { get; init; } = null!;
 
-    public GenerationData GenerationData { get; init; } = default!;
-    public EnergyCommunityData EnergyCommunityData { get; init; } = default!;
-    public Supplier Supplier { get; init; } = default!;
+    public GenerationData GenerationData { get; init; } = null!;
+    public EnergyCommunityData EnergyCommunityData { get; init; } = null!;
+    public Supplier Supplier { get; init; } = null!;
 
-    public string SynthProfile { get; init; } = default!;
+    public string SynthProfile { get; init; } = null!;
 
     public bool SmartMeterActivationPossible { get; init; }
     public bool LoadProfileActivationPossible { get; init; }
@@ -38,8 +38,8 @@ public record Contract
     public bool AmisActive { get; init; }
     public bool LoadCurveActive { get; init; }
 
-    public string MonthlyProfileDispatchStatus { get; init; } = default!;
-    public string DailyProfileDispatchStatus { get; init; } = default!;
+    public string MonthlyProfileDispatchStatus { get; init; } = null!;
+    public string DailyProfileDispatchStatus { get; init; } = null!;
 
     public bool NonSmart { get; init; }
     public bool AmisMeter { get; init; }
@@ -49,7 +49,7 @@ public record Contract
     public bool OptInPossible { get; init; }
     public bool ReactiveCurrentProfilePresent { get; init; }
 
-    public string DeviceKeyStatus { get; init; } = default!;
+    public string DeviceKeyStatus { get; init; } = null!;
 
     public List<string> AvailableProfileTypes { get; init; } = [];
 }
@@ -58,7 +58,7 @@ public record Consumptions
 {
     public List<ConsumptionValue> Values { get; init; } = [];
     public int TotalConsumption { get; init; }
-    public ConsumptionValue LargestConsumption { get; init; } = default!;
+    public ConsumptionValue LargestConsumption { get; init; } = null!;
 }
 
 public record ConsumptionValue
@@ -87,24 +87,24 @@ public record EditableReadings
 
 public record PointOfDelivery
 {
-    public string MeterPointAdministrationNumber { get; init; } = default!;
-    public Meter Meter { get; init; } = default!;
+    public string MeterPointAdministrationNumber { get; init; } = null!;
+    public Meter Meter { get; init; } = null!;
 
     public List<Profile> Profiles { get; init; } = [];
 
-    public string ActivationStatus { get; init; } = default!;
-    public string DailyDispatchStatus { get; init; } = default!;
-    public string MonthlyDispatchStatus { get; init; } = default!;
+    public string ActivationStatus { get; init; } = null!;
+    public string DailyDispatchStatus { get; init; } = null!;
+    public string MonthlyDispatchStatus { get; init; } = null!;
 
     public DateOnly RetroactiveActivationDate { get; init; }
 
-    public string DeviceKeyStatus { get; init; } = default!;
-    public string SnapStatus { get; init; } = default!;
+    public string DeviceKeyStatus { get; init; } = null!;
+    public string SnapStatus { get; init; } = null!;
 
-    public Trend MonthlyTrend { get; init; } = default!;
-    public Trend YearlyTrend { get; init; } = default!;
+    public Trend MonthlyTrend { get; init; } = null!;
+    public Trend YearlyTrend { get; init; } = null!;
 
-    public LastReadings LastReadings { get; init; } = default!;
+    public LastReadings LastReadings { get; init; } = null!;
 
     public DateOnly MinimumDate { get; init; }
     public DateOnly MaximumDate { get; init; }
@@ -114,12 +114,12 @@ public record PointOfDelivery
 
     public List<string> AvailableProfileTypes { get; init; } = [];
 
-    public DateRange AvailableTimeRange { get; init; } = default!;
+    public DateRange AvailableTimeRange { get; init; } = null!;
 }
 
 public record Meter
 {
-    public string MeterNumber { get; init; } = default!;
+    public string MeterNumber { get; init; } = null!;
 }
 
 public record Profile
@@ -127,17 +127,17 @@ public record Profile
     public DateOnly From { get; init; }
     public DateOnly To { get; init; }
 
-    public string Granularity { get; init; } = default!;
-    public string ProfileType { get; init; } = default!;
+    public string Granularity { get; init; } = null!;
+    public string ProfileType { get; init; } = null!;
 }
 
 public record Trend
 {
-    public TrendConsumption ConsumptionOld { get; init; } = default!;
-    public TrendConsumption ConsumptionNew { get; init; } = default!;
+    public TrendConsumption ConsumptionOld { get; init; } = null!;
+    public TrendConsumption ConsumptionNew { get; init; } = null!;
 
-    public DateTimeRange TimerangeOld { get; init; } = default!;
-    public DateTimeRange TimerangeNew { get; init; } = default!;
+    public DateTimeRange TimerangeOld { get; init; } = null!;
+    public DateTimeRange TimerangeNew { get; init; } = null!;
 }
 
 public record TrendConsumption
@@ -161,24 +161,24 @@ public record LastReadings
 
 public record ReadingValue
 {
-    public string Meternumber { get; init; } = default!;
-    public string Equipmentnumber { get; init; } = default!;
-    public string Registernumber { get; init; } = default!;
+    public string Meternumber { get; init; } = null!;
+    public string Equipmentnumber { get; init; } = null!;
+    public string Registernumber { get; init; } = null!;
 
     public int IntegerPlaces { get; init; }
     public double DecimalPlaces { get; init; }
 
-    public string ReferenceNumber { get; init; } = default!;
+    public string ReferenceNumber { get; init; } = null!;
 
     public double CaloricValue { get; init; }
     public double AdditionalValue { get; init; }
 
-    public ReadingResult OldResult { get; init; } = default!;
-    public ReadingResultWithTimestamp NewResult { get; init; } = default!;
+    public ReadingResult OldResult { get; init; } = null!;
+    public ReadingResultWithTimestamp NewResult { get; init; } = null!;
 
     public double CalculatedConsumption { get; init; }
 
-    public string UnitForCalculatedConsumption { get; init; } = default!;
+    public string UnitForCalculatedConsumption { get; init; } = null!;
 
     public double RelevantConsumption { get; init; }
 }
@@ -214,13 +214,13 @@ public record GenerationData
     public bool SmallInFeederDeactivationPossible { get; init; }
     public bool ShowAnetteLight { get; init; }
 
-    public string TrafficLightColor { get; init; } = default!;
-    public string TrafficLightReason { get; init; } = default!;
+    public string TrafficLightColor { get; init; } = null!;
+    public string TrafficLightReason { get; init; } = null!;
 }
 
 public record EnergyCommunityData
 {
-    public string Status { get; init; } = default!;
+    public string Status { get; init; } = null!;
 
     public List<EnergyCommunityTimeslice> Timeslices { get; init; } = [];
 
@@ -229,14 +229,14 @@ public record EnergyCommunityData
 
 public record EnergyCommunityTimeslice
 {
-    public string EnergyCommunityId { get; init; } = default!;
-    public string EnergyCommunityName { get; init; } = default!;
+    public string EnergyCommunityId { get; init; } = null!;
+    public string EnergyCommunityName { get; init; } = null!;
 
     public DateOnly From { get; init; }
     public DateOnly To { get; init; }
 
-    public string Status { get; init; } = default!;
-    public string StatusText { get; init; } = default!;
+    public string Status { get; init; } = null!;
+    public string StatusText { get; init; } = null!;
 
     public List<Profile> Profiles { get; init; } = [];
 
@@ -246,6 +246,6 @@ public record EnergyCommunityTimeslice
 
 public record Supplier
 {
-    public string Id { get; init; } = default!;
-    public string Name { get; init; } = default!;
+    public string Id { get; init; } = null!;
+    public string Name { get; init; } = null!;
 }

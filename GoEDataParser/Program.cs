@@ -252,7 +252,7 @@ public abstract class ChargeData
                 "Download consumptions file",
                 codeBlock: async Task () =>
                 {
-                    await downloader.Login(Configuration.ConsumptionUserName()!, Configuration.ConsumptionPassword()!);
+                    await downloader.Login(Configuration.ConsumptionUserName(), Configuration.ConsumptionPassword());
                     await downloader.DownloadCsv(fromDate, toDate, fileName);
                 });
 
@@ -270,7 +270,6 @@ public abstract class ChargeData
         {
             var index = args.ToList().IndexOf("-import-consumption-file");
             var filename = args[index + 1];
-            // var filename = "/home/martin/Downloads/manager_eg_202509.csv";
 
             Time.MeasureTimeVoid(
                 "Read consumptions from file",
@@ -314,8 +313,5 @@ public abstract class ChargeData
             codeBlock: () => evaluator.GroupYearly(charges)
         );
         evaluator.PrintGroup(yearly, "year");
-
-        // var docs = Time.MeasureTime("Get stats by DB ... ", codeBlock: store.GroupMonthly);
-        // evaluator.PrintGroup(docs, "month");
     }
 }

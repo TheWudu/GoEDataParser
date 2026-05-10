@@ -213,7 +213,7 @@ public class NetOoeConsumptionDownloader : IConsumptionDownloader
         var content = await response.Content.ReadAsByteArrayAsync();
 
         // Save file
-        await System.IO.File.WriteAllBytesAsync(fileName, content);
+        await File.WriteAllBytesAsync(fileName, content);
 
         Console.WriteLine($"Download complete, written to: {fileName}");
 
