@@ -92,6 +92,7 @@ namespace GoEDataParser
                             Missing = missing,
                             Consumption = consumption,
                             ConsumptionFromEg = consumptionFromEg,
+                            KwhValues = [c.Kwh],
                         }
                     );
                 }
@@ -172,7 +173,7 @@ namespace GoEDataParser
                     : 0.0;
 
             Console.WriteLine(
-                "{0}: {1,7:F2}, {2,7:F2} (Count: {3,3}, Max: {4:F2} kWh, Avg: {5,5:F2} kWh, TimeSum: {6,11}, Missing: {7,6:F2} kWh, Consumption: {8,7:F2} / {10,5:F2} kWh ({9,5:F2} %, {11,5:F2} % from EG)",
+                "{0}: {1,7:F2}, {2,7:F2} (Count: {3,3}, Max: {4,5:F2} kWh, Avg: {5,5:F2} kWh, TimeSum: {6,11}, Missing: {7,6:F2} kWh, Consumption: {8,7:F2} / {10,7:F2} kWh ({9,5:F2} %, {11,5:F2} % from EG)",
                 chargeInfo.TimeKey,
                 chargeInfo.KwhSum,
                 kwhSum,

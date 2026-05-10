@@ -1,4 +1,5 @@
-﻿using GoEDataParser.Models;
+﻿using GoEDataParser.Downloader.ConsumptionDownloader;
+using GoEDataParser.Models;
 using GoEDataParser.Parser;
 using GoEDataParser.Parser.Parser;
 using GoEDataParser.Repository;
@@ -229,6 +230,39 @@ public abstract class ChargeData
             Time.MeasureTimeVoid(
                 "List charges ... ",
                 codeBlock: () => ListChargesWithConsumptions(charges, cp)
+            );
+        }
+
+        if (args.Contains("-download-consumption-file"))
+        {
+            var downloader = new NetOoeConsumptionDownloader();
+            
+            var index = args.ToList().IndexOf("-download-consumption-file");
+            var yearmonth = args[index + 1];
+
+            var from = DateTime.Parse(yearmonth);
+            var fromDate = new DateTime(from.Year, from.Month, 1);
+            var toDate = fromDate.AddMonths(1).AddDays(-1);
+            
+            var fileName = $"/home/martin/Downloads/manager_eg_{fromDate.ToString("yyyy_MM")}.csv";
+
+            Console.WriteLine($"Downloading from {fromDate} to {toDate}, storing in {fileName}");
+            
+            await Time.MeasureTimeVoidAsync(
+                "Download consumptions file",
+                codeBlock: async Task () =>
+                {
+                    await downloader.Login(Configuration.ConsumptionUserName()!, Configuration.ConsumptionPassword()!);
+                    await downloader.DownloadCsv(fromDate, toDate, fileName);
+                });
+
+            Time.MeasureTimeVoid(
+                "Read consumptions from file",
+                codeBlock: () => cp.ReadFile(fileName)
+            );
+            await Time.MeasureTimeVoidAsync(
+                "Store consumptions",
+                codeBlock: async Task () => await cp.StoreConsumptions()
             );
         }
 

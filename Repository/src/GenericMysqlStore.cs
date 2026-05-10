@@ -104,7 +104,7 @@ namespace Repository
 
         public async Task<List<T>> ReadAll()
         {
-            var list = await Dataset.Where(e => true).ToListAsync();
+            var list = await Dataset.Where(e => true).AsNoTracking().ToListAsync();
 
             return list;
         }

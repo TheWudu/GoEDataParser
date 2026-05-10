@@ -199,6 +199,7 @@ namespace GoEDataParser.Parser
 
             public async Task ReadConsumptionsFromDb()
             {
+                _consumptions.Clear();
                 _consumptions.AddRange(await _consumptionStore.ReadAll());
             }
 

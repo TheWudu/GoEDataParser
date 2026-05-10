@@ -8,6 +8,16 @@ namespace GoEDataParser
         {
             return ConfigurationManager.AppSettings.Get("Token");
         }
+        
+        public static string? ConsumptionUserName()
+        {
+            return ConfigurationManager.AppSettings.Get("ConsumptionUserName");
+        }
+        
+        public static string? ConsumptionPassword()
+        {
+            return ConfigurationManager.AppSettings.Get("ConsumptionPassword");
+        }
 
         public static string Culture()
         {
