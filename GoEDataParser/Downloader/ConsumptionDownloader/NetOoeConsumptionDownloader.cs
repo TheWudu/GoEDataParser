@@ -103,7 +103,7 @@ public class NetOoeConsumptionDownloader : IConsumptionDownloader
         var body = await dashboardResponse.Content.ReadAsStringAsync();
         var dashboard = JsonSerializer.Deserialize<DashboardResponse>(body, _jsonOptions);
         if (dashboard is null)
-            throw new Exception("Unable to parse dashbaord data");
+            throw new Exception("Unable to parse dashboard data");
 
         var contractAccount = dashboard.ContractAccounts.FirstOrDefault(ca =>
             ca.Contracts.FirstOrDefault(c => c.PowerGenerationUnit == false) != null);

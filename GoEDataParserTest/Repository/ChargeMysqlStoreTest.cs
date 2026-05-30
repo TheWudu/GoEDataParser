@@ -17,6 +17,7 @@ public class ChargeMysqlStoreTest
         string dbPassword = Configuration.MysqlDbPassword();
         _store = new(dbHost, dbName, dbUser, dbPassword);
 
+        _store.Setup();
         _store.Clear();
     }
 

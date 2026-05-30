@@ -1,18 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.57.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="9.0.13" />
-        <PackageReference Include="MongoDB.Driver" Version="3.2.1" />
-        <PackageReference Include="EntityFramework" Version="6.5.1" />
-        <PackageReference Include="MySql.Data" Version="9.2.0" />
-        <PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.60.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="10.0.8" />
+        <PackageReference Include="MongoDB.Driver" Version="3.9.0" />
+        <PackageReference Include="EntityFramework" Version="6.5.2" />
+        <PackageReference Include="MySql.Data" Version="9.7.0" />
+        <PackageReference Include="MySql.EntityFrameworkCore" Version="10.0.7" />
     </ItemGroup>
 
     <ItemGroup>

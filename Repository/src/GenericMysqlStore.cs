@@ -56,9 +56,10 @@ namespace Repository
                 var databaseCreator = this.GetService<IRelationalDatabaseCreator>();
                 databaseCreator.CreateTables();
             }
-            catch (MySqlException)
+            catch (MySqlException e)
             {
                 // nothing
+                Console.WriteLine($"Create tables failed {e.Message}");
             }
         }
 
