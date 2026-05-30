@@ -37,17 +37,19 @@ public class GenericCosmosStoreTest
     public async Task UpdateTest()
     {
         string id = "0c8af010-a101-4fef-957c-1c78977524cc";
-        _ = CreateEntity("Daniel", id);
+        _ = await CreateEntity("Daniel", id);
 
         TestEntity? ut = await _store.Find(id);
         Assert.NotNull(ut);
         ut.Name = "Michael";
-        _ = _store.Update(ut);
+        _ = await _store.Update(ut);
 
         var storedEntity = await _store.Find(id);
+        var count = await _store.Count();
+        
         Assert.Equal(ut, storedEntity);
         Assert.Equal(2, storedEntity?.Version);
-        Assert.Equal(1, await _store.Count());
+        Assert.Equal(1, count);
     }
 
     [Fact]
